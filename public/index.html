@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aviator Predictor</title>
+    <!-- Подключаем скрипт Telegram -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            background-color: #0f1923; /* Темный фон как в игре */
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .circle {
+            width: 200px;
+            height: 200px;
+            border: 5px solid #e50b20; /* Красный цвет авиатора */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            box-shadow: 0 0 20px #e50b20;
+            margin-bottom: 50px;
+            background: rgba(0,0,0,0.3);
+        }
+        .btn {
+            background: linear-gradient(90deg, #e50b20, #ff4d4d);
+            border: none;
+            padding: 15px 40px;
+            color: white;
+            font-size: 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(229, 11, 32, 0.4);
+            transition: transform 0.1s;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        h2 { margin-bottom: 10px; color: #aaa; }
+    </style>
+</head>
+<body>
+
+    <h2>AVIATOR SIGNAL</h2>
+    
+    <div class="circle" id="result">
+        0.00x
+    </div>
+
+    <button class="btn" onclick="getPrediction()">GET SIGNAL</button>
+
+    <script>
+        // Сообщаем Телеграму, что приложение готово
+        window.Telegram.WebApp.ready();
+        // Расширяем на весь экран
+        window.Telegram.WebApp.expand();
+
+        function getPrediction() {
+            const resultElement = document.getElementById('result');
+            
+            // Эффект "загрузки" цифр
+            let interval = setInterval(() => {
+                resultElement.innerText = (Math.random() * 10).toFixed(2) + "x";
+            }, 50);
+
+            // Через 1 секунду показываем финальный "прогноз"
+            setTimeout(() => {
+                clearInterval(interval);
+                
+                // Генерируем случайное число от 1.00 до 5.00 (имитация)
+                // Ты можешь настроить логику здесь
+                const finalNumber = (Math.random() * (5.00 - 1.00) + 1.00).toFixed(2);
+                
+                resultElement.innerText = finalNumber + "x";
+            }, 800);
+        }
+    </script>
+</body>
+</html>
