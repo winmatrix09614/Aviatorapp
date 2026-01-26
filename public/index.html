@@ -23,17 +23,13 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            user-select: none; /* Защита от выделения текста */
+            user-select: none;
         }
 
-        /* Убираем стрелочки в поле ввода цифр */
+        /* Убираем стрелочки в инпуте */
         input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
-        }
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
-        /* Экраны */
         .screen {
             display: none;
             flex-direction: column;
@@ -48,7 +44,7 @@
 
         .screen.active { display: flex; }
 
-        /* Меню */
+        /* --- МЕНЮ --- */
         .menu-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -65,133 +61,137 @@
             cursor: pointer;
             border: 1px solid rgba(255,255,255,0.05);
             transition: all 0.2s;
-            position: relative;
-            overflow: hidden;
         }
 
         .game-card:active { transform: scale(0.95); background-color: #2a3040; }
         .game-icon { font-size: 35px; margin-bottom: 10px; }
         .game-title { font-weight: bold; font-size: 14px; letter-spacing: 1px; }
 
-        /* Интерфейс игры */
-        h2 { margin-bottom: 20px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; color: #888; }
+        h2 { margin-bottom: 15px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; color: #888; font-size: 14px; }
 
-        /* КРУГ (Для Aviator и Penalty) */
-        .circle-display {
-            width: 200px;
-            height: 200px;
-            border: 4px solid var(--aviator-red);
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            font-weight: bold;
-            box-shadow: 0 0 40px rgba(229, 11, 32, 0.2);
-            margin: 20px 0;
-            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 70%);
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        /* СЕТКА МИН (Новое!) */
-        .mines-grid-container {
-            display: none; /* Скрыто по умолчанию */
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            background: #151921;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .mine-cell {
-            width: 45px;
-            height: 45px;
-            background-color: #2a3040;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            transition: transform 0.2s, background 0.3s;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
-        }
-
-        .mine-cell.active {
-            background-color: #00e700;
-            transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(0, 231, 0, 0.5);
-        }
-
-        .penalty-text { font-size: 24px; color: var(--penalty-yellow); }
-
-        /* Инпуты */
-        .input-group {
-            margin-bottom: 20px;
-            text-align: center;
-            width: 100%;
-            max-width: 300px;
-        }
-        
-        .hidden { display: none !important; } /* Важно: скрывать элементы */
-
+        /* --- ОБЩИЕ ЭЛЕМЕНТЫ --- */
+        .input-group { width: 100%; max-width: 300px; margin-bottom: 15px; text-align: center;}
+        .hidden { display: none !important; }
         .input-group label { display: block; margin-bottom: 8px; font-size: 12px; color: #666; }
-
         .history-input {
-            background: var(--card-bg);
-            border: 1px solid #333;
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            width: 100%;
-            text-align: center;
-            font-size: 20px;
-            outline: none;
-            box-sizing: border-box;
+            background: var(--card-bg); border: 1px solid #333; color: white;
+            padding: 12px; border-radius: 10px; width: 100%; text-align: center;
+            font-size: 18px; outline: none; box-sizing: border-box;
         }
-        
         .history-input:focus { border-color: var(--primary); }
 
-        /* Кнопки */
         .btn {
-            background: linear-gradient(90deg, #007aff, #00b4ff);
-            border: none;
-            padding: 18px;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 12px;
-            cursor: pointer;
-            box-shadow: 0 5px 20px rgba(0, 122, 255, 0.2);
-            width: 100%;
-            max-width: 300px;
-            margin-top: 10px;
+            background: linear-gradient(90deg, #007aff, #00b4ff); border: none;
+            padding: 16px; color: white; font-size: 16px; font-weight: bold;
+            border-radius: 12px; cursor: pointer; width: 100%; max-width: 300px;
+            margin-top: 15px; box-shadow: 0 5px 20px rgba(0, 122, 255, 0.2);
+        }
+        .btn-back { background: transparent; border: none; padding: 15px; color: #555; font-size: 14px; cursor: pointer; }
+
+        /* --- MINES (Сетка) --- */
+        .mines-grid-container {
+            display: none; grid-template-columns: repeat(5, 1fr); gap: 8px;
+            background: #151921; padding: 10px; border-radius: 10px; margin-bottom: 10px;
+        }
+        .mine-cell {
+            width: 45px; height: 45px; background-color: #2a3040; border-radius: 5px;
+            display: flex; align-items: center; justify-content: center; font-size: 24px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5); transition: 0.3s;
+        }
+        .mine-cell.active { background-color: #00e700; transform: scale(1.05); box-shadow: 0 0 15px rgba(0, 231, 0, 0.5); }
+
+        /* --- AVIATOR (Новый дизайн) --- */
+        .aviator-stage {
+            display: none; width: 100%; max-width: 320px; height: 200px;
+            background: linear-gradient(to bottom, #1a1d29, #0f121b);
+            border-radius: 20px; border: 1px solid #333; position: relative;
+            overflow: hidden; margin-bottom: 20px;
+            align-items: center; justify-content: center;
         }
         
-        .btn-back {
-            background: transparent;
-            border: none;
-            padding: 15px;
-            margin-top: 5px;
-            color: #555;
-            font-size: 14px;
-            cursor: pointer;
+        /* Кривая полета (CSS SVG) */
+        .fly-curve {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+            stroke: var(--aviator-red); stroke-width: 3; fill: none;
+            stroke-dasharray: 1000; stroke-dashoffset: 1000;
+        }
+        .fly-curve.anim { animation: drawLine 2s forwards ease-out; }
+
+        /* Самолетик */
+        .plane-icon {
+            position: absolute; font-size: 30px; bottom: 10px; left: 10px;
+            transition: transform 0.1s; opacity: 0;
+        }
+        .plane-icon.flying { 
+            opacity: 1; 
+            animation: flyMove 2s forwards ease-out; 
         }
 
-        /* Загрузка */
+        /* Цифра коэффициента */
+        .aviator-big-text {
+            font-size: 48px; font-weight: 800; color: white; z-index: 10;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        @keyframes drawLine { to { stroke-dashoffset: 0; } }
+        @keyframes flyMove { 
+            0% { bottom: 10px; left: 10px; transform: rotate(0deg); }
+            100% { bottom: 120px; left: 240px; transform: rotate(15deg); }
+        }
+
+        /* --- PENALTY (Новый дизайн: Ворота) --- */
+        .penalty-stage {
+            display: none; width: 100%; max-width: 320px; height: 220px;
+            position: relative; margin-bottom: 20px;
+            background: url('https://i.imgur.com/8Qj9X9r.png') no-repeat center bottom; /* Трава */
+            background-size: cover;
+            border-radius: 15px; overflow: hidden; border: 1px solid #333;
+        }
+        
+        /* Сетка ворот */
+        .goal-net {
+            width: 100%; height: 100%;
+            background: 
+                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            position: relative;
+        }
+
+        .goalkeeper {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            font-size: 60px; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
+        }
+
+        /* Мячи-цели */
+        .target-ball {
+            position: absolute; width: 30px; height: 30px;
+            background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            transition: 0.3s;
+        }
+        /* Позиции мячей */
+        .pos-tl { top: 20px; left: 20px; } /* Верх Лево */
+        .pos-tr { top: 20px; right: 20px; } /* Верх Право */
+        .pos-bl { bottom: 40px; left: 20px; } /* Низ Лево */
+        .pos-br { bottom: 40px; right: 20px; } /* Низ Право */
+        .pos-tc { top: 20px; left: 50%; transform: translateX(-50%); } /* Верх Центр */
+
+        /* Активный мяч */
+        .target-ball.active {
+            background: var(--penalty-yellow);
+            border-color: #fff;
+            box-shadow: 0 0 20px var(--penalty-yellow);
+            transform: scale(1.3);
+        }
+        .target-ball.active::after { content: '⚽'; font-size: 18px; }
+
+        /* --- ЗАГРУЗКА --- */
         .loader {
-            border: 4px solid rgba(255,255,255,0.1);
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            display: none;
-            margin: 50px 0; 
+            border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--primary);
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 1s linear infinite; display: none; margin: 50px auto;
         }
-
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -203,49 +203,59 @@
     <div id="screen-menu" class="screen active">
         <h2 style="color: white;">CHOOSE GAME</h2>
         <div class="menu-grid">
-            
             <div class="game-card" onclick="openGame('aviator')">
                 <div class="game-icon">✈️</div>
                 <div class="game-title">AVIATOR</div>
             </div>
-
             <div class="game-card" onclick="openGame('penalty')">
                 <div class="game-icon">⚽</div>
                 <div class="game-title">PENALTY</div>
             </div>
-
             <div class="game-card" onclick="openGame('mines')">
                 <div class="game-icon">💣</div>
                 <div class="game-title">MINES</div>
             </div>
-            
             <div class="game-card" style="opacity: 0.5;">
                 <div class="game-icon">🔒</div>
                 <div class="game-title">SOON...</div>
             </div>
-
         </div>
     </div>
 
-    <!-- ИГРОВОЙ ЭКРАН -->
+    <!-- ИГРА -->
     <div id="screen-game" class="screen">
         <h2 id="game-title">GAME</h2>
         
-        <!-- Инпут (только для Авиатора) -->
+        <!-- Input (Только Aviator) -->
         <div class="input-group" id="input-block">
             <label>ENTER LAST COEFFICIENT</label>
             <input type="number" id="last-coef" class="history-input" placeholder="1.00" step="0.01">
         </div>
 
-        <!-- КРУГ (Aviator / Penalty) -->
-        <div class="circle-display" id="result-display">
-            START
+        <!-- 1. AVIATOR STAGE -->
+        <div class="aviator-stage" id="aviator-stage">
+            <!-- Кривая SVG -->
+            <svg class="fly-curve" viewBox="0 0 300 200">
+                <path id="curve-path" d="M0,200 Q150,200 300,50" fill="none" stroke="#e50b20" stroke-width="5" stroke-dasharray="400" stroke-dashoffset="400" />
+            </svg>
+            <div class="plane-icon" id="plane">✈️</div>
+            <div class="aviator-big-text" id="aviator-result">1.00x</div>
         </div>
 
-        <!-- СЕТКА МИН (Mines) - Генерируется автоматически -->
-        <div class="mines-grid-container" id="mines-grid">
-            <!-- Клетки создаются скриптом -->
+        <!-- 2. PENALTY STAGE -->
+        <div class="penalty-stage" id="penalty-stage">
+            <div class="goal-net">
+                <div class="target-ball pos-tl" id="ball-0"></div>
+                <div class="target-ball pos-tc" id="ball-1"></div>
+                <div class="target-ball pos-tr" id="ball-2"></div>
+                <div class="target-ball pos-bl" id="ball-3"></div>
+                <div class="target-ball pos-br" id="ball-4"></div>
+                <div class="goalkeeper">🧤</div>
+            </div>
         </div>
+
+        <!-- 3. MINES STAGE -->
+        <div class="mines-grid-container" id="mines-grid"></div>
 
         <div class="loader" id="loader"></div>
 
@@ -259,7 +269,7 @@
 
         let currentGame = '';
 
-        // Создаем сетку мин при запуске
+        // Создаем Мины
         function createMinesGrid() {
             const grid = document.getElementById('mines-grid');
             grid.innerHTML = '';
@@ -278,43 +288,42 @@
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-game').classList.add('active');
 
-            const title = document.getElementById('game-title');
-            const circle = document.getElementById('result-display');
-            const minesGrid = document.getElementById('mines-grid');
-            const inputBlock = document.getElementById('input-block');
-
-            // Сброс всех экранов
-            circle.style.display = 'flex'; // По умолчанию показываем круг
-            minesGrid.style.display = 'none'; // Скрываем сетку
-            inputBlock.classList.add('hidden'); // Скрываем инпут
+            // Скрываем все игровые зоны
+            document.getElementById('aviator-stage').style.display = 'none';
+            document.getElementById('penalty-stage').style.display = 'none';
+            document.getElementById('mines-grid').style.display = 'none';
+            document.getElementById('input-block').classList.add('hidden');
             document.getElementById('last-coef').value = '';
-            
-            // Очистка сетки мин (убираем звезды)
-            const cells = document.querySelectorAll('.mine-cell');
-            cells.forEach(c => {
-                c.classList.remove('active');
-                c.innerHTML = '';
-            });
 
-            // Настройка под игру
+            const title = document.getElementById('game-title');
+            const btn = document.querySelector('.btn');
+            btn.innerHTML = "GET SIGNAL";
+
             if (gameType === 'aviator') {
-                title.innerText = 'AVIATOR';
-                circle.style.borderColor = '#e50b20';
-                circle.style.boxShadow = '0 0 40px rgba(229, 11, 32, 0.2)';
-                circle.innerHTML = "START";
-                circle.style.fontSize = "40px";
-                inputBlock.classList.remove('hidden'); // Показываем инпут
+                title.innerText = 'AVIATOR PRO';
+                document.getElementById('aviator-stage').style.display = 'flex';
+                document.getElementById('input-block').classList.remove('hidden');
+                
+                // Сброс анимации Авиатора
+                document.getElementById('aviator-result').innerText = "WAIT";
+                document.getElementById('plane').classList.remove('flying');
+                document.getElementById('curve-path').style.transition = 'none';
+                document.getElementById('curve-path').style.strokeDashoffset = '400';
             } 
             else if (gameType === 'penalty') {
-                title.innerText = 'PENALTY';
-                circle.style.borderColor = '#ffcc00';
-                circle.style.boxShadow = '0 0 40px rgba(255, 204, 0, 0.2)';
-                circle.innerHTML = "READY?";
+                title.innerText = 'PENALTY PRO';
+                document.getElementById('penalty-stage').style.display = 'block';
+                // Сброс мячей
+                document.querySelectorAll('.target-ball').forEach(b => b.classList.remove('active'));
             } 
             else if (gameType === 'mines') {
-                title.innerText = 'MINES';
-                circle.style.display = 'none'; // Прячем круг
-                minesGrid.style.display = 'grid'; // Показываем сетку
+                title.innerText = 'MINES PREMIUM';
+                document.getElementById('mines-grid').style.display = 'grid';
+                // Очистка мин
+                document.querySelectorAll('.mine-cell').forEach(c => {
+                    c.classList.remove('active');
+                    c.innerHTML = '';
+                });
             }
         }
 
@@ -324,67 +333,78 @@
         }
 
         function makePrediction() {
-            const circle = document.getElementById('result-display');
-            const minesGrid = document.getElementById('mines-grid');
             const loader = document.getElementById('loader');
             const btn = document.querySelector('.btn');
             const lastCoef = document.getElementById('last-coef').value;
 
-            // Проверка для Авиатора
+            // Валидация для Авиатора
             if (currentGame === 'aviator' && !lastCoef) {
                 window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
-                circle.innerText = "INPUT!";
+                const res = document.getElementById('aviator-result');
+                res.innerText = "INPUT!";
+                setTimeout(() => res.innerText = "WAIT", 1000);
                 return;
             }
 
-            // Анимация загрузки
-            if(currentGame !== 'mines') circle.style.display = 'none';
-            if(currentGame === 'mines') minesGrid.style.opacity = '0.5';
-            
+            // Старт загрузки
             loader.style.display = 'block';
             btn.disabled = true;
             btn.style.opacity = '0.5';
 
+            // Скрываем старые результаты на время загрузки
+            if(currentGame === 'mines') document.getElementById('mines-grid').style.opacity = '0.5';
+            if(currentGame === 'penalty') document.querySelectorAll('.target-ball').forEach(b => b.classList.remove('active'));
+            if(currentGame === 'aviator') {
+                 document.getElementById('aviator-result').innerText = "ANALYZING...";
+                 document.getElementById('plane').classList.remove('flying');
+                 document.getElementById('curve-path').style.strokeDashoffset = '400';
+            }
+
             setTimeout(() => {
                 window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-                
-                // === ЛОГИКА ===
-                
+                loader.style.display = 'none';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+
+                // --- ЛОГИКА AVIATOR ---
                 if (currentGame === 'aviator') {
-                    circle.style.display = 'flex';
+                    // Анимация полета
+                    document.getElementById('plane').classList.add('flying');
+                    document.getElementById('curve-path').style.transition = 'stroke-dashoffset 2s ease-out';
+                    document.getElementById('curve-path').style.strokeDashoffset = '0';
+
+                    // Генерация числа
                     let prediction;
-                    if (Math.random() > 0.85) {
-                        prediction = (Math.random() * (5.00 - 2.00) + 2.00).toFixed(2);
-                    } else {
-                        prediction = (Math.random() * (1.90 - 1.10) + 1.10).toFixed(2);
-                    }
-                    circle.innerText = prediction + "x";
-                } 
-                
-                else if (currentGame === 'penalty') {
-                    circle.style.display = 'flex';
-                    const zones = ["↖️<br>LEFT UP", "↗️<br>RIGHT UP", "↙️<br>LEFT DOWN", "↘️<br>RIGHT DOWN", "⬆️<br>TOP"];
-                    const randomZone = zones[Math.floor(Math.random() * zones.length)];
-                    circle.innerHTML = `<span class="penalty-text">${randomZone}</span>`;
+                    if (Math.random() > 0.85) prediction = (Math.random() * (7.00 - 2.00) + 2.00).toFixed(2);
+                    else prediction = (Math.random() * (1.90 - 1.10) + 1.10).toFixed(2);
+                    
+                    document.getElementById('aviator-result').innerText = prediction + "x";
                 }
-                
+
+                // --- ЛОГИКА PENALTY ---
+                else if (currentGame === 'penalty') {
+                    const balls = document.querySelectorAll('.target-ball');
+                    // Выбираем случайный шар (0-4)
+                    const randomBallIndex = Math.floor(Math.random() * 5);
+                    balls[randomBallIndex].classList.add('active');
+                }
+
+                // --- ЛОГИКА MINES ---
                 else if (currentGame === 'mines') {
-                    minesGrid.style.opacity = '1';
+                    const grid = document.getElementById('mines-grid');
+                    grid.style.opacity = '1';
+                    
                     // Очистка
-                    const cells = document.querySelectorAll('.mine-cell');
-                    cells.forEach(c => {
-                        c.classList.remove('active');
-                        c.innerHTML = '';
+                    document.querySelectorAll('.mine-cell').forEach(c => {
+                        c.classList.remove('active'); c.innerHTML = '';
                     });
 
-                    // Выбираем 4 случайные клетки
+                    // Генерация звезд
                     let safeSpots = [];
                     while(safeSpots.length < 4) {
                         let r = Math.floor(Math.random() * 25);
                         if(safeSpots.indexOf(r) === -1) safeSpots.push(r);
                     }
-
-                    // Показываем звезды
                     safeSpots.forEach(index => {
                         const cell = document.getElementById('cell-' + index);
                         cell.classList.add('active');
@@ -392,11 +412,7 @@
                     });
                 }
 
-                loader.style.display = 'none';
-                btn.disabled = false;
-                btn.style.opacity = '1';
-
-            }, 1000); 
+            }, 1500);
         }
     </script>
 </body>
