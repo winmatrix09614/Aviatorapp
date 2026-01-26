@@ -3,86 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aviator Predictor</title>
-    <!-- Подключаем скрипт Telegram -->
+    <title>Pro Signal Bot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        :root {
+            --bg-color: #0f121b;
+            --card-bg: #1e222d;
+            --primary: #007aff;
+            --aviator-red: #e50b20;
+            --penalty-yellow: #ffcc00; /* Цвет для пенальти */
+            --text-color: #ffffff;
+        }
+
         body {
-            background-color: #0f1923; /* Темный фон как в игре */
-            color: white;
-            font-family: Arial, sans-serif;
-            display: flex;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* Экраны */
+        .screen {
+            display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            margin: 0;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            animation: fadeIn 0.3s ease-in-out;
         }
-        .circle {
+
+        .screen.active { display: flex; }
+
+        /* Меню */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .game-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.2s;
+        }
+
+        .game-card:active { transform: scale(0.95); background-color: #2a3040; }
+        .game-icon { font-size: 35px; margin-bottom: 10px; }
+        .game-title { font-weight: bold; font-size: 14px; letter-spacing: 1px; }
+
+        /* Интерфейс игры */
+        h2 { margin-bottom: 20px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; color: #888; }
+
+        .circle-display {
             width: 200px;
             height: 200px;
-            border: 5px solid #e50b20; /* Красный цвет авиатора */
+            border: 4px solid var(--aviator-red);
             border-radius: 50%;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             font-size: 40px;
             font-weight: bold;
-            box-shadow: 0 0 20px #e50b20;
-            margin-bottom: 50px;
-            background: rgba(0,0,0,0.3);
+            box-shadow: 0 0 40px rgba(229, 11, 32, 0.2);
+            margin: 20px 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 70%);
+            text-align: center;
+            line-height: 1.2;
         }
-        .btn {
-            background: linear-gradient(90deg, #e50b20, #ff4d4d);
-            border: none;
-            padding: 15px 40px;
+        
+        /* Текст внутри круга для пенальти (поменьше) */
+        .penalty-text { font-size: 24px; color: var(--penalty-yellow); }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: center;
+            width: 100%;
+            max-width: 300px;
+            transition: opacity 0.3s;
+        }
+        
+        /* Класс чтобы скрывать инпут */
+        .hidden { display: none; }
+
+        .input-group label { display: block; margin-bottom: 8px; font-size: 12px; color: #666; }
+
+        .history-input {
+            background: var(--card-bg);
+            border: 1px solid #333;
             color: white;
+            padding: 15px;
+            border-radius: 10px;
+            width: 100%;
+            text-align: center;
             font-size: 20px;
-            border-radius: 25px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        
+        .history-input:focus { border-color: var(--primary); }
+
+        .btn {
+            background: linear-gradient(90deg, #007aff, #00b4ff);
+            border: none;
+            padding: 18px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 12px;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(229, 11, 32, 0.4);
-            transition: transform 0.1s;
+            box-shadow: 0 5px 20px rgba(0, 122, 255, 0.2);
+            width: 100%;
+            max-width: 300px;
         }
-        .btn:active {
-            transform: scale(0.95);
+        
+        .btn-back {
+            background: transparent;
+            border: none;
+            padding: 15px;
+            margin-top: 10px;
+            color: #555;
+            font-size: 14px;
+            cursor: pointer;
         }
-        h2 { margin-bottom: 10px; color: #aaa; }
+
+        .loader {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin: 80px 0; /* Отступ чтобы круг не прыгал */
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
     </style>
 </head>
 <body>
 
-    <h2>AVIATOR SIGNAL</h2>
-    
-    <div class="circle" id="result">
-        0.00x
+    <!-- МЕНЮ -->
+    <div id="screen-menu" class="screen active">
+        <h2 style="color: white;">CHOOSE GAME</h2>
+        <div class="menu-grid">
+            
+            <!-- AVIATOR -->
+            <div class="game-card" onclick="openGame('aviator')">
+                <div class="game-icon">✈️</div>
+                <div class="game-title">AVIATOR</div>
+            </div>
+
+            <!-- PENALTY (Вместо Lucky Jet) -->
+            <div class="game-card" onclick="openGame('penalty')">
+                <div class="game-icon">⚽</div>
+                <div class="game-title">PENALTY</div>
+            </div>
+
+            <!-- MINES -->
+            <div class="game-card" onclick="openGame('mines')">
+                <div class="game-icon">💣</div>
+                <div class="game-title">MINES</div>
+            </div>
+            
+            <!-- Заглушка (COMING SOON) -->
+            <div class="game-card" style="opacity: 0.5;">
+                <div class="game-icon">🔒</div>
+                <div class="game-title">SOON...</div>
+            </div>
+
+        </div>
     </div>
 
-    <button class="btn" onclick="getPrediction()">GET SIGNAL</button>
+    <!-- ИГРОВОЙ ЭКРАН -->
+    <div id="screen-game" class="screen">
+        <h2 id="game-title">GAME</h2>
+        
+        <!-- Инпут (скрывается для Penalty) -->
+        <div class="input-group" id="input-block">
+            <label>ENTER LAST COEFFICIENT</label>
+            <input type="number" id="last-coef" class="history-input" placeholder="1.00" step="0.01">
+        </div>
+
+        <!-- Круг с результатом -->
+        <div class="circle-display" id="result-display">
+            START
+        </div>
+
+        <div class="loader" id="loader"></div>
+
+        <button class="btn" onclick="makePrediction()">GET SIGNAL</button>
+        <button class="btn-back" onclick="backToMenu()">BACK TO MENU</button>
+    </div>
 
     <script>
-        // Сообщаем Телеграму, что приложение готово
         window.Telegram.WebApp.ready();
-        // Расширяем на весь экран
         window.Telegram.WebApp.expand();
 
-        function getPrediction() {
-            const resultElement = document.getElementById('result');
-            
-            // Эффект "загрузки" цифр
-            let interval = setInterval(() => {
-                resultElement.innerText = (Math.random() * 10).toFixed(2) + "x";
-            }, 50);
+        let currentGame = '';
 
-            // Через 1 секунду показываем финальный "прогноз"
+        function openGame(gameType) {
+            currentGame = gameType;
+            
+            // UI переключение
+            document.getElementById('screen-menu').classList.remove('active');
+            document.getElementById('screen-game').classList.add('active');
+
+            const title = document.getElementById('game-title');
+            const display = document.getElementById('result-display');
+            const inputBlock = document.getElementById('input-block');
+
+            // Сброс стилей
+            display.style.fontSize = "40px";
+            display.innerHTML = "START";
+            document.getElementById('last-coef').value = '';
+
+            // Настройка под игру
+            if (gameType === 'aviator') {
+                title.innerText = 'AVIATOR';
+                display.style.borderColor = '#e50b20';
+                display.style.boxShadow = '0 0 40px rgba(229, 11, 32, 0.2)';
+                inputBlock.classList.remove('hidden'); // Показываем инпут
+            } 
+            else if (gameType === 'penalty') {
+                title.innerText = 'PENALTY';
+                display.style.borderColor = '#ffcc00'; // Желтый цвет
+                display.style.boxShadow = '0 0 40px rgba(255, 204, 0, 0.2)';
+                inputBlock.classList.add('hidden'); // СКРЫВАЕМ инпут (в пенальти он не нужен)
+                display.innerHTML = "READY?";
+            } 
+            else if (gameType === 'mines') {
+                title.innerText = 'MINES';
+                display.style.borderColor = '#00e700';
+                display.style.boxShadow = '0 0 40px rgba(0, 231, 0, 0.2)';
+                inputBlock.classList.add('hidden'); // Тоже скроем пока
+            }
+        }
+
+        function backToMenu() {
+            document.getElementById('screen-game').classList.remove('active');
+            document.getElementById('screen-menu').classList.add('active');
+        }
+
+        function makePrediction() {
+            const display = document.getElementById('result-display');
+            const loader = document.getElementById('loader');
+            const btn = document.querySelector('.btn');
+            const lastCoef = document.getElementById('last-coef').value;
+
+            // Проверка для Авиатора (нужен инпут)
+            if (currentGame === 'aviator' && !lastCoef) {
+                window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+                display.innerText = "INPUT!";
+                return;
+            }
+
+            // Анимация загрузки
+            display.style.display = 'none';
+            loader.style.display = 'block';
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+
             setTimeout(() => {
-                clearInterval(interval);
+                window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
                 
-                // Генерируем случайное число от 1.00 до 5.00 (имитация)
-                // Ты можешь настроить логику здесь
-                const finalNumber = (Math.random() * (5.00 - 1.00) + 1.00).toFixed(2);
+                // === ЛОГИКА ВЫДАЧИ РЕЗУЛЬТАТА ===
                 
-                resultElement.innerText = finalNumber + "x";
-            }, 800);
+                if (currentGame === 'aviator') {
+                    // Генерация коэффицента
+                    let prediction;
+                    if (Math.random() > 0.85) {
+                        prediction = (Math.random() * (5.00 - 2.00) + 2.00).toFixed(2);
+                    } else {
+                        prediction = (Math.random() * (1.90 - 1.10) + 1.10).toFixed(2);
+                    }
+                    display.innerText = prediction + "x";
+                } 
+                
+                else if (currentGame === 'penalty') {
+                    // Генерация направления удара
+                    const zones = [
+                        "↖️<br>LEFT UP", 
+                        "↗️<br>RIGHT UP", 
+                        "↙️<br>LEFT DOWN", 
+                        "↘️<br>RIGHT DOWN", 
+                        "⬆️<br>TOP CENTER"
+                    ];
+                    // Выбираем случайную зону
+                    const randomZone = zones[Math.floor(Math.random() * zones.length)];
+                    
+                    display.innerHTML = `<span class="penalty-text">${randomZone}</span>`;
+                }
+                
+                else if (currentGame === 'mines') {
+                     display.innerText = "SAFE ⭐️"; // Заглушка пока что
+                }
+
+                // Возвращаем интерфейс
+                loader.style.display = 'none';
+                display.style.display = 'flex';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+
+            }, 1500); // 1.5 сек задержка
         }
     </script>
 </body>
