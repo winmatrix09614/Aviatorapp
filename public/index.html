@@ -5,29 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AI Signal Bot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Подключаем Orbitron для цифр и Cairo для Арабского языка -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;500&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-color: #050505;
-            --card-bg: #111;
-            --neon-blue: #00f3ff;
-            --neon-red: #ff003c;
+            /* Органичные красные оттенки */
+            --bg-color: #050000;
+            --deep-red: #3a0005;
+            --neon-red: #ff334b; /* Приятный красный, не ядовитый */
+            --accent-red: #d6002a;
             --text-color: #ffffff;
         }
 
         body {
-            background-color: var(--bg-color);
+            /* Градиентный фон для глубины */
+            background: radial-gradient(circle at center, var(--deep-red) 0%, var(--bg-color) 80%);
             color: var(--text-color);
             font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
             overflow: hidden;
             user-select: none;
+            height: 100vh;
         }
 
-        /* ФОН С ЧАСТИЦАМИ */
+        /* ЧАСТИЦЫ */
         #particles-canvas {
             position: absolute;
             top: 0;
@@ -35,7 +37,7 @@
             width: 100%;
             height: 100%;
             z-index: 0;
-            opacity: 0.4;
+            opacity: 0.6; /* Чуть ярче, так как красный темнее синего */
         }
 
         /* ГЛАВНЫЙ КОНТЕЙНЕР */
@@ -43,7 +45,7 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: center; /* Центрирование по вертикали */
             height: 100vh;
             width: 100%;
             position: relative;
@@ -60,9 +62,9 @@
         }
 
         select {
-            background: rgba(0, 0, 0, 0.6);
-            color: var(--neon-blue);
-            border: 1px solid var(--neon-blue);
+            background: rgba(40, 0, 0, 0.6);
+            color: var(--neon-red);
+            border: 1px solid var(--neon-red);
             padding: 5px 10px;
             border-radius: 5px;
             font-family: 'Orbitron', sans-serif;
@@ -72,11 +74,7 @@
             cursor: pointer;
             text-transform: uppercase;
         }
-        
-        option {
-            background: #000;
-            color: white;
-        }
+        option { background: #1a0000; color: white; }
 
         /* --- МЕНЮ --- */
         .menu-header {
@@ -85,7 +83,8 @@
             margin-bottom: 30px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            color: var(--neon-red);
+            text-shadow: 0 0 15px rgba(255, 51, 75, 0.4);
             text-align: center;
         }
 
@@ -100,39 +99,51 @@
         .game-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 51, 75, 0.2);
             border-radius: 16px;
             padding: 20px;
             text-align: center;
             cursor: pointer;
             transition: 0.3s;
         }
-        .game-card:active { transform: scale(0.96); background: rgba(255, 255, 255, 0.1); }
+        .game-card:active { transform: scale(0.96); background: rgba(255, 51, 75, 0.1); }
         .game-icon { font-size: 32px; margin-bottom: 10px; }
         .game-title { font-weight: 600; font-size: 14px; letter-spacing: 1px; }
 
         /* --- AVIATOR INTERFACE --- */
         
-        /* Ссылка на Telegram */
+        /* 1. Ссылка на Telegram (Поднята выше) */
         .telegram-link {
             text-decoration: none;
             font-family: 'Orbitron', sans-serif;
-            color: var(--neon-blue);
-            border: 1px solid var(--neon-blue);
+            color: var(--neon-red);
+            border: 1px solid var(--neon-red);
             padding: 10px 24px;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 14px;
             letter-spacing: 1px;
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
-            margin-bottom: 40px;
-            text-shadow: 0 0 5px var(--neon-blue);
-            background: rgba(0, 243, 255, 0.05);
+            box-shadow: 0 0 15px rgba(255, 51, 75, 0.2);
+            margin-bottom: 20px; /* Отступ до лого */
+            margin-top: -40px;   /* Поднимаем выше визуально */
+            background: rgba(255, 0, 0, 0.05);
             transition: 0.3s;
             display: inline-block;
         }
         .telegram-link:active {
             transform: scale(0.95);
-            background: rgba(0, 243, 255, 0.15);
+            background: rgba(255, 0, 0, 0.15);
+        }
+
+        /* 2. Логотип Авиатора (Под ссылкой) */
+        .aviator-logo-container {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+        }
+        .aviator-logo-img {
+            width: 180px; /* Размер логотипа */
+            height: auto;
+            filter: drop-shadow(0 0 10px rgba(229, 11, 32, 0.6)); /* Красная тень */
         }
 
         /* КРУГОВОЙ ИНДИКАТОР */
@@ -143,29 +154,30 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .progress-ring { transform: rotate(-90deg); }
         .progress-ring__circle {
             transition: stroke-dashoffset 0.5s ease-in-out;
             transform-origin: 50% 50%;
-            filter: drop-shadow(0 0 10px var(--neon-red));
+            filter: drop-shadow(0 0 15px var(--accent-red));
         }
 
         .coef-text {
             position: absolute;
             font-family: 'Orbitron', sans-serif;
-            font-size: 48px;
+            font-size: 52px;
             font-weight: 900;
             color: #fff;
-            text-shadow: 0 0 20px rgba(255, 0, 60, 0.6);
+            text-shadow: 0 0 25px rgba(255, 0, 60, 0.8);
             z-index: 2;
         }
 
-        /* КНОПКА СИГНАЛА */
+        /* КНОПКА СИГНАЛА (Красный стиль) */
         .btn-signal {
-            background: linear-gradient(90deg, #1cb5e0 0%, #000851 100%);
+            /* Органичный красно-черный градиент */
+            background: linear-gradient(90deg, #d6002a 0%, #5e0012 100%);
             border: none;
             width: 80%;
             max-width: 300px;
@@ -176,18 +188,19 @@
             font-size: 16px;
             letter-spacing: 1px;
             cursor: pointer;
-            box-shadow: 0 5px 25px rgba(28, 181, 224, 0.4);
+            box-shadow: 0 5px 25px rgba(214, 0, 42, 0.3);
             transition: 0.3s;
             text-transform: uppercase;
             position: relative;
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .btn-signal:active { transform: scale(0.98); }
         .btn-signal:disabled { filter: grayscale(1); cursor: not-allowed; }
         
         .btn-signal::before {
             content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
             transition: 0.5s;
         }
         .btn-signal:hover::before { left: 100%; }
@@ -196,9 +209,9 @@
         .loader-bar-container {
             width: 80%;
             max-width: 300px;
-            height: 6px;
+            height: 4px;
             background: #222;
-            border-radius: 3px;
+            border-radius: 2px;
             margin-top: 15px;
             overflow: hidden;
             display: none;
@@ -206,8 +219,8 @@
         .loader-bar {
             height: 100%;
             width: 0%;
-            background: var(--neon-blue);
-            box-shadow: 0 0 10px var(--neon-blue);
+            background: var(--neon-red);
+            box-shadow: 0 0 10px var(--neon-red);
             transition: width 0.1s linear;
         }
         .loader-text {
@@ -218,34 +231,23 @@
         .btn-back {
             margin-top: 30px;
             background: transparent;
-            border: 1px solid #333;
-            color: #666;
+            border: 1px solid #444;
+            color: #888;
             padding: 10px 30px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
             font-family: 'Orbitron', sans-serif;
             transition: 0.3s;
         }
-        .btn-back:hover { border-color: #666; color: #fff; }
+        .btn-back:hover { border-color: var(--neon-red); color: #fff; }
 
-        /* Адаптация под Арабский язык */
-        body.rtl {
-            font-family: 'Cairo', sans-serif !important;
-            direction: rtl;
+        /* RTL */
+        body.rtl { font-family: 'Cairo', sans-serif !important; direction: rtl; }
+        body.rtl .menu-header, body.rtl .btn-signal, body.rtl .loader-text, body.rtl .btn-back, body.rtl select {
+            font-family: 'Cairo', sans-serif !important; font-weight: 700;
         }
-        body.rtl .menu-header, 
-        body.rtl .btn-signal, 
-        body.rtl .loader-text, 
-        body.rtl .btn-back,
-        body.rtl select {
-            font-family: 'Cairo', sans-serif !important;
-            font-weight: 700;
-        }
-        body.rtl .coef-text {
-            font-family: 'Orbitron', sans-serif !important; /* Цифры всегда Orbitron */
-            direction: ltr; /* Цифры всегда слева направо */
-        }
+        body.rtl .coef-text { font-family: 'Orbitron', sans-serif !important; direction: ltr; }
 
     </style>
 </head>
@@ -253,7 +255,6 @@
 
     <canvas id="particles-canvas"></canvas>
 
-    <!-- СЕЛЕКТОР ЯЗЫКА (ВСЕГДА ВИДЕН) -->
     <div class="lang-container">
         <select id="language-select" onchange="changeLanguage()">
             <option value="en">🇬🇧 EN</option>
@@ -285,14 +286,20 @@
     <!-- ЭКРАН ИГРЫ -->
     <div id="screen-game" class="screen">
         
-        <!-- КЛИКАБЕЛЬНАЯ ССЫЛКА -->
+        <!-- 1. ССЫЛКА (ВЫШЕ) -->
         <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
 
-        <!-- Круговой индикатор -->
+        <!-- 2. ЛОГОТИП (ПОД ССЫЛКОЙ) -->
+        <div class="aviator-logo-container">
+            <!-- ВАЖНО: Загрузи файл aviator_logo.png в папку img! -->
+            <img src="/img/aviator_logo.png" alt="Aviator" class="aviator-logo-img">
+        </div>
+
+        <!-- КРУГ -->
         <div class="circle-container">
             <svg class="progress-ring" width="260" height="260">
-                <circle class="progress-ring__circle-bg" stroke="#1a1a1a" stroke-width="8" fill="transparent" r="110" cx="130" cy="130"/>
-                <circle class="progress-ring__circle" stroke="#ff003c" stroke-width="8" fill="transparent" r="110" cx="130" cy="130"
+                <circle class="progress-ring__circle-bg" stroke="#2a0a0a" stroke-width="6" fill="transparent" r="110" cx="130" cy="130"/>
+                <circle class="progress-ring__circle" stroke="#ff334b" stroke-width="8" fill="transparent" r="110" cx="130" cy="130"
                         style="stroke-dasharray: 691; stroke-dashoffset: 691; stroke-linecap: round;"/>
             </svg>
             <div class="coef-text" id="coef-text">0.00x</div>
@@ -312,48 +319,11 @@
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
 
-        // --- ЛОКАЛИЗАЦИЯ (ЯЗЫКИ) ---
         const translations = {
-            en: {
-                choose_game: "CHOOSE GAME",
-                get_signal: "GET SIGNAL",
-                exit: "EXIT",
-                connecting: "Connecting to server...",
-                analyzing: "Analyzing data...",
-                predicting: "Predicting...",
-                wait: "NEXT SIGNAL IN",
-                seconds: "s"
-            },
-            es: {
-                choose_game: "ELIGE JUEGO",
-                get_signal: "OBTENER SEÑAL",
-                exit: "SALIR",
-                connecting: "Conectando al servidor...",
-                analyzing: "Analizando datos...",
-                predicting: "Prediciendo...",
-                wait: "SIGUIENTE EN",
-                seconds: "s"
-            },
-            ms: {
-                choose_game: "PILIH PERMAINAN",
-                get_signal: "DAPATKAN SIGNAL",
-                exit: "KELUAR",
-                connecting: "Menyambung ke pelayan...",
-                analyzing: "Menganalisis data...",
-                predicting: "Meramal...",
-                wait: "SIGNAL SETERUSNYA",
-                seconds: "s"
-            },
-            ar: {
-                choose_game: "اختر اللعبة",
-                get_signal: "احصل على إشارة",
-                exit: "خروج",
-                connecting: "الاتصال بالخادم...",
-                analyzing: "تحليل البيانات...",
-                predicting: "جار التنبؤ...",
-                wait: "الإشارة التالية في",
-                seconds: "ث"
-            }
+            en: { choose_game: "CHOOSE GAME", get_signal: "GET SIGNAL", exit: "EXIT", connecting: "Connecting...", analyzing: "Analyzing...", predicting: "Predicting...", wait: "NEXT IN", seconds: "s" },
+            es: { choose_game: "ELIGE JUEGO", get_signal: "OBTENER SEÑAL", exit: "SALIR", connecting: "Conectando...", analyzing: "Analizando...", predicting: "Prediciendo...", wait: "SIGUIENTE", seconds: "s" },
+            ms: { choose_game: "PILIH PERMAINAN", get_signal: "DAPATKAN SIGNAL", exit: "KELUAR", connecting: "Menyambung...", analyzing: "Menganalisis...", predicting: "Meramal...", wait: "SETERUSNYA", seconds: "s" },
+            ar: { choose_game: "اختر اللعبة", get_signal: "احصل على إشارة", exit: "خروج", connecting: "جار الاتصال...", analyzing: "تحليل...", predicting: "تنبؤ...", wait: "التالي في", seconds: "ث" }
         };
 
         let currentLang = 'en';
@@ -361,21 +331,15 @@
         function changeLanguage() {
             const selector = document.getElementById('language-select');
             currentLang = selector.value;
-            
-            // RTL для Арабского
             if (currentLang === 'ar') document.body.classList.add('rtl');
             else document.body.classList.remove('rtl');
-
-            // Обновляем все статические тексты
             document.querySelectorAll('[data-translate]').forEach(el => {
                 const key = el.getAttribute('data-translate');
-                if (translations[currentLang][key]) {
-                    el.innerText = translations[currentLang][key];
-                }
+                if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
             });
         }
 
-        // --- ЛОГИКА ЧАСТИЦ (ФОН) ---
+        // --- ОРГАНИЧНЫЙ КРАСНЫЙ ФОН ---
         const canvas = document.getElementById("particles-canvas");
         const ctx = canvas.getContext("2d");
         canvas.width = window.innerWidth;
@@ -386,10 +350,11 @@
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.directionX = (Math.random() * 0.4) - 0.2;
-                this.directionY = (Math.random() * 0.4) - 0.2;
-                this.size = Math.random() * 2;
-                this.color = '#00f3ff';
+                this.directionX = (Math.random() * 0.2) - 0.1; // Медленнее для органичности
+                this.directionY = (Math.random() * 0.2) - 0.1;
+                this.size = Math.random() * 2.5; // Разный размер
+                // Разные оттенки красного для "узоров"
+                this.color = Math.random() > 0.5 ? '#ff334b' : '#800020'; 
             }
             draw() {
                 ctx.beginPath();
@@ -407,7 +372,7 @@
         }
         function initParticles() {
             particlesArray = [];
-            let numberOfParticles = (canvas.height * canvas.width) / 9000;
+            let numberOfParticles = (canvas.height * canvas.width) / 8000;
             for (let i = 0; i < numberOfParticles; i++) particlesArray.push(new Particle());
         }
         function animateParticles() {
@@ -424,8 +389,9 @@
                                    ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
                     if (distance < (canvas.width/7) * (canvas.height/7)) {
                         opacityValue = 1 - (distance / 20000);
-                        ctx.strokeStyle = 'rgba(0, 243, 255,' + opacityValue + ')';
-                        ctx.lineWidth = 1;
+                        // Линии органичного красного цвета
+                        ctx.strokeStyle = 'rgba(255, 51, 75,' + opacityValue + ')';
+                        ctx.lineWidth = 0.5;
                         ctx.beginPath();
                         ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
                         ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
@@ -442,28 +408,22 @@
         initParticles();
         animateParticles();
 
-
-        // --- ИГРОВАЯ ЛОГИКА ---
         const circle = document.querySelector('.progress-ring__circle');
         const radius = circle.r.baseVal.value;
         const circumference = radius * 2 * Math.PI;
-
         circle.style.strokeDasharray = `${circumference} ${circumference}`;
         circle.style.strokeDashoffset = circumference;
-
         function setProgress(percent) {
             const offset = circumference - (percent / 100) * circumference;
             circle.style.strokeDashoffset = offset;
         }
 
         function openGame(game) {
-            // Пока открываем только Авиатор и Пенальти, остальное заглушки
             if(game === 'aviator' || game === 'penalty') {
                 document.getElementById('screen-menu').classList.remove('active');
                 document.getElementById('screen-game').classList.add('active');
             }
         }
-
         function backToMenu() {
             document.getElementById('screen-game').classList.remove('active');
             document.getElementById('screen-menu').classList.add('active');
@@ -475,16 +435,15 @@
             const loaderBar = document.getElementById('loader-bar');
             const loaderContainer = document.getElementById('loader-bar-container');
             const loaderText = document.getElementById('loader-text');
-            const t = translations[currentLang]; // Берем текущий перевод
+            const t = translations[currentLang];
 
             if (btn.disabled) return;
             btn.disabled = true;
 
             loaderContainer.style.display = 'block';
             loaderText.style.display = 'block';
-            loaderText.innerText = t.connecting; // Перевод
+            loaderText.innerText = t.connecting;
             loaderBar.style.width = '0%';
-            
             textElement.innerText = "0.00x";
             setProgress(0);
             
@@ -493,41 +452,29 @@
                 progress += Math.random() * 10;
                 if(progress > 100) progress = 100;
                 loaderBar.style.width = progress + '%';
-                
-                if (progress > 30) loaderText.innerText = t.analyzing; // Перевод
-                if (progress > 70) loaderText.innerText = t.predicting; // Перевод
-
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    showResult();
-                }
+                if (progress > 30) loaderText.innerText = t.analyzing;
+                if (progress > 70) loaderText.innerText = t.predicting;
+                if (progress >= 100) { clearInterval(interval); showResult(); }
             }, 150);
 
             function showResult() {
                 loaderText.style.display = 'none';
-                
                 let result;
                 if (Math.random() > 0.6) result = (Math.random() * (4.00 - 1.20) + 1.20).toFixed(2);
                 else result = (Math.random() * (15.00 - 4.00) + 4.00).toFixed(2);
-
                 animateValue(textElement, 1.00, parseFloat(result), 1000);
                 setProgress(100); 
-
                 window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
                 
-                // Таймер
                 let cooldown = 5;
-                const updateTimerBtn = () => {
-                    btn.innerHTML = `${t.wait} ${cooldown}${t.seconds}`;
-                }
+                const updateTimerBtn = () => { btn.innerHTML = `${t.wait} ${cooldown}${t.seconds}`; }
                 updateTimerBtn();
-                
                 let cooldownTimer = setInterval(() => {
                     cooldown--;
                     updateTimerBtn();
                     if (cooldown <= 0) {
                         clearInterval(cooldownTimer);
-                        btn.innerHTML = t.get_signal; // Возвращаем текст на нужном языке
+                        btn.innerHTML = t.get_signal;
                         btn.disabled = false;
                         setProgress(0);
                         loaderContainer.style.display = 'none';
@@ -542,13 +489,10 @@
                 if (!startTimestamp) startTimestamp = timestamp;
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
                 obj.innerHTML = (progress * (end - start) + start).toFixed(2) + "x";
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
+                if (progress < 1) window.requestAnimationFrame(step);
             };
             window.requestAnimationFrame(step);
         }
-
     </script>
 </body>
 </html>
