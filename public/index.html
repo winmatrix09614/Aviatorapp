@@ -11,7 +11,7 @@
         :root {
             --bg-dark: #050000;
             --text-color: #ffffff;
-            --primary-red: #ff334b; /* Фиксированный красный для кнопок */
+            --brand-red: #ff334b; /* Фирменный красный */
         }
 
         body {
@@ -26,14 +26,16 @@
             position: relative;
         }
 
-        /* --- RGB АНИМАЦИЯ --- */
-        @keyframes rgbFlow {
-            0% { filter: hue-rotate(0deg); }
-            50% { filter: hue-rotate(180deg); }
-            100% { filter: hue-rotate(360deg); }
+        /* --- ОПТИМИЗИРОВАННЫЙ ФОН --- */
+        /* Вместо тяжелых фильтров просто меняем цвет фона CSS анимацией */
+        @keyframes colorCycle {
+            0% { background-color: #1a0000; }   /* Dark Red */
+            25% { background-color: #1a001a; }  /* Dark Purple */
+            50% { background-color: #00001a; }  /* Dark Blue */
+            75% { background-color: #001a1a; }  /* Dark Teal */
+            100% { background-color: #1a0000; } /* Back to Red */
         }
 
-        /* ДИНАМИЧЕСКИЙ ФОН */
         .background-animate {
             position: absolute;
             top: 0;
@@ -41,14 +43,12 @@
             width: 100%;
             height: 100%;
             z-index: -2;
-            /* Базовый градиент (красный), который мы будем крутить */
-            background: radial-gradient(circle at center, #4a0005 0%, #000000 85%);
-            background-size: 100% 100%;
-            /* Применяем RGB вращение */
-            animation: rgbFlow 20s linear infinite; 
+            /* Радиальный градиент: Центр прозрачный (видно цвет анимации), края черные */
+            background: radial-gradient(circle at center, transparent 0%, #000000 90%);
+            animation: colorCycle 20s infinite linear; /* Очень плавная смена */
         }
 
-        /* ЧАСТИЦЫ (Тоже переливаются) */
+        /* ЧАСТИЦЫ */
         #particles-canvas {
             position: absolute;
             top: 0;
@@ -56,9 +56,6 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            opacity: 0.8;
-            /* Частицы тоже меняют цвет синхронно с фоном */
-            animation: rgbFlow 20s linear infinite;
         }
 
         /* ГЛАВНЫЙ КОНТЕЙНЕР */
@@ -84,7 +81,7 @@
         select {
             background: rgba(0, 0, 0, 0.6);
             color: #fff;
-            border: 1px solid #fff;
+            border: 1px solid rgba(255,255,255,0.3);
             padding: 5px 10px;
             border-radius: 5px;
             font-family: 'Orbitron', sans-serif;
@@ -104,7 +101,7 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             color: #fff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
             text-align: center;
         }
 
@@ -117,7 +114,7 @@
         }
 
         .game-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
@@ -125,19 +122,41 @@
             text-align: center;
             cursor: pointer;
             transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
-        .game-card:active { transform: scale(0.96); background: rgba(255, 255, 255, 0.1); }
-        .game-icon { font-size: 32px; margin-bottom: 10px; }
-        .game-title { font-weight: 600; font-size: 14px; letter-spacing: 1px; }
+        .game-card:active { transform: scale(0.96); background: rgba(255, 255, 255, 0.08); }
+        
+        /* СТИЛЬ ДЛЯ КАРТИНОК В МЕНЮ */
+        .game-img {
+            width: 60px; /* Размер иконки */
+            height: 60px;
+            object-fit: contain;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2)); /* Легкое свечение */
+            transition: 0.3s;
+        }
+        .game-card:hover .game-img { transform: scale(1.1); }
+
+        .game-title { font-weight: 600; font-size: 14px; letter-spacing: 1px; color: #ddd; }
+
+        /* SOON CARD */
+        .card-disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none; /* Нельзя нажать */
+            filter: grayscale(1); /* Черно-белый */
+        }
 
         /* --- AVIATOR UI --- */
         
-        /* Ссылка остается красной (бренд) */
         .telegram-link {
             text-decoration: none;
             font-family: 'Orbitron', sans-serif;
-            color: var(--primary-red);
-            border: 1px solid var(--primary-red);
+            color: var(--brand-red);
+            border: 1px solid var(--brand-red);
             padding: 10px 24px;
             border-radius: 8px;
             font-size: 14px;
@@ -145,7 +164,7 @@
             box-shadow: 0 0 15px rgba(255, 51, 75, 0.2);
             margin-bottom: 20px;
             margin-top: -40px;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.4);
             transition: 0.3s;
             display: inline-block;
         }
@@ -159,7 +178,6 @@
         .aviator-logo-img {
             width: 180px;
             height: auto;
-            /* Логотип оставляем красным, не вращаем цвета */
             filter: drop-shadow(0 0 10px rgba(229, 11, 32, 0.6));
         }
 
@@ -174,17 +192,16 @@
             margin-bottom: 30px;
         }
 
-        /* Свечение за кругом (ТОЖЕ RGB) */
         .circle-glow {
             position: absolute;
             width: 220px;
             height: 220px;
             border-radius: 50%;
             background: transparent;
-            /* Изначально красный, но меняется анимацией */
-            box-shadow: 0 0 50px rgba(255, 51, 75, 0.4); 
+            /* Свечение меняется JS-ом синхронно с частицами */
+            box-shadow: 0 0 60px rgba(255, 255, 255, 0.1); 
             z-index: 0;
-            animation: rgbFlow 20s linear infinite; /* Синхронно с фоном */
+            transition: box-shadow 0.1s;
         }
 
         .progress-ring { transform: rotate(-90deg); z-index: 1; }
@@ -203,7 +220,7 @@
             z-index: 2;
         }
 
-        /* КНОПКА (Фиксированный красный градиент, чтобы выделялась) */
+        /* КНОПКА (Всегда Красная) */
         .btn-signal {
             background: linear-gradient(90deg, #d6002a 0%, #8a001a 100%);
             border: none;
@@ -233,7 +250,6 @@
         }
         .btn-signal:hover::before { left: 100%; }
 
-        /* Loader */
         .loader-bar-container {
             width: 80%;
             max-width: 300px;
@@ -280,7 +296,6 @@
 </head>
 <body>
 
-    <!-- RGB Фон -->
     <div class="background-animate"></div>
     <canvas id="particles-canvas"></canvas>
 
@@ -297,17 +312,30 @@
     <div id="screen-menu" class="screen active">
         <div class="menu-header" data-translate="choose_game">CHOOSE GAME</div>
         <div class="menu-grid">
+            <!-- AVIATOR -->
             <div class="game-card" onclick="openGame('aviator')">
-                <div class="game-icon">✈️</div>
+                <!-- Замени иконку на картинку -->
+                <img src="/img/menu_aviator.png" class="game-img" alt="Aviator">
                 <div class="game-title">AVIATOR</div>
             </div>
+            
+            <!-- PENALTY -->
             <div class="game-card" onclick="openGame('penalty')">
-                <div class="game-icon">⚽</div>
+                <img src="/img/menu_penalty.png" class="game-img" alt="Penalty">
                 <div class="game-title">PENALTY</div>
             </div>
-            <div class="game-card" style="opacity: 0.5;">
-                <div class="game-icon">💣</div>
-                <div class="game-title">MINES</div>
+            
+            <!-- MINES (SOON) -->
+            <!-- Добавил класс card-disabled, чтобы было видно что скоро -->
+            <div class="game-card card-disabled">
+                <img src="/img/menu_mines.png" class="game-img" alt="Mines">
+                <div class="game-title">MINES (SOON)</div>
+            </div>
+            
+            <!-- Заглушка (чтобы было 4 плитки, красиво) -->
+            <div class="game-card card-disabled">
+                <div style="font-size: 30px;">🔒</div>
+                <div class="game-title">SOON...</div>
             </div>
         </div>
     </div>
@@ -322,12 +350,10 @@
         </div>
 
         <div class="circle-container">
-            <!-- Свечение переливается RGB -->
-            <div class="circle-glow"></div>
+            <div class="circle-glow" id="circle-glow"></div>
             
             <svg class="progress-ring" width="260" height="260">
                 <circle class="progress-ring__circle-bg" stroke="#222" stroke-width="6" fill="transparent" r="110" cx="130" cy="130"/>
-                <!-- Круг прогресса тоже фиксируем красным, чтобы было видно заполнение -->
                 <circle class="progress-ring__circle" stroke="#ff334b" stroke-width="8" fill="transparent" r="110" cx="130" cy="130"
                         style="stroke-dasharray: 691; stroke-dashoffset: 691; stroke-linecap: round;"/>
             </svg>
@@ -368,26 +394,30 @@
             });
         }
 
+        // --- ВЫСОКОПРОИЗВОДИТЕЛЬНАЯ АНИМАЦИЯ (CANVAS) ---
         const canvas = document.getElementById("particles-canvas");
         const ctx = canvas.getContext("2d");
+        const circleGlow = document.getElementById("circle-glow");
+        
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
         let particlesArray;
+        let hue = 0; // Переменная цвета для всего спектра
+
         class Particle {
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
                 this.directionX = (Math.random() * 0.2) - 0.1;
                 this.directionY = (Math.random() * 0.2) - 0.1;
-                this.size = Math.random() * 2.5;
-                // Базовый цвет (теперь он будет фильтроваться CSS анимацией)
-                this.color = Math.random() > 0.5 ? '#ff334b' : '#cc0025'; 
+                this.size = Math.random() * 2 + 0.5;
             }
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-                ctx.fillStyle = this.color;
+                // Используем HSL для супер-плавной смены цвета
+                ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
                 ctx.fill();
             }
             update() {
@@ -398,17 +428,30 @@
                 this.draw();
             }
         }
+
         function initParticles() {
             particlesArray = [];
-            let numberOfParticles = (canvas.height * canvas.width) / 8000;
+            // Оптимизация: меньше частиц на слабых экранах
+            let numberOfParticles = (canvas.height * canvas.width) / 9000;
             for (let i = 0; i < numberOfParticles; i++) particlesArray.push(new Particle());
         }
+
         function animateParticles() {
             requestAnimationFrame(animateParticles);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Плавно меняем цвет (hue) каждый кадр
+            hue += 0.2; 
+            
+            // Применяем этот цвет к свечению круга (синхронизация)
+            if(circleGlow) {
+                 circleGlow.style.boxShadow = `0 0 60px hsla(${hue}, 100%, 50%, 0.2)`;
+            }
+
             for (let i = 0; i < particlesArray.length; i++) particlesArray[i].update();
             connectParticles();
         }
+
         function connectParticles() {
             let opacityValue = 1;
             for (let a = 0; a < particlesArray.length; a++) {
@@ -417,7 +460,8 @@
                                    ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
                     if (distance < (canvas.width/7) * (canvas.height/7)) {
                         opacityValue = 1 - (distance / 20000);
-                        ctx.strokeStyle = 'rgba(255, 51, 75,' + opacityValue + ')';
+                        // Цвет линий тоже динамический HSL
+                        ctx.strokeStyle = `hsla(${hue}, 100%, 50%, ${opacityValue})`;
                         ctx.lineWidth = 0.5;
                         ctx.beginPath();
                         ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
@@ -446,6 +490,7 @@
         }
 
         function openGame(game) {
+            // Mines пока отключен
             if(game === 'aviator' || game === 'penalty') {
                 document.getElementById('screen-menu').classList.remove('active');
                 document.getElementById('screen-game').classList.add('active');
