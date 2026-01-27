@@ -9,17 +9,14 @@
     
     <style>
         :root {
-            /* Органичные красные оттенки */
-            --bg-color: #050000;
-            --deep-red: #3a0005;
-            --neon-red: #ff334b; /* Приятный красный, не ядовитый */
-            --accent-red: #d6002a;
+            --bg-dark: #050000;
+            --bg-red: #2a0003;
+            --neon-red: #ff334b;
             --text-color: #ffffff;
         }
 
         body {
-            /* Градиентный фон для глубины */
-            background: radial-gradient(circle at center, var(--deep-red) 0%, var(--bg-color) 80%);
+            background-color: var(--bg-dark);
             color: var(--text-color);
             font-family: 'Poppins', sans-serif;
             margin: 0;
@@ -27,6 +24,31 @@
             overflow: hidden;
             user-select: none;
             height: 100vh;
+            position: relative;
+        }
+
+        /* --- ДИНАМИЧЕСКИЙ ФОН (ДЫХАНИЕ) --- */
+        .background-animate {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at center, #3a0005 0%, #000000 80%);
+            background-size: 150% 150%;
+            animation: breathe 6s ease-in-out infinite alternate;
+        }
+
+        @keyframes breathe {
+            0% {
+                background: radial-gradient(circle at center, #250002 0%, #000000 70%);
+                opacity: 0.8;
+            }
+            100% {
+                background: radial-gradient(circle at center, #450008 10%, #000000 90%);
+                opacity: 1;
+            }
         }
 
         /* ЧАСТИЦЫ */
@@ -36,8 +58,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 0;
-            opacity: 0.6; /* Чуть ярче, так как красный темнее синего */
+            z-index: -1;
+            opacity: 0.6;
         }
 
         /* ГЛАВНЫЙ КОНТЕЙНЕР */
@@ -45,7 +67,7 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* Центрирование по вертикали */
+            justify-content: center;
             height: 100vh;
             width: 100%;
             position: relative;
@@ -53,14 +75,13 @@
         }
         .screen.active { display: flex; }
 
-        /* --- ЯЗЫКОВОЙ СЕЛЕКТОР --- */
+        /* ЯЗЫКОВОЙ СЕЛЕКТОР */
         .lang-container {
             position: absolute;
             top: 20px;
             right: 20px;
             z-index: 20;
         }
-
         select {
             background: rgba(40, 0, 0, 0.6);
             color: var(--neon-red);
@@ -76,7 +97,7 @@
         }
         option { background: #1a0000; color: white; }
 
-        /* --- МЕНЮ --- */
+        /* МЕНЮ */
         .menu-header {
             font-family: 'Orbitron', sans-serif;
             font-size: 24px;
@@ -112,7 +133,6 @@
 
         /* --- AVIATOR INTERFACE --- */
         
-        /* 1. Ссылка на Telegram (Поднята выше) */
         .telegram-link {
             text-decoration: none;
             font-family: 'Orbitron', sans-serif;
@@ -123,27 +143,23 @@
             font-size: 14px;
             letter-spacing: 1px;
             box-shadow: 0 0 15px rgba(255, 51, 75, 0.2);
-            margin-bottom: 20px; /* Отступ до лого */
-            margin-top: -40px;   /* Поднимаем выше визуально */
+            margin-bottom: 20px;
+            margin-top: -40px;
             background: rgba(255, 0, 0, 0.05);
             transition: 0.3s;
             display: inline-block;
         }
-        .telegram-link:active {
-            transform: scale(0.95);
-            background: rgba(255, 0, 0, 0.15);
-        }
+        .telegram-link:active { transform: scale(0.95); background: rgba(255, 0, 0, 0.15); }
 
-        /* 2. Логотип Авиатора (Под ссылкой) */
         .aviator-logo-container {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             display: flex;
             justify-content: center;
         }
         .aviator-logo-img {
-            width: 180px; /* Размер логотипа */
+            width: 180px;
             height: auto;
-            filter: drop-shadow(0 0 10px rgba(229, 11, 32, 0.6)); /* Красная тень */
+            filter: drop-shadow(0 0 10px rgba(229, 11, 32, 0.6));
         }
 
         /* КРУГОВОЙ ИНДИКАТОР */
@@ -157,11 +173,28 @@
             margin-bottom: 30px;
         }
 
-        .progress-ring { transform: rotate(-90deg); }
+        /* ИСПРАВЛЕНИЕ КВАДРАТА: Добавляем круглое свечение позади SVG */
+        .circle-glow {
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%; /* Идеальный круг */
+            background: transparent;
+            /* Мягкое красное свечение без квадратных краев */
+            box-shadow: 0 0 40px rgba(255, 51, 75, 0.25);
+            z-index: 0;
+        }
+
+        .progress-ring { 
+            transform: rotate(-90deg); 
+            z-index: 1; /* Поверх свечения */
+        }
+
         .progress-ring__circle {
             transition: stroke-dashoffset 0.5s ease-in-out;
             transform-origin: 50% 50%;
-            filter: drop-shadow(0 0 15px var(--accent-red));
+            /* УБРАЛИ drop-shadow с самого круга, чтобы не было квадрата */
+            filter: none; 
         }
 
         .coef-text {
@@ -174,9 +207,7 @@
             z-index: 2;
         }
 
-        /* КНОПКА СИГНАЛА (Красный стиль) */
         .btn-signal {
-            /* Органичный красно-черный градиент */
             background: linear-gradient(90deg, #d6002a 0%, #5e0012 100%);
             border: none;
             width: 80%;
@@ -205,7 +236,6 @@
         }
         .btn-signal:hover::before { left: 100%; }
 
-        /* ПРОГРЕСС БАР */
         .loader-bar-container {
             width: 80%;
             max-width: 300px;
@@ -242,7 +272,6 @@
         }
         .btn-back:hover { border-color: var(--neon-red); color: #fff; }
 
-        /* RTL */
         body.rtl { font-family: 'Cairo', sans-serif !important; direction: rtl; }
         body.rtl .menu-header, body.rtl .btn-signal, body.rtl .loader-text, body.rtl .btn-back, body.rtl select {
             font-family: 'Cairo', sans-serif !important; font-weight: 700;
@@ -253,6 +282,8 @@
 </head>
 <body>
 
+    <!-- Анимированный градиент -->
+    <div class="background-animate"></div>
     <canvas id="particles-canvas"></canvas>
 
     <div class="lang-container">
@@ -286,17 +317,17 @@
     <!-- ЭКРАН ИГРЫ -->
     <div id="screen-game" class="screen">
         
-        <!-- 1. ССЫЛКА (ВЫШЕ) -->
         <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
 
-        <!-- 2. ЛОГОТИП (ПОД ССЫЛКОЙ) -->
         <div class="aviator-logo-container">
-            <!-- ВАЖНО: Загрузи файл aviator_logo.png в папку img! -->
             <img src="/img/aviator_logo.png" alt="Aviator" class="aviator-logo-img">
         </div>
 
         <!-- КРУГ -->
         <div class="circle-container">
+            <!-- Отдельный слой для свечения (исправляет квадрат) -->
+            <div class="circle-glow"></div>
+            
             <svg class="progress-ring" width="260" height="260">
                 <circle class="progress-ring__circle-bg" stroke="#2a0a0a" stroke-width="6" fill="transparent" r="110" cx="130" cy="130"/>
                 <circle class="progress-ring__circle" stroke="#ff334b" stroke-width="8" fill="transparent" r="110" cx="130" cy="130"
@@ -339,7 +370,6 @@
             });
         }
 
-        // --- ОРГАНИЧНЫЙ КРАСНЫЙ ФОН ---
         const canvas = document.getElementById("particles-canvas");
         const ctx = canvas.getContext("2d");
         canvas.width = window.innerWidth;
@@ -350,10 +380,9 @@
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.directionX = (Math.random() * 0.2) - 0.1; // Медленнее для органичности
+                this.directionX = (Math.random() * 0.2) - 0.1;
                 this.directionY = (Math.random() * 0.2) - 0.1;
-                this.size = Math.random() * 2.5; // Разный размер
-                // Разные оттенки красного для "узоров"
+                this.size = Math.random() * 2.5;
                 this.color = Math.random() > 0.5 ? '#ff334b' : '#800020'; 
             }
             draw() {
@@ -389,7 +418,6 @@
                                    ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
                     if (distance < (canvas.width/7) * (canvas.height/7)) {
                         opacityValue = 1 - (distance / 20000);
-                        // Линии органичного красного цвета
                         ctx.strokeStyle = 'rgba(255, 51, 75,' + opacityValue + ')';
                         ctx.lineWidth = 0.5;
                         ctx.beginPath();
