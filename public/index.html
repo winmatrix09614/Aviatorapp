@@ -84,7 +84,9 @@
             padding: 16px; color: white; font-size: 16px; font-weight: bold;
             border-radius: 12px; cursor: pointer; width: 100%; max-width: 300px;
             margin-top: 15px; box-shadow: 0 5px 20px rgba(0, 122, 255, 0.2);
+            transition: 0.2s;
         }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-back { background: transparent; border: none; padding: 15px; color: #555; font-size: 14px; cursor: pointer; }
 
         /* MINES */
@@ -137,9 +139,8 @@
             position: relative; 
             margin-bottom: 20px;
             
-            /* Фон: Картинка ворот + трава внизу */
+            /* Фон */
             background-image: url('/img/gate.png'), radial-gradient(circle at bottom, #203a20 0%, #0f121b 80%);
-            
             background-size: 100% 100%, cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -163,15 +164,10 @@
             transform-origin: bottom center;
         }
         
-        /* ПРЫЖКИ */
-        .keeper-img.jump-left { 
-            transform: translate(-80px, 10px) rotate(-45deg); 
-        }
-        .keeper-img.jump-right { 
-            transform: translate(80px, 10px) rotate(45deg); 
-        }
+        .keeper-img.jump-left { transform: translate(-80px, 10px) rotate(-45deg); }
+        .keeper-img.jump-right { transform: translate(80px, 10px) rotate(45deg); }
 
-        /* Мячи-цели */
+        /* МЯЧИ-ЦЕЛИ (Поправил позиции для углов) */
         .target-ball {
             position: absolute; 
             width: 30px; 
@@ -184,33 +180,33 @@
             z-index: 10;
         }
         
-        .pos-tl { top: 35px; left: 35px; } 
-        .pos-tr { top: 35px; right: 35px; } 
-        .pos-bl { bottom: 35px; left: 35px; } 
-        .pos-br { bottom: 35px; right: 35px; } 
-        .pos-tc { top: 25px; left: 50%; transform: translateX(-50%); } 
+        /* КООРДИНАТЫ 5 ТОЧЕК (Поправил чтобы летело в углы) */
+        .pos-0 { top: 35px; left: 35px; } /* Верх Лево */
+        .pos-1 { top: 25px; left: 50%; transform: translateX(-50%); } /* Верх Центр */
+        .pos-2 { top: 35px; right: 35px; } /* Верх Право */
+        .pos-3 { bottom: 35px; left: 35px; } /* Низ Лево */
+        .pos-4 { bottom: 35px; right: 35px; } /* Низ Право */
 
-        /* АКТИВНЫЙ МЯЧ (КАРТИНКА) */
+        /* АКТИВНЫЙ МЯЧ */
         .target-ball.active {
             width: 50px;  
             height: 50px;
             border: none;
-            background-color: transparent; /* Прозрачный фон */
-            
-            /* СНОВА ИСПОЛЬЗУЕМ КАРТИНКУ */
+            background-color: transparent;
             background-image: url('/img/ball.png');
             background-size: contain;
             background-repeat: no-repeat;
-            
-            /* Свечение */
             box-shadow: 0 0 30px rgba(255, 255, 255, 0.9); 
-            
             transform: scale(1.2);
-            animation: pulseBall 0.4s infinite alternate;
+            /* Если это центр, нужно сохранить translateX */
             z-index: 20;
+            animation: pulseBall 0.4s infinite alternate;
         }
         
-        @keyframes pulseBall { from { transform: scale(1.2); } to { transform: scale(1.4); } }
+        /* Спец. стиль для активного мяча по центру, чтобы не сбилось выравнивание */
+        .pos-1.active { transform: translateX(-50%) scale(1.2); }
+
+        @keyframes pulseBall { from { opacity: 0.8; } to { opacity: 1; } }
 
         /* LOADER */
         .loader {
@@ -271,11 +267,11 @@
         <div class="penalty-stage" id="penalty-stage">
             <img src="/img/keeper.png" class="keeper-img" id="goalkeeper" alt="keeper">
             
-            <div class="target-ball pos-tl" id="ball-0"></div>
-            <div class="target-ball pos-tc" id="ball-1"></div>
-            <div class="target-ball pos-tr" id="ball-2"></div>
-            <div class="target-ball pos-bl" id="ball-3"></div>
-            <div class="target-ball pos-br" id="ball-4"></div>
+            <div class="target-ball pos-0" id="ball-0"></div> <!-- TL -->
+            <div class="target-ball pos-1" id="ball-1"></div> <!-- TC -->
+            <div class="target-ball pos-2" id="ball-2"></div> <!-- TR -->
+            <div class="target-ball pos-3" id="ball-3"></div> <!-- BL -->
+            <div class="target-ball pos-4" id="ball-4"></div> <!-- BR -->
         </div>
 
         <!-- 3. MINES STAGE -->
@@ -292,6 +288,7 @@
         window.Telegram.WebApp.expand();
 
         let currentGame = '';
+        let penaltyStep = 1; // Счетчик ударов (1 из 5)
 
         function createMinesGrid() {
             const grid = document.getElementById('mines-grid');
@@ -307,6 +304,7 @@
 
         function openGame(gameType) {
             currentGame = gameType;
+            penaltyStep = 1; // Сброс шагов
             
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-game').classList.add('active');
@@ -336,6 +334,7 @@
                 document.getElementById('penalty-stage').style.display = 'block';
                 document.querySelectorAll('.target-ball').forEach(b => b.classList.remove('active'));
                 document.getElementById('goalkeeper').className = 'keeper-img';
+                btn.innerHTML = "START GAME"; // Начальная кнопка
             } 
             else if (gameType === 'mines') {
                 title.innerText = 'MINES';
@@ -356,6 +355,7 @@
             const btn = document.querySelector('.btn');
             const lastCoef = document.getElementById('last-coef').value;
 
+            // --- AVIATOR CHECK ---
             if (currentGame === 'aviator' && !lastCoef) {
                 window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
                 const res = document.getElementById('aviator-result');
@@ -364,10 +364,25 @@
                 return;
             }
 
+            // --- PENALTY RESET LOGIC ---
+            if (currentGame === 'penalty') {
+                if (penaltyStep > 5) {
+                    // Игра окончена, сброс
+                    penaltyStep = 1;
+                    btn.innerHTML = "SHOOT (1/5)";
+                    document.querySelectorAll('.target-ball').forEach(b => b.classList.remove('active'));
+                    document.getElementById('goalkeeper').className = 'keeper-img';
+                    return; 
+                }
+                // Обновляем текст кнопки
+                btn.innerHTML = `SHOOT (${penaltyStep}/5)`;
+            }
+
             loader.style.display = 'block';
             btn.disabled = true;
             btn.style.opacity = '0.5';
 
+            // Очистка перед новым сигналом
             if(currentGame === 'mines') document.getElementById('mines-grid').style.opacity = '0.5';
             if(currentGame === 'penalty') {
                 document.querySelectorAll('.target-ball').forEach(b => b.classList.remove('active'));
@@ -398,18 +413,38 @@
                     document.getElementById('aviator-result').innerText = prediction + "x";
                 }
 
-                // --- PENALTY LOGIC ---
+                // --- PENALTY LOGIC (FIXED) ---
                 else if (currentGame === 'penalty') {
                     const balls = document.querySelectorAll('.target-ball');
+                    // Случайный выбор из 5 позиций (0-4)
                     const randomBallIndex = Math.floor(Math.random() * 5);
                     balls[randomBallIndex].classList.add('active');
                     
-                    // Вратарь прыгает
                     const keeper = document.getElementById('goalkeeper');
-                    if (randomBallIndex === 0 || randomBallIndex === 2) { 
-                        keeper.classList.add('jump-right'); 
+                    
+                    // ЛОГИКА ВРАТАРЯ (ЧТОБЫ НЕ СТОЛКНУЛСЯ)
+                    // 0 (TL) и 3 (BL) - это ЛЕВАЯ сторона -> Вратарь прыгает ВПРАВО
+                    // 2 (TR) и 4 (BR) - это ПРАВАЯ сторона -> Вратарь прыгает ВЛЕВО
+                    // 1 (TC) - Центр -> Рандомно (но лучше в угол, чтобы не перекрыть центр)
+                    
+                    if (randomBallIndex === 0 || randomBallIndex === 3) {
+                        keeper.classList.add('jump-right'); // Мяч слева, вратарь вправо
+                    } 
+                    else if (randomBallIndex === 2 || randomBallIndex === 4) {
+                        keeper.classList.add('jump-left'); // Мяч справа, вратарь влево
+                    } 
+                    else {
+                        // Если центр, рандомно влево или вправо
+                         if(Math.random() > 0.5) keeper.classList.add('jump-left');
+                         else keeper.classList.add('jump-right');
+                    }
+
+                    // Увеличиваем шаг
+                    penaltyStep++;
+                    if (penaltyStep <= 5) {
+                        btn.innerHTML = `NEXT STEP (${penaltyStep}/5)`;
                     } else {
-                        keeper.classList.add('jump-left');
+                        btn.innerHTML = "NEW GAME";
                     }
                 }
 
