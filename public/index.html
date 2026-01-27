@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aviator Premium Signal</title>
+    <title>AI Signal Bot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Подключаем крутой технологичный шрифт -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    <!-- Подключаем Orbitron для цифр и Cairo для Арабского языка -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;500&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -47,11 +47,38 @@
             height: 100vh;
             width: 100%;
             position: relative;
-            z-index: 10; /* Поверх частиц */
+            z-index: 10;
         }
         .screen.active { display: flex; }
 
-        /* --- МЕНЮ (Оставил аккуратным) --- */
+        /* --- ЯЗЫКОВОЙ СЕЛЕКТОР --- */
+        .lang-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 20;
+        }
+
+        select {
+            background: rgba(0, 0, 0, 0.6);
+            color: var(--neon-blue);
+            border: 1px solid var(--neon-blue);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            outline: none;
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        
+        option {
+            background: #000;
+            color: white;
+        }
+
+        /* --- МЕНЮ --- */
         .menu-header {
             font-family: 'Orbitron', sans-serif;
             font-size: 24px;
@@ -59,6 +86,7 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            text-align: center;
         }
 
         .menu-grid {
@@ -83,36 +111,28 @@
         .game-icon { font-size: 32px; margin-bottom: 10px; }
         .game-title { font-weight: 600; font-size: 14px; letter-spacing: 1px; }
 
-        /* --- AVIATOR HACK INTERFACE --- */
+        /* --- AVIATOR INTERFACE --- */
         
-        /* Логотип бота сверху */
-        .hack-logo {
+        /* Ссылка на Telegram */
+        .telegram-link {
+            text-decoration: none;
             font-family: 'Orbitron', sans-serif;
             color: var(--neon-blue);
             border: 1px solid var(--neon-blue);
-            padding: 8px 24px;
+            padding: 10px 24px;
             border-radius: 8px;
             font-size: 16px;
-            letter-spacing: 3px;
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
-            margin-bottom: 20px;
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+            margin-bottom: 40px;
             text-shadow: 0 0 5px var(--neon-blue);
             background: rgba(0, 243, 255, 0.05);
+            transition: 0.3s;
+            display: inline-block;
         }
-
-        .aviator-logo-img {
-            width: 120px;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 0 10px #e50b20);
-        }
-
-        .hack-title {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--neon-blue);
-            font-size: 18px;
-            letter-spacing: 4px;
-            margin-bottom: 30px;
-            text-shadow: 0 0 10px var(--neon-blue);
+        .telegram-link:active {
+            transform: scale(0.95);
+            background: rgba(0, 243, 255, 0.15);
         }
 
         /* КРУГОВОЙ ИНДИКАТОР */
@@ -126,7 +146,6 @@
             margin-bottom: 40px;
         }
 
-        /* SVG Круг */
         .progress-ring { transform: rotate(-90deg); }
         .progress-ring__circle {
             transition: stroke-dashoffset 0.5s ease-in-out;
@@ -134,7 +153,6 @@
             filter: drop-shadow(0 0 10px var(--neon-red));
         }
 
-        /* Текст внутри круга */
         .coef-text {
             position: absolute;
             font-family: 'Orbitron', sans-serif;
@@ -165,6 +183,8 @@
             overflow: hidden;
         }
         .btn-signal:active { transform: scale(0.98); }
+        .btn-signal:disabled { filter: grayscale(1); cursor: not-allowed; }
+        
         .btn-signal::before {
             content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
@@ -172,7 +192,7 @@
         }
         .btn-signal:hover::before { left: 100%; }
 
-        /* ПРОГРЕСС БАР ВНИЗУ */
+        /* ПРОГРЕСС БАР */
         .loader-bar-container {
             width: 80%;
             max-width: 300px;
@@ -181,7 +201,7 @@
             border-radius: 3px;
             margin-top: 15px;
             overflow: hidden;
-            display: none; /* Скрыт пока не нужен */
+            display: none;
         }
         .loader-bar {
             height: 100%;
@@ -191,39 +211,69 @@
             transition: width 0.1s linear;
         }
         .loader-text {
-            font-size: 10px; color: #888; margin-top: 5px; font-family: 'Orbitron', sans-serif;
-            display: none;
+            font-size: 12px; color: #aaa; margin-top: 8px; font-family: 'Orbitron', sans-serif;
+            display: none; letter-spacing: 1px;
         }
 
         .btn-back {
-            margin-top: 20px;
+            margin-top: 30px;
             background: transparent;
             border: 1px solid #333;
             color: #666;
-            padding: 10px 20px;
+            padding: 10px 30px;
             border-radius: 20px;
             font-size: 12px;
             cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            transition: 0.3s;
+        }
+        .btn-back:hover { border-color: #666; color: #fff; }
+
+        /* Адаптация под Арабский язык */
+        body.rtl {
+            font-family: 'Cairo', sans-serif !important;
+            direction: rtl;
+        }
+        body.rtl .menu-header, 
+        body.rtl .btn-signal, 
+        body.rtl .loader-text, 
+        body.rtl .btn-back,
+        body.rtl select {
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 700;
+        }
+        body.rtl .coef-text {
+            font-family: 'Orbitron', sans-serif !important; /* Цифры всегда Orbitron */
+            direction: ltr; /* Цифры всегда слева направо */
         }
 
     </style>
 </head>
 <body>
 
-    <!-- Фон с частицами -->
     <canvas id="particles-canvas"></canvas>
+
+    <!-- СЕЛЕКТОР ЯЗЫКА (ВСЕГДА ВИДЕН) -->
+    <div class="lang-container">
+        <select id="language-select" onchange="changeLanguage()">
+            <option value="en">🇬🇧 EN</option>
+            <option value="es">🇪🇸 ES</option>
+            <option value="ms">🇲🇾 MS</option>
+            <option value="ar">🇸🇦 AR</option>
+        </select>
+    </div>
 
     <!-- МЕНЮ -->
     <div id="screen-menu" class="screen active">
-        <div class="menu-header">AI PREDICTOR v4.0</div>
+        <div class="menu-header" data-translate="choose_game">CHOOSE GAME</div>
         <div class="menu-grid">
             <div class="game-card" onclick="openGame('aviator')">
                 <div class="game-icon">✈️</div>
                 <div class="game-title">AVIATOR</div>
             </div>
-            <div class="game-card" style="opacity: 0.5;">
+            <div class="game-card" onclick="openGame('penalty')">
                 <div class="game-icon">⚽</div>
-                <div class="game-title">PENALTY (UPD)</div>
+                <div class="game-title">PENALTY</div>
             </div>
             <div class="game-card" style="opacity: 0.5;">
                 <div class="game-icon">💣</div>
@@ -232,41 +282,98 @@
         </div>
     </div>
 
-    <!-- ЭКРАН AVIATOR (PREMIUM STYLE) -->
+    <!-- ЭКРАН ИГРЫ -->
     <div id="screen-game" class="screen">
         
-        <!-- Верхний лого -->
-        <div class="hack-logo">GURUHACK</div>
-        
-        <!-- Лого авиатора (опционально) -->
-        <!-- <img src="/img/plane.png" class="aviator-logo-img"> -->
-        <div class="hack-title">PREDICTOR</div>
+        <!-- КЛИКАБЕЛЬНАЯ ССЫЛКА -->
+        <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
 
         <!-- Круговой индикатор -->
         <div class="circle-container">
             <svg class="progress-ring" width="260" height="260">
-                <!-- Серый круг (подложка) -->
                 <circle class="progress-ring__circle-bg" stroke="#1a1a1a" stroke-width="8" fill="transparent" r="110" cx="130" cy="130"/>
-                <!-- Красный круг (прогресс) -->
                 <circle class="progress-ring__circle" stroke="#ff003c" stroke-width="8" fill="transparent" r="110" cx="130" cy="130"
                         style="stroke-dasharray: 691; stroke-dashoffset: 691; stroke-linecap: round;"/>
             </svg>
             <div class="coef-text" id="coef-text">0.00x</div>
         </div>
 
-        <button class="btn-signal" id="signal-btn" onclick="getAviatorSignal()">GET SIGNAL</button>
+        <button class="btn-signal" id="signal-btn" onclick="getAviatorSignal()" data-translate="get_signal">GET SIGNAL</button>
         
         <div class="loader-bar-container" id="loader-bar-container">
             <div class="loader-bar" id="loader-bar"></div>
         </div>
-        <div class="loader-text" id="loader-text">Analyzing network...</div>
+        <div class="loader-text" id="loader-text">...</div>
 
-        <button class="btn-back" onclick="backToMenu()">EXIT</button>
+        <button class="btn-back" onclick="backToMenu()" data-translate="exit">EXIT</button>
     </div>
 
     <script>
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
+
+        // --- ЛОКАЛИЗАЦИЯ (ЯЗЫКИ) ---
+        const translations = {
+            en: {
+                choose_game: "CHOOSE GAME",
+                get_signal: "GET SIGNAL",
+                exit: "EXIT",
+                connecting: "Connecting to server...",
+                analyzing: "Analyzing data...",
+                predicting: "Predicting...",
+                wait: "NEXT SIGNAL IN",
+                seconds: "s"
+            },
+            es: {
+                choose_game: "ELIGE JUEGO",
+                get_signal: "OBTENER SEÑAL",
+                exit: "SALIR",
+                connecting: "Conectando al servidor...",
+                analyzing: "Analizando datos...",
+                predicting: "Prediciendo...",
+                wait: "SIGUIENTE EN",
+                seconds: "s"
+            },
+            ms: {
+                choose_game: "PILIH PERMAINAN",
+                get_signal: "DAPATKAN SIGNAL",
+                exit: "KELUAR",
+                connecting: "Menyambung ke pelayan...",
+                analyzing: "Menganalisis data...",
+                predicting: "Meramal...",
+                wait: "SIGNAL SETERUSNYA",
+                seconds: "s"
+            },
+            ar: {
+                choose_game: "اختر اللعبة",
+                get_signal: "احصل على إشارة",
+                exit: "خروج",
+                connecting: "الاتصال بالخادم...",
+                analyzing: "تحليل البيانات...",
+                predicting: "جار التنبؤ...",
+                wait: "الإشارة التالية في",
+                seconds: "ث"
+            }
+        };
+
+        let currentLang = 'en';
+
+        function changeLanguage() {
+            const selector = document.getElementById('language-select');
+            currentLang = selector.value;
+            
+            // RTL для Арабского
+            if (currentLang === 'ar') document.body.classList.add('rtl');
+            else document.body.classList.remove('rtl');
+
+            // Обновляем все статические тексты
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (translations[currentLang][key]) {
+                    el.innerText = translations[currentLang][key];
+                }
+            });
+        }
 
         // --- ЛОГИКА ЧАСТИЦ (ФОН) ---
         const canvas = document.getElementById("particles-canvas");
@@ -275,7 +382,6 @@
         canvas.height = window.innerHeight;
 
         let particlesArray;
-
         class Particle {
             constructor() {
                 this.x = Math.random() * canvas.width;
@@ -283,7 +389,7 @@
                 this.directionX = (Math.random() * 0.4) - 0.2;
                 this.directionY = (Math.random() * 0.4) - 0.2;
                 this.size = Math.random() * 2;
-                this.color = '#00f3ff'; // Neon Blue particles
+                this.color = '#00f3ff';
             }
             draw() {
                 ctx.beginPath();
@@ -299,24 +405,17 @@
                 this.draw();
             }
         }
-
         function initParticles() {
             particlesArray = [];
             let numberOfParticles = (canvas.height * canvas.width) / 9000;
-            for (let i = 0; i < numberOfParticles; i++) {
-                particlesArray.push(new Particle());
-            }
+            for (let i = 0; i < numberOfParticles; i++) particlesArray.push(new Particle());
         }
-
         function animateParticles() {
             requestAnimationFrame(animateParticles);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update();
-            }
+            for (let i = 0; i < particlesArray.length; i++) particlesArray[i].update();
             connectParticles();
         }
-
         function connectParticles() {
             let opacityValue = 1;
             for (let a = 0; a < particlesArray.length; a++) {
@@ -335,7 +434,6 @@
                 }
             }
         }
-
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -346,7 +444,6 @@
 
 
         // --- ИГРОВАЯ ЛОГИКА ---
-
         const circle = document.querySelector('.progress-ring__circle');
         const radius = circle.r.baseVal.value;
         const circumference = radius * 2 * Math.PI;
@@ -360,7 +457,8 @@
         }
 
         function openGame(game) {
-            if(game === 'aviator') {
+            // Пока открываем только Авиатор и Пенальти, остальное заглушки
+            if(game === 'aviator' || game === 'penalty') {
                 document.getElementById('screen-menu').classList.remove('active');
                 document.getElementById('screen-game').classList.add('active');
             }
@@ -377,70 +475,64 @@
             const loaderBar = document.getElementById('loader-bar');
             const loaderContainer = document.getElementById('loader-bar-container');
             const loaderText = document.getElementById('loader-text');
+            const t = translations[currentLang]; // Берем текущий перевод
 
             if (btn.disabled) return;
             btn.disabled = true;
 
-            // 1. Анимация загрузки (имитация анализа)
             loaderContainer.style.display = 'block';
             loaderText.style.display = 'block';
-            loaderText.innerText = "Connecting to server...";
+            loaderText.innerText = t.connecting; // Перевод
             loaderBar.style.width = '0%';
             
-            // Сброс
             textElement.innerText = "0.00x";
             setProgress(0);
             
-            // Прогресс бар "анализа"
             let progress = 0;
             let interval = setInterval(() => {
                 progress += Math.random() * 10;
                 if(progress > 100) progress = 100;
                 loaderBar.style.width = progress + '%';
                 
-                if (progress > 30) loaderText.innerText = "Calculating hash...";
-                if (progress > 70) loaderText.innerText = "Predicting trajectory...";
+                if (progress > 30) loaderText.innerText = t.analyzing; // Перевод
+                if (progress > 70) loaderText.innerText = t.predicting; // Перевод
 
                 if (progress >= 100) {
                     clearInterval(interval);
                     showResult();
                 }
-            }, 200);
+            }, 150);
 
             function showResult() {
-                loaderText.innerText = "DONE";
-                setTimeout(() => {
-                    loaderContainer.style.display = 'none';
-                    loaderText.style.display = 'none';
-                    
-                    // Генерация кэфа
-                    let result;
-                    if (Math.random() > 0.6) result = (Math.random() * (4.00 - 1.20) + 1.20).toFixed(2); // Обычный
-                    else result = (Math.random() * (15.00 - 4.00) + 4.00).toFixed(2); // Крупный
+                loaderText.style.display = 'none';
+                
+                let result;
+                if (Math.random() > 0.6) result = (Math.random() * (4.00 - 1.20) + 1.20).toFixed(2);
+                else result = (Math.random() * (15.00 - 4.00) + 4.00).toFixed(2);
 
-                    // Анимация цифр
-                    animateValue(textElement, 1.00, parseFloat(result), 1000);
-                    // Анимация круга (заполняем красный круг)
-                    setProgress(100); 
+                animateValue(textElement, 1.00, parseFloat(result), 1000);
+                setProgress(100); 
 
-                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-                    
-                    btn.innerHTML = "NEXT SIGNAL IN 5s";
-                    
-                    // Таймер до следующего сигнала
-                    let cooldown = 5;
-                    let cooldownTimer = setInterval(() => {
-                        cooldown--;
-                        btn.innerHTML = `NEXT SIGNAL IN ${cooldown}s`;
-                        if (cooldown <= 0) {
-                            clearInterval(cooldownTimer);
-                            btn.innerHTML = "GET SIGNAL";
-                            btn.disabled = false;
-                            setProgress(0); // Сброс круга
-                        }
-                    }, 1000);
-
-                }, 500);
+                window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                
+                // Таймер
+                let cooldown = 5;
+                const updateTimerBtn = () => {
+                    btn.innerHTML = `${t.wait} ${cooldown}${t.seconds}`;
+                }
+                updateTimerBtn();
+                
+                let cooldownTimer = setInterval(() => {
+                    cooldown--;
+                    updateTimerBtn();
+                    if (cooldown <= 0) {
+                        clearInterval(cooldownTimer);
+                        btn.innerHTML = t.get_signal; // Возвращаем текст на нужном языке
+                        btn.disabled = false;
+                        setProgress(0);
+                        loaderContainer.style.display = 'none';
+                    }
+                }, 1000);
             }
         }
 
