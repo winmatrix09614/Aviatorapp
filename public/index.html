@@ -15,7 +15,7 @@
             --text-color: #ffffff;
             --brand-red: #ff334b;
             --brand-green: #00ff41;
-            --glass-bg: rgba(20, 0, 5, 0.85);
+            --glass-bg: rgba(20, 0, 5, 0.95);
         }
 
         body {
@@ -73,7 +73,7 @@
         /* --- LUXURY PIN PAD MODAL --- */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px);
             z-index: 1000; justify-content: center; align-items: center; flex-direction: column;
         }
 
@@ -90,15 +90,25 @@
             position: relative;
             overflow: hidden;
         }
+
+        /* Кнопка закрытия */
+        .close-modal-btn {
+            position: absolute; top: 15px; right: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 24px; cursor: pointer;
+            transition: 0.3s;
+            line-height: 1;
+        }
+        .close-modal-btn:hover { color: #fff; transform: scale(1.1); }
         
         .pin-header {
             font-family: 'Orbitron', sans-serif;
             color: var(--brand-red);
             font-size: 14px; letter-spacing: 2px;
             margin-bottom: 20px; text-align: center;
+            margin-top: 5px;
         }
 
-        /* Экран ввода */
         .pin-display {
             width: 100%; height: 50px;
             background: rgba(0,0,0,0.5);
@@ -109,19 +119,19 @@
             font-size: 24px; color: #fff; letter-spacing: 5px;
             margin-bottom: 25px;
             box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+            transition: all 0.3s;
         }
         
-        .pin-display.success { color: var(--brand-green); border-color: var(--brand-green); text-shadow: 0 0 10px var(--brand-green); }
-        .pin-display.error { color: var(--brand-red); border-color: var(--brand-red); animation: shake 0.3s; }
+        .pin-display.success { color: var(--brand-green); border-color: var(--brand-green); text-shadow: 0 0 10px var(--brand-green); font-size: 18px; letter-spacing: 1px; }
+        .pin-display.error { color: var(--brand-red); border-color: var(--brand-red); animation: shake 0.3s; font-size: 18px; letter-spacing: 1px; }
 
-        /* Клавиатура */
         .keypad {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%;
         }
         .key {
             height: 60px;
             background: rgba(255,255,255,0.05);
-            border-radius: 50%; /* Круглые кнопки */
+            border-radius: 50%;
             border: 1px solid rgba(255,255,255,0.1);
             color: #fff; font-family: 'Orbitron', sans-serif; font-size: 20px;
             display: flex; justify-content: center; align-items: center;
@@ -129,7 +139,7 @@
         }
         .key:active { background: rgba(255, 51, 75, 0.3); transform: scale(0.9); border-color: var(--brand-red); }
         
-        .key-action { font-size: 14px; color: #aaa; border-radius: 12px; } /* Кнопки DEL и OK квадратнее */
+        .key-action { font-size: 14px; color: #aaa; border-radius: 12px; }
         .key-action.clear { color: var(--brand-red); }
         .key-action.enter { color: var(--brand-green); background: rgba(0, 255, 65, 0.1); border-color: rgba(0, 255, 65, 0.3); }
         .key-action.enter:active { background: rgba(0, 255, 65, 0.3); }
@@ -298,6 +308,8 @@
     <!-- LUXURY PIN PAD -->
     <div id="security-modal" class="modal-overlay">
         <div class="pin-container">
+            <div class="close-modal-btn" onclick="closeModal()">✕</div>
+            
             <div class="pin-header">SECURITY ACCESS</div>
             <div class="pin-display" id="pin-display"></div>
             
@@ -386,17 +398,25 @@
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
 
-        // --- БАЗА КОДОВ (ТОЛЬКО ЦИФРЫ) ---
+        // --- БАЗА КОДОВ (ОБНОВЛЕННАЯ, 10 ШТУК КАЖДАЯ) ---
+        // Коды будут указаны в списке. Если ввести код Авиатора, находясь в Пенальти - зачислятся кредиты Авиатора, но в Пенальти играть нельзя.
         const VALID_CODES = {
             // Авиатор (3 попытки)
-            aviator: ['19255', '2024', '77777', '123456'],
+            aviator: [
+                '112233', '999999', '123123', '550055', '101010', 
+                '887766', '258000', '774411', '369369', '445566'
+            ],
             // Пенальти (5 попыток)
-            penalty: ['2101', '8888', '55555']
+            penalty: [
+                '555555', '808080', '202525', '007007', '191919', 
+                '663300', '789789', '456456', '987654', '321321'
+            ]
         };
 
         // Состояние
         let aviatorCredits = 0;
         let penaltyCredits = 0;
+        let usedCodes = []; // Список использованных кодов
         let activeGame = 'aviator';
         let currentPin = "";
         let isVerifying = false;
@@ -408,13 +428,17 @@
                 const data = JSON.parse(saved);
                 aviatorCredits = data.av || 0;
                 penaltyCredits = data.pen || 0;
+                usedCodes = data.used || [];
             }
         }
         function saveState() {
-            const data = { av: aviatorCredits, pen: penaltyCredits };
+            const data = { 
+                av: aviatorCredits, 
+                pen: penaltyCredits,
+                used: usedCodes 
+            };
             localStorage.setItem('omar_credits_v1', JSON.stringify(data));
         }
-        // Загружаем при старте
         loadState();
 
         // --- PIN PAD LOGIC ---
@@ -427,10 +451,13 @@
             clearPin();
             window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
         }
+        function closeModal() {
+            modal.style.display = 'none';
+        }
 
         function enterDigit(digit) {
             if (isVerifying) return;
-            if (currentPin.length < 8) { // Макс длина
+            if (currentPin.length < 8) {
                 currentPin += digit;
                 updatePinDisplay();
                 window.Telegram.WebApp.HapticFeedback.selectionChanged();
@@ -440,13 +467,12 @@
         function clearPin() {
             if (isVerifying) return;
             currentPin = "";
-            pinDisplay.className = "pin-display"; // Сброс классов цвета
+            pinDisplay.className = "pin-display"; 
             pinDisplay.innerText = "_ _ _ _";
             window.Telegram.WebApp.HapticFeedback.selectionChanged();
         }
 
         function updatePinDisplay() {
-            // Показываем точки или звездочки вместо цифр
             pinDisplay.innerText = currentPin.split('').map(() => '•').join(' ');
         }
 
@@ -454,17 +480,14 @@
             if (isVerifying || currentPin.length === 0) return;
             isVerifying = true;
             
-            // Эффект "Дешифровки" (Matrix Style)
             pinDisplay.style.color = "#fff";
             let steps = 0;
             const maxSteps = 10;
             const originalPin = currentPin;
             
             const interval = setInterval(() => {
-                // Показываем рандомные цифры
                 pinDisplay.innerText = Math.floor(Math.random() * 100000);
                 steps++;
-                
                 if (steps > maxSteps) {
                     clearInterval(interval);
                     validateLogic(originalPin);
@@ -473,32 +496,33 @@
         }
 
         function validateLogic(code) {
-            let success = false;
-            let msg = "ACCESS GRANTED";
-            let addedCredits = 0;
-
-            if (VALID_CODES.aviator.includes(code)) {
-                aviatorCredits += 3;
-                success = true;
-                msg = "AVIATOR +3";
-            } else if (VALID_CODES.penalty.includes(code)) {
-                if (activeGame === 'aviator') {
-                    // Код пенальти, но мы в авиаторе. Разрешаем, но предупреждаем
-                    penaltyCredits += 5;
-                    success = false; // Визуально покажем ошибку, что не та игра
-                    pinDisplay.innerText = "PENALTY CODE";
-                    pinDisplay.className = "pin-display error";
-                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
-                    saveState();
-                    setTimeout(() => { isVerifying = false; clearPin(); }, 1500);
-                    return;
-                } else {
-                    penaltyCredits += 5;
-                    success = true;
-                    msg = "PENALTY +5";
-                }
+            // 1. Проверка на использованный код (Blacklist)
+            if (usedCodes.includes(code)) {
+                showResult(false, "CODE REDEEMED");
+                return;
             }
 
+            // 2. Проверка базы Авиатора
+            if (VALID_CODES.aviator.includes(code)) {
+                aviatorCredits += 3;
+                usedCodes.push(code); // Заносим в черный список
+                showResult(true, "AVIATOR +3");
+                return;
+            }
+
+            // 3. Проверка базы Пенальти
+            if (VALID_CODES.penalty.includes(code)) {
+                penaltyCredits += 5;
+                usedCodes.push(code); // Заносим в черный список
+                showResult(true, "PENALTY +5");
+                return;
+            }
+
+            // 4. Код не найден
+            showResult(false, "INVALID CODE");
+        }
+
+        function showResult(success, msg) {
             if (success) {
                 saveState();
                 updateCreditsDisplay();
@@ -512,13 +536,13 @@
                     clearPin();
                 }, 1500);
             } else {
-                pinDisplay.innerText = "ACCESS DENIED";
+                pinDisplay.innerText = msg;
                 pinDisplay.className = "pin-display error";
                 window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
                 setTimeout(() => {
                     isVerifying = false;
                     clearPin();
-                }, 1000);
+                }, 1500);
             }
         }
 
@@ -531,7 +555,7 @@
         }
 
 
-        // --- ОБЩИЙ КОД ---
+        // --- UI & LOGIC ---
         function updatePing() {
             const pingElement = document.getElementById('ping-counter');
             if (pingElement) {
