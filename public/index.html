@@ -9,7 +9,9 @@
     
     <style>
         :root {
-            --bg-dark: #050505; /* Почти черный */
+            --bg-dark: #020002;
+            --grid-color: rgba(255, 51, 75, 0.3); /* Цвет линий сетки */
+            --horizon-color: #4a000e; /* Цвет горизонта */
             --text-color: #ffffff;
             --brand-red: #ff334b;
         }
@@ -26,52 +28,54 @@
             position: relative;
         }
 
-        /* --- ФОН "NEON SMOKE" (Туманность) --- */
-        /* Это легкие цветные пятна, которые плавают на фоне */
-        .fog-container {
+        /* --- ФОН "CYBER GRID" (3D СЕТКА) --- */
+        .grid-wrapper {
             position: absolute;
             width: 100%;
             height: 100%;
             overflow: hidden;
+            background: linear-gradient(to bottom, #000 0%, #1a0005 100%);
             z-index: -1;
-            background: #000;
+            perspective: 400px; /* Глубина 3D */
         }
-        
-        .fog-blob {
+
+        .grid-floor {
             position: absolute;
-            filter: blur(80px); /* Сильное размытие для эффекта дыма */
+            bottom: -30%;
+            left: -50%;
+            width: 200%;
+            height: 100%;
+            background-image: 
+                /* Вертикальные линии */
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px),
+                /* Горизонтальные линии */
+                linear-gradient(0deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px; /* Размер клетки */
+            transform: rotateX(60deg); /* Наклон пола */
+            animation: gridMove 1.5s linear infinite; /* Скорость полета */
+            
+            /* Маска, чтобы сетка исчезала вдали */
+            mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
+            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
+        }
+
+        /* Дальнее свечение (Горизонт) */
+        .horizon-glow {
+            position: absolute;
+            top: 30%;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: radial-gradient(ellipse at center, var(--horizon-color) 0%, transparent 70%);
             opacity: 0.6;
-            animation: moveFog 20s infinite alternate ease-in-out;
-            border-radius: 50%;
+            filter: blur(40px);
         }
 
-        /* Красное пятно */
-        .blob-1 {
-            width: 300px; height: 300px;
-            background: #4a0005;
-            top: -50px; left: -50px;
-            animation-duration: 25s;
-        }
-        /* Синее/Фиолетовое пятно */
-        .blob-2 {
-            width: 400px; height: 400px;
-            background: #0f0025;
-            bottom: -100px; right: -50px;
-            animation-duration: 30s;
-        }
-        /* Центральное пятно */
-        .blob-3 {
-            width: 250px; height: 250px;
-            background: #1a0000;
-            top: 40%; left: 30%;
-            animation-duration: 35s;
-            opacity: 0.4;
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 40px; } /* Двигаем на размер одной клетки */
         }
 
-        @keyframes moveFog {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, 50px) scale(1.2); }
-        }
 
         /* --- ИНТЕРФЕЙС --- */
         .screen {
@@ -93,9 +97,9 @@
             z-index: 20;
         }
         select {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.6);
             color: #fff;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255, 51, 75, 0.4);
             padding: 5px 10px;
             border-radius: 8px;
             font-family: 'Orbitron', sans-serif;
@@ -114,7 +118,7 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             color: #fff;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            text-shadow: 0 0 15px rgba(255, 51, 75, 0.5); /* Красное свечение текста */
             text-align: center;
         }
 
@@ -128,9 +132,9 @@
 
         /* КАРТОЧКА ИГРЫ */
         .game-card {
-            background: rgba(255, 255, 255, 0.05); /* Стекло */
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 51, 75, 0.3); /* Красная обводка */
             border-radius: 20px;
             padding: 20px;
             text-align: center;
@@ -142,52 +146,39 @@
             justify-content: center;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
         
-        .game-card:active { transform: scale(0.96); background: rgba(255, 255, 255, 0.1); }
+        .game-card:active { transform: scale(0.96); border-color: rgba(255, 51, 75, 0.6); }
         
-        /* ИКОНКА (App Icon Style) */
         .game-img {
             width: 75px;
             height: 75px;
             object-fit: cover;
-            border-radius: 16px; /* Закругленный квадрат (как iOS) */
+            border-radius: 16px;
             margin-bottom: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); /* Тень */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             transition: 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         
         .game-card:hover .game-img { transform: scale(1.05); }
 
         .game-title { 
             font-weight: 600; font-size: 13px; letter-spacing: 1px; color: #eee; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
 
-        /* СТИЛЬ ДЛЯ НЕДОСТУПНЫХ (SOON) */
-        .card-disabled {
-            cursor: not-allowed;
-            /* НЕ ДЕЛАЕМ ЧЕРНО-БЕЛЫМ, ОСТАВЛЯЕМ ЦВЕТ! */
-            /* filter: grayscale(1);  <- УБРАЛИ ЭТО */
-        }
-        
-        /* Затемнение поверх карточки (вуаль) */
+        /* SOON */
+        .card-disabled { cursor: not-allowed; }
         .card-disabled::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6); /* Полупрозрачный черный */
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); /* Темнее */
             z-index: 5;
-            border-radius: 20px;
         }
-        
-        /* Замочек поверх затемнения */
         .lock-icon {
-            position: absolute;
-            top: 10px; right: 10px;
-            font-size: 14px;
-            color: rgba(255,255,255,0.7);
-            z-index: 6;
+            position: absolute; top: 10px; right: 10px; font-size: 14px;
+            color: rgba(255,255,255,0.7); z-index: 6;
         }
 
         /* --- UI ИГРЫ --- */
@@ -201,14 +192,15 @@
             border-radius: 12px;
             font-size: 14px;
             letter-spacing: 1px;
-            background: rgba(20, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
             margin-bottom: 20px;
             margin-top: -40px;
             transition: 0.3s;
             display: inline-block;
+            box-shadow: 0 0 15px rgba(255, 51, 75, 0.2);
         }
-        .telegram-link:active { transform: scale(0.95); background: rgba(255, 51, 75, 0.1); }
+        .telegram-link:active { transform: scale(0.95); }
 
         .aviator-logo-container {
             margin-bottom: 25px;
@@ -232,7 +224,6 @@
             margin-bottom: 30px;
         }
 
-        /* Свечение за кругом (статичное, но мягкое) */
         .circle-glow {
             position: absolute;
             width: 220px;
@@ -313,7 +304,7 @@
         .btn-back {
             margin-top: 30px;
             background: transparent;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255, 51, 75, 0.3);
             color: #aaa;
             padding: 10px 30px;
             border-radius: 20px;
@@ -322,7 +313,7 @@
             font-family: 'Orbitron', sans-serif;
             transition: 0.3s;
         }
-        .btn-back:hover { border-color: #fff; color: #fff; background: rgba(255,255,255,0.05); }
+        .btn-back:hover { border-color: #fff; color: #fff; background: rgba(255, 51, 75, 0.1); }
 
         body.rtl { font-family: 'Cairo', sans-serif !important; direction: rtl; }
         body.rtl .menu-header, body.rtl .btn-signal, body.rtl .loader-text, body.rtl .btn-back, body.rtl select {
@@ -334,11 +325,10 @@
 </head>
 <body>
 
-    <!-- ФОНОВЫЙ ТУМАН (Без JS, только CSS) -->
-    <div class="fog-container">
-        <div class="fog-blob blob-1"></div>
-        <div class="fog-blob blob-2"></div>
-        <div class="fog-blob blob-3"></div>
+    <!-- ФОН "CYBER GRID" -->
+    <div class="grid-wrapper">
+        <div class="horizon-glow"></div>
+        <div class="grid-floor"></div>
     </div>
 
     <div class="lang-container">
@@ -367,9 +357,8 @@
             </div>
             
             <!-- MINES (SOON) -->
-            <!-- Цветная картинка, но под темной вуалью -->
             <div class="game-card card-disabled">
-                <div class="lock-icon">🔒</div> <!-- Иконка замка -->
+                <div class="lock-icon">🔒</div>
                 <img src="/img/menu_mines.png" class="game-img" alt="Mines">
                 <div class="game-title">MINES (SOON)</div>
             </div>
