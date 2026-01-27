@@ -10,8 +10,8 @@
     <style>
         :root {
             --bg-dark: #020002;
-            --grid-color: rgba(255, 51, 75, 0.3); /* Цвет линий сетки */
-            --horizon-color: #4a000e; /* Цвет горизонта */
+            --grid-color: rgba(255, 51, 75, 0.2);
+            --horizon-color: #ff334b; /* Ярче для свечения */
             --text-color: #ffffff;
             --brand-red: #ff334b;
         }
@@ -28,17 +28,18 @@
             position: relative;
         }
 
-        /* --- ФОН "CYBER GRID" (3D СЕТКА) --- */
+        /* --- ФОН: СЕТКА + ГОРИЗОНТ + ЗВЕЗДЫ --- */
         .grid-wrapper {
             position: absolute;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: linear-gradient(to bottom, #000 0%, #1a0005 100%);
-            z-index: -1;
-            perspective: 400px; /* Глубина 3D */
+            background: linear-gradient(to bottom, #050005 0%, #2a000a 100%);
+            z-index: -2;
+            perspective: 400px;
         }
 
+        /* 1. Сетка (Пол) */
         .grid-floor {
             position: absolute;
             bottom: -30%;
@@ -46,38 +47,87 @@
             width: 200%;
             height: 100%;
             background-image: 
-                /* Вертикальные линии */
                 linear-gradient(90deg, var(--grid-color) 1px, transparent 1px),
-                /* Горизонтальные линии */
                 linear-gradient(0deg, var(--grid-color) 1px, transparent 1px);
-            background-size: 40px 40px; /* Размер клетки */
-            transform: rotateX(60deg); /* Наклон пола */
-            animation: gridMove 1.5s linear infinite; /* Скорость полета */
-            
-            /* Маска, чтобы сетка исчезала вдали */
-            mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
-            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
+            background-size: 50px 50px;
+            transform: rotateX(60deg);
+            animation: gridMove 2s linear infinite;
+            mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 50%);
+            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 50%);
         }
 
-        /* Дальнее свечение (Горизонт) */
-        .horizon-glow {
+        /* 2. Свечение горизонта (Digital Sun) */
+        .horizon-light {
             position: absolute;
-            top: 30%;
-            left: 0;
-            width: 100%;
-            height: 200px;
-            background: radial-gradient(ellipse at center, var(--horizon-color) 0%, transparent 70%);
-            opacity: 0.6;
+            top: 40%; /* Чуть выше центра */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 150px;
+            background: radial-gradient(ellipse at center, rgba(255, 51, 75, 0.4) 0%, transparent 70%);
             filter: blur(40px);
+            z-index: -1;
+            animation: pulseLight 4s infinite alternate;
+        }
+
+        /* 3. Звездная пыль (верхняя часть) */
+        .stars-dust {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 60%;
+            background-image: 
+                radial-gradient(white 1px, transparent 1px),
+                radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px);
+            background-size: 100px 100px, 40px 40px;
+            background-position: 0 0, 20px 20px;
+            opacity: 0.3;
+            animation: starsMove 60s linear infinite;
+            z-index: -2;
         }
 
         @keyframes gridMove {
             0% { background-position: 0 0; }
-            100% { background-position: 0 40px; } /* Двигаем на размер одной клетки */
+            100% { background-position: 0 50px; }
+        }
+        @keyframes pulseLight {
+            0% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+        }
+        @keyframes starsMove {
+            0% { background-position: 0 0, 20px 20px; }
+            100% { background-position: 100px 100px, 120px 120px; }
         }
 
+        /* --- HUD (System Info) --- */
+        .hud-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 20px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            z-index: 50;
+            pointer-events: none; /* Чтобы можно было нажать на селектор языка под ним */
+        }
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-dot {
+            width: 6px; height: 6px; background-color: #00ff41;
+            border-radius: 50%; box-shadow: 0 0 5px #00ff41;
+            animation: blinkStatus 2s infinite;
+        }
+        .ping-value { color: var(--brand-red); font-weight: bold; width: 30px; text-align: right; display: inline-block;}
+        @keyframes blinkStatus { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        /* --- ИНТЕРФЕЙС --- */
+
+        /* --- ГЛАВНЫЙ ЭКРАН --- */
         .screen {
             display: none;
             flex-direction: column;
@@ -90,9 +140,10 @@
         }
         .screen.active { display: flex; }
 
+        /* ЯЗЫК (опускаем чуть ниже из-за HUD) */
         .lang-container {
             position: absolute;
-            top: 20px;
+            top: 50px;
             right: 20px;
             z-index: 20;
         }
@@ -111,14 +162,43 @@
         }
         option { background: #000; color: white; }
 
+        /* БРЕНДИНГ (ЛОГОТИП) */
+        .main-logo {
+            text-align: center;
+            margin-bottom: 20px; /* Отступ до Choose Game */
+            position: relative;
+            z-index: 5;
+        }
+        .logo-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 28px;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(255, 51, 75, 0.6);
+            letter-spacing: 1px;
+            margin: 0;
+            background: linear-gradient(180deg, #fff 0%, #ffaaaa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .logo-subtitle {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+        .logo-subtitle span { color: var(--brand-red); font-weight: 500; }
+
         .menu-header {
             font-family: 'Orbitron', sans-serif;
-            font-size: 24px;
-            margin-bottom: 30px;
+            font-size: 16px; /* Чуть меньше, так как теперь есть лого */
+            margin-bottom: 25px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            color: #fff;
-            text-shadow: 0 0 15px rgba(255, 51, 75, 0.5); /* Красное свечение текста */
+            color: rgba(255, 255, 255, 0.8);
             text-align: center;
         }
 
@@ -134,7 +214,7 @@
         .game-card {
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 51, 75, 0.3); /* Красная обводка */
+            border: 1px solid rgba(255, 51, 75, 0.3);
             border-radius: 20px;
             padding: 20px;
             text-align: center;
@@ -148,20 +228,15 @@
             overflow: hidden;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
-        
         .game-card:active { transform: scale(0.96); border-color: rgba(255, 51, 75, 0.6); }
         
         .game-img {
-            width: 75px;
-            height: 75px;
-            object-fit: cover;
-            border-radius: 16px;
-            margin-bottom: 12px;
+            width: 75px; height: 75px; object-fit: cover;
+            border-radius: 16px; margin-bottom: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             transition: 0.3s;
             border: 1px solid rgba(255,255,255,0.1);
         }
-        
         .game-card:hover .game-img { transform: scale(1.05); }
 
         .game-title { 
@@ -169,12 +244,10 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
 
-        /* SOON */
         .card-disabled { cursor: not-allowed; }
         .card-disabled::after {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7); /* Темнее */
-            z-index: 5;
+            background: rgba(0, 0, 0, 0.7); z-index: 5;
         }
         .lock-icon {
             position: absolute; top: 10px; right: 10px; font-size: 14px;
@@ -182,7 +255,6 @@
         }
 
         /* --- UI ИГРЫ --- */
-        
         .telegram-link {
             text-decoration: none;
             font-family: 'Orbitron', sans-serif;
@@ -213,7 +285,6 @@
             filter: drop-shadow(0 0 20px rgba(255, 51, 75, 0.4));
         }
 
-        /* КРУГ */
         .circle-container {
             position: relative;
             width: 260px;
@@ -223,29 +294,23 @@
             justify-content: center;
             margin-bottom: 30px;
         }
-
         .circle-glow {
             position: absolute;
-            width: 220px;
-            height: 220px;
+            width: 220px; height: 220px;
             border-radius: 50%;
             background: transparent;
             box-shadow: 0 0 80px rgba(255, 51, 75, 0.25); 
             z-index: 0;
         }
-
         .progress-ring { transform: rotate(-90deg); z-index: 1; }
         .progress-ring__circle {
             transition: stroke-dashoffset 0.5s ease-in-out;
             transform-origin: 50% 50%;
         }
-
         .coef-text {
             position: absolute;
             font-family: 'Orbitron', sans-serif;
-            font-size: 52px;
-            font-weight: 900;
-            color: #fff;
+            font-size: 52px; font-weight: 900; color: #fff;
             text-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
             z-index: 2;
         }
@@ -253,14 +318,12 @@
         .btn-signal {
             background: linear-gradient(90deg, #d6002a 0%, #8a001a 100%);
             border: none;
-            width: 80%;
-            max-width: 300px;
+            width: 80%; max-width: 300px;
             padding: 18px;
             border-radius: 12px;
             color: white;
             font-family: 'Orbitron', sans-serif;
-            font-size: 16px;
-            letter-spacing: 1px;
+            font-size: 16px; letter-spacing: 1px;
             cursor: pointer;
             box-shadow: 0 10px 30px rgba(214, 0, 42, 0.2);
             transition: 0.3s;
@@ -280,20 +343,13 @@
         .btn-signal:hover::before { left: 100%; }
 
         .loader-bar-container {
-            width: 80%;
-            max-width: 300px;
-            height: 4px;
-            background: #222;
-            border-radius: 2px;
-            margin-top: 15px;
-            overflow: hidden;
-            display: none;
+            width: 80%; max-width: 300px; height: 4px;
+            background: #222; border-radius: 2px;
+            margin-top: 15px; overflow: hidden; display: none;
         }
         .loader-bar {
-            height: 100%;
-            width: 0%;
-            background: #fff;
-            box-shadow: 0 0 10px #fff;
+            height: 100%; width: 0%;
+            background: #fff; box-shadow: 0 0 10px #fff;
             transition: width 0.1s linear;
         }
         .loader-text {
@@ -325,10 +381,25 @@
 </head>
 <body>
 
-    <!-- ФОН "CYBER GRID" -->
+    <!-- ФОН (Сетка + Свет + Звезды) -->
     <div class="grid-wrapper">
-        <div class="horizon-glow"></div>
+        <div class="stars-dust"></div>
+        <div class="horizon-light"></div>
         <div class="grid-floor"></div>
+    </div>
+
+    <!-- HUD (Техническая инфа сверху) -->
+    <div class="hud-bar">
+        <div class="hud-item">
+            <div class="status-dot"></div>
+            <span>SYSTEM: ONLINE</span>
+        </div>
+        <div class="hud-item">
+            <span>PING: <span id="ping-counter" class="ping-value">34</span>ms</span>
+        </div>
+        <div class="hud-item">
+            <span>VER: 3.7</span>
+        </div>
     </div>
 
     <div class="lang-container">
@@ -342,7 +413,15 @@
 
     <!-- МЕНЮ -->
     <div id="screen-menu" class="screen active">
+        
+        <!-- БРЕНДИНГ (Логотип) -->
+        <div class="main-logo">
+            <h1 class="logo-title">AI PREDICTOR 3.7</h1>
+            <div class="logo-subtitle">POWERED <span>BY OMAR</span></div>
+        </div>
+
         <div class="menu-header" data-translate="choose_game">CHOOSE GAME</div>
+        
         <div class="menu-grid">
             <!-- AVIATOR -->
             <div class="game-card" onclick="openGame('aviator')">
@@ -383,7 +462,6 @@
 
         <div class="circle-container">
             <div class="circle-glow"></div>
-            
             <svg class="progress-ring" width="260" height="260">
                 <circle class="progress-ring__circle-bg" stroke="#1a1a1a" stroke-width="6" fill="transparent" r="110" cx="130" cy="130"/>
                 <circle class="progress-ring__circle" stroke="#ff334b" stroke-width="8" fill="transparent" r="110" cx="130" cy="130"
@@ -405,6 +483,23 @@
     <script>
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
+
+        // --- ДИНАМИЧЕСКИЙ ПИНГ ---
+        function updatePing() {
+            const pingElement = document.getElementById('ping-counter');
+            if (pingElement) {
+                // Случайное число от 5 до 60
+                const randomPing = Math.floor(Math.random() * (60 - 5 + 1)) + 5;
+                pingElement.innerText = randomPing;
+                
+                // Цвет пинга: зеленый если < 30, иначе белый/желтый
+                if(randomPing < 30) pingElement.style.color = '#00ff41';
+                else pingElement.style.color = '#ff334b';
+            }
+        }
+        // Обновляем пинг каждые 2.5 секунды
+        setInterval(updatePing, 2500);
+
 
         const translations = {
             en: { choose_game: "CHOOSE GAME", get_signal: "GET SIGNAL", exit: "EXIT", connecting: "Connecting...", analyzing: "Analyzing...", predicting: "Predicting...", wait: "NEXT IN", seconds: "s" },
