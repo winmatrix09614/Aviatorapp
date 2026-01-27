@@ -10,9 +10,8 @@
     <style>
         :root {
             --bg-dark: #050000;
-            --bg-red: #2a0003;
-            --neon-red: #ff334b;
             --text-color: #ffffff;
+            --primary-red: #ff334b; /* Фиксированный красный для кнопок */
         }
 
         body {
@@ -27,7 +26,14 @@
             position: relative;
         }
 
-        /* --- ДИНАМИЧЕСКИЙ ФОН (ДЫХАНИЕ) --- */
+        /* --- RGB АНИМАЦИЯ --- */
+        @keyframes rgbFlow {
+            0% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(180deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        /* ДИНАМИЧЕСКИЙ ФОН */
         .background-animate {
             position: absolute;
             top: 0;
@@ -35,23 +41,14 @@
             width: 100%;
             height: 100%;
             z-index: -2;
-            background: radial-gradient(circle at center, #3a0005 0%, #000000 80%);
-            background-size: 150% 150%;
-            animation: breathe 6s ease-in-out infinite alternate;
+            /* Базовый градиент (красный), который мы будем крутить */
+            background: radial-gradient(circle at center, #4a0005 0%, #000000 85%);
+            background-size: 100% 100%;
+            /* Применяем RGB вращение */
+            animation: rgbFlow 20s linear infinite; 
         }
 
-        @keyframes breathe {
-            0% {
-                background: radial-gradient(circle at center, #250002 0%, #000000 70%);
-                opacity: 0.8;
-            }
-            100% {
-                background: radial-gradient(circle at center, #450008 10%, #000000 90%);
-                opacity: 1;
-            }
-        }
-
-        /* ЧАСТИЦЫ */
+        /* ЧАСТИЦЫ (Тоже переливаются) */
         #particles-canvas {
             position: absolute;
             top: 0;
@@ -59,7 +56,9 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            opacity: 0.6;
+            opacity: 0.8;
+            /* Частицы тоже меняют цвет синхронно с фоном */
+            animation: rgbFlow 20s linear infinite;
         }
 
         /* ГЛАВНЫЙ КОНТЕЙНЕР */
@@ -75,7 +74,7 @@
         }
         .screen.active { display: flex; }
 
-        /* ЯЗЫКОВОЙ СЕЛЕКТОР */
+        /* ЯЗЫК */
         .lang-container {
             position: absolute;
             top: 20px;
@@ -83,9 +82,9 @@
             z-index: 20;
         }
         select {
-            background: rgba(40, 0, 0, 0.6);
-            color: var(--neon-red);
-            border: 1px solid var(--neon-red);
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            border: 1px solid #fff;
             padding: 5px 10px;
             border-radius: 5px;
             font-family: 'Orbitron', sans-serif;
@@ -95,7 +94,7 @@
             cursor: pointer;
             text-transform: uppercase;
         }
-        option { background: #1a0000; color: white; }
+        option { background: #000; color: white; }
 
         /* МЕНЮ */
         .menu-header {
@@ -104,8 +103,8 @@
             margin-bottom: 30px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            color: var(--neon-red);
-            text-shadow: 0 0 15px rgba(255, 51, 75, 0.4);
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             text-align: center;
         }
 
@@ -120,24 +119,25 @@
         .game-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 51, 75, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
             padding: 20px;
             text-align: center;
             cursor: pointer;
             transition: 0.3s;
         }
-        .game-card:active { transform: scale(0.96); background: rgba(255, 51, 75, 0.1); }
+        .game-card:active { transform: scale(0.96); background: rgba(255, 255, 255, 0.1); }
         .game-icon { font-size: 32px; margin-bottom: 10px; }
         .game-title { font-weight: 600; font-size: 14px; letter-spacing: 1px; }
 
-        /* --- AVIATOR INTERFACE --- */
+        /* --- AVIATOR UI --- */
         
+        /* Ссылка остается красной (бренд) */
         .telegram-link {
             text-decoration: none;
             font-family: 'Orbitron', sans-serif;
-            color: var(--neon-red);
-            border: 1px solid var(--neon-red);
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
             padding: 10px 24px;
             border-radius: 8px;
             font-size: 14px;
@@ -145,11 +145,11 @@
             box-shadow: 0 0 15px rgba(255, 51, 75, 0.2);
             margin-bottom: 20px;
             margin-top: -40px;
-            background: rgba(255, 0, 0, 0.05);
+            background: rgba(0, 0, 0, 0.3);
             transition: 0.3s;
             display: inline-block;
         }
-        .telegram-link:active { transform: scale(0.95); background: rgba(255, 0, 0, 0.15); }
+        .telegram-link:active { transform: scale(0.95); }
 
         .aviator-logo-container {
             margin-bottom: 25px;
@@ -159,10 +159,11 @@
         .aviator-logo-img {
             width: 180px;
             height: auto;
+            /* Логотип оставляем красным, не вращаем цвета */
             filter: drop-shadow(0 0 10px rgba(229, 11, 32, 0.6));
         }
 
-        /* КРУГОВОЙ ИНДИКАТОР */
+        /* КРУГ */
         .circle-container {
             position: relative;
             width: 260px;
@@ -173,28 +174,23 @@
             margin-bottom: 30px;
         }
 
-        /* ИСПРАВЛЕНИЕ КВАДРАТА: Добавляем круглое свечение позади SVG */
+        /* Свечение за кругом (ТОЖЕ RGB) */
         .circle-glow {
             position: absolute;
             width: 220px;
             height: 220px;
-            border-radius: 50%; /* Идеальный круг */
+            border-radius: 50%;
             background: transparent;
-            /* Мягкое красное свечение без квадратных краев */
-            box-shadow: 0 0 40px rgba(255, 51, 75, 0.25);
+            /* Изначально красный, но меняется анимацией */
+            box-shadow: 0 0 50px rgba(255, 51, 75, 0.4); 
             z-index: 0;
+            animation: rgbFlow 20s linear infinite; /* Синхронно с фоном */
         }
 
-        .progress-ring { 
-            transform: rotate(-90deg); 
-            z-index: 1; /* Поверх свечения */
-        }
-
+        .progress-ring { transform: rotate(-90deg); z-index: 1; }
         .progress-ring__circle {
             transition: stroke-dashoffset 0.5s ease-in-out;
             transform-origin: 50% 50%;
-            /* УБРАЛИ drop-shadow с самого круга, чтобы не было квадрата */
-            filter: none; 
         }
 
         .coef-text {
@@ -203,12 +199,13 @@
             font-size: 52px;
             font-weight: 900;
             color: #fff;
-            text-shadow: 0 0 25px rgba(255, 0, 60, 0.8);
+            text-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
             z-index: 2;
         }
 
+        /* КНОПКА (Фиксированный красный градиент, чтобы выделялась) */
         .btn-signal {
-            background: linear-gradient(90deg, #d6002a 0%, #5e0012 100%);
+            background: linear-gradient(90deg, #d6002a 0%, #8a001a 100%);
             border: none;
             width: 80%;
             max-width: 300px;
@@ -225,10 +222,10 @@
             position: relative;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 5;
         }
         .btn-signal:active { transform: scale(0.98); }
         .btn-signal:disabled { filter: grayscale(1); cursor: not-allowed; }
-        
         .btn-signal::before {
             content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
@@ -236,6 +233,7 @@
         }
         .btn-signal:hover::before { left: 100%; }
 
+        /* Loader */
         .loader-bar-container {
             width: 80%;
             max-width: 300px;
@@ -249,8 +247,8 @@
         .loader-bar {
             height: 100%;
             width: 0%;
-            background: var(--neon-red);
-            box-shadow: 0 0 10px var(--neon-red);
+            background: #fff;
+            box-shadow: 0 0 10px #fff;
             transition: width 0.1s linear;
         }
         .loader-text {
@@ -270,7 +268,7 @@
             font-family: 'Orbitron', sans-serif;
             transition: 0.3s;
         }
-        .btn-back:hover { border-color: var(--neon-red); color: #fff; }
+        .btn-back:hover { border-color: #fff; color: #fff; }
 
         body.rtl { font-family: 'Cairo', sans-serif !important; direction: rtl; }
         body.rtl .menu-header, body.rtl .btn-signal, body.rtl .loader-text, body.rtl .btn-back, body.rtl select {
@@ -282,7 +280,7 @@
 </head>
 <body>
 
-    <!-- Анимированный градиент -->
+    <!-- RGB Фон -->
     <div class="background-animate"></div>
     <canvas id="particles-canvas"></canvas>
 
@@ -323,13 +321,13 @@
             <img src="/img/aviator_logo.png" alt="Aviator" class="aviator-logo-img">
         </div>
 
-        <!-- КРУГ -->
         <div class="circle-container">
-            <!-- Отдельный слой для свечения (исправляет квадрат) -->
+            <!-- Свечение переливается RGB -->
             <div class="circle-glow"></div>
             
             <svg class="progress-ring" width="260" height="260">
-                <circle class="progress-ring__circle-bg" stroke="#2a0a0a" stroke-width="6" fill="transparent" r="110" cx="130" cy="130"/>
+                <circle class="progress-ring__circle-bg" stroke="#222" stroke-width="6" fill="transparent" r="110" cx="130" cy="130"/>
+                <!-- Круг прогресса тоже фиксируем красным, чтобы было видно заполнение -->
                 <circle class="progress-ring__circle" stroke="#ff334b" stroke-width="8" fill="transparent" r="110" cx="130" cy="130"
                         style="stroke-dasharray: 691; stroke-dashoffset: 691; stroke-linecap: round;"/>
             </svg>
@@ -383,7 +381,8 @@
                 this.directionX = (Math.random() * 0.2) - 0.1;
                 this.directionY = (Math.random() * 0.2) - 0.1;
                 this.size = Math.random() * 2.5;
-                this.color = Math.random() > 0.5 ? '#ff334b' : '#800020'; 
+                // Базовый цвет (теперь он будет фильтроваться CSS анимацией)
+                this.color = Math.random() > 0.5 ? '#ff334b' : '#cc0025'; 
             }
             draw() {
                 ctx.beginPath();
