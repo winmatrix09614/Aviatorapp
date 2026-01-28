@@ -61,10 +61,9 @@
         }
         @keyframes cyberMove { 0% { background-position: 0 0; } 100% { background-position: 0 50px; } }
 
-        /* --- HUD (Исправил отступы Пинга) --- */
+        /* --- HUD --- */
         .hud-bar {
             position: absolute; top: 0; left: 0; width: 100%; 
-            /* Увеличил padding справа до 40px, чтобы пинг не улетал */
             padding: 15px 40px 15px 20px; 
             display: flex; justify-content: space-between;
             font-family: 'Orbitron', sans-serif; font-size: 11px;
@@ -77,9 +76,8 @@
         }
         .ping-value { color: var(--accent-cyan); font-weight: bold; }
 
-        /* --- LANGUAGE SELECTOR (Теперь глобальный, виден везде) --- */
         .lang-container { 
-            position: absolute; top: 50px; right: 20px; z-index: 60; /* z-index выше чем у экранов */
+            position: absolute; top: 50px; right: 20px; z-index: 60; 
         }
         select {
             background: rgba(0, 0, 0, 0.6); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2);
@@ -88,7 +86,6 @@
         }
         option { background: #000; color: #fff; }
 
-        /* --- SESSION ID --- */
         .session-id {
             position: absolute; bottom: 15px; left: 0; width: 100%;
             text-align: center; font-family: 'Orbitron', sans-serif; font-size: 10px;
@@ -163,7 +160,6 @@
 
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 90%; max-width: 400px; }
         
-        /* КАРТОЧКИ ИГР */
         .game-card {
             background: var(--glass-panel); backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px;
@@ -174,26 +170,11 @@
         .game-img { width: 75px; height: 75px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .game-title { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 13px; color: #fff; letter-spacing: 0.5px; }
 
-        /* LOCKED CARDS (Mines & Soon) */
-        .game-card.locked {
-            opacity: 0.7; cursor: not-allowed;
-            background: rgba(10, 10, 15, 0.4);
-        }
-        /* При наведении они светятся, но не кликаются */
-        .game-card.locked:hover {
-            opacity: 1;
-            border-color: var(--accent-purple);
-            box-shadow: 0 0 20px rgba(123, 44, 191, 0.3);
-            transform: translateY(-2px);
-        }
-        .lock-icon {
-            position: absolute; top: 10px; right: 10px; font-size: 14px;
-            color: rgba(255,255,255,0.5);
-        }
+        .game-card.locked { opacity: 0.7; cursor: not-allowed; background: rgba(10, 10, 15, 0.4); }
+        .game-card.locked:hover { opacity: 1; border-color: var(--accent-purple); box-shadow: 0 0 20px rgba(123, 44, 191, 0.3); transform: translateY(-2px); }
+        .lock-icon { position: absolute; top: 10px; right: 10px; font-size: 14px; color: rgba(255,255,255,0.5); }
 
         /* --- GAME UI --- */
-        
-        /* Кнопка поддержки */
         .telegram-link {
             text-decoration: none; font-family: 'Orbitron', sans-serif; color: var(--accent-cyan);
             border: 1px solid rgba(0, 242, 234, 0.3); padding: 8px 16px; border-radius: 20px;
@@ -203,9 +184,11 @@
         }
         .telegram-link:hover { background: rgba(0, 242, 234, 0.1); box-shadow: 0 0 15px rgba(0, 242, 234, 0.2); }
 
+        /* --- AVIATOR UI --- */
         .circle-container {
             position: relative; width: 260px; height: 260px; 
-            display: flex; align-items: center; justify-content: center;
+            display: none; /* Скрыто по умолчанию */
+            align-items: center; justify-content: center;
             margin-bottom: 25px;
         }
         .circle-glow {
@@ -214,10 +197,8 @@
             animation: pulseCore 3s infinite alternate;
         }
         @keyframes pulseCore { 0% { opacity: 0.3; transform: scale(0.9); } 100% { opacity: 0.6; transform: scale(1.1); } }
-
         .progress-ring { transform: rotate(-90deg); z-index: 1; }
         .progress-ring__circle { transition: stroke-dashoffset 0.5s ease-in-out; }
-        
         .coef-text {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%);
             font-family: 'Orbitron', sans-serif; font-size: 52px; font-weight: 900;
@@ -225,11 +206,87 @@
             z-index: 2; width: 100%; text-align: center;
         }
 
+        /* --- PENALTY UI (GOAL) --- */
+        .penalty-container {
+            position: relative; width: 280px; height: 200px;
+            display: none; /* Скрыто по умолчанию */
+            margin-bottom: 30px;
+            perspective: 800px;
+        }
+        
+        /* Каркас ворот */
+        .goal-post {
+            width: 100%; height: 100%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-bottom: none;
+            position: relative;
+            background: 
+                linear-gradient(90deg, transparent 49%, rgba(255,255,255,0.1) 50%, transparent 51%),
+                linear-gradient(0deg, transparent 49%, rgba(255,255,255,0.1) 50%, transparent 51%);
+            background-size: 40px 40px; /* Сетка */
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Зоны для мяча (5 штук) */
+        .target-zone {
+            position: absolute; width: 50px; height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 51, 75, 0.0); /* Скрыты */
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            transition: 0.2s;
+        }
+        /* Позиции */
+        .z1 { top: 10px; left: 10px; } /* TL */
+        .z2 { top: 10px; right: 10px; } /* TR */
+        .z3 { top: 50%; left: 50%; transform: translate(-50%, -50%); } /* Center */
+        .z4 { bottom: 10px; left: 10px; } /* BL */
+        .z5 { bottom: 10px; right: 10px; } /* BR */
+
+        /* Активная зона при сканировании */
+        .target-zone.scanning {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 10px #fff;
+            border-style: solid;
+        }
+
+        /* МЯЧ (Результат) */
+        .ball {
+            width: 100%; height: 100%;
+            background: radial-gradient(circle at 30% 30%, #fff, #ddd, #333);
+            border-radius: 50%;
+            display: none; /* Скрыт */
+            box-shadow: 0 0 20px #fff, 0 0 40px var(--accent-cyan);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+        /* Текстура мяча (условная) */
+        .ball::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(circle at 50% 50%, transparent 60%, rgba(0,0,0,0.5) 100%);
+            border-radius: 50%;
+        }
+        
+        .target-zone.winner {
+            border: none;
+            background: transparent;
+        }
+        .target-zone.winner .ball { display: block; }
+
+        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+
+        /* --- COMMON UI --- */
         .risk-block {
             position: absolute; top: 65%; left: 0; width: 100%;
             display: flex; justify-content: center; gap: 10px; 
             opacity: 0; transition: opacity 0.5s; z-index: 3;
         }
+        /* Для пенальти блок рисков чуть ниже ворот */
+        .penalty-container + .risk-block {
+            top: auto; bottom: -30px;
+        }
+
         .risk-item {
             background: rgba(0,0,0,0.8); padding: 3px 8px; border-radius: 4px;
             font-family: 'Orbitron', sans-serif; font-size: 9px; color: #888; border: 1px solid rgba(255,255,255,0.1);
@@ -325,13 +382,11 @@
                 <img src="/img/menu_penalty.png" class="game-img">
                 <div class="game-title">PENALTY</div>
             </div>
-            <!-- MINES (LOCKED) -->
             <div class="game-card locked">
                 <div class="lock-icon">🔒</div>
                 <img src="/img/menu_mines.png" class="game-img">
                 <div class="game-title">MINES (SOON)</div>
             </div>
-            <!-- SOON (LOCKED) -->
             <div class="game-card locked">
                 <div class="lock-icon">🔒</div>
                 <div style="font-size: 40px; margin-bottom: 12px; opacity: 0.5;">🎲</div>
@@ -339,17 +394,16 @@
             </div>
         </div>
 
-        <!-- UNIQUE SESSION ID -->
         <div class="session-id" id="session-id-display">SESSION ID: ...</div>
     </div>
 
     <!-- GAME SCREEN -->
     <div id="screen-game" class="screen">
         
-        <!-- TELEGRAM LINK -->
         <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
 
-        <div class="circle-container">
+        <!-- AVIATOR GAME (CIRCLE) -->
+        <div class="circle-container" id="aviator-view">
             <div class="circle-glow"></div>
             <svg class="progress-ring" width="260" height="260">
                 <circle class="progress-ring__circle-bg" stroke="rgba(255,255,255,0.05)" stroke-width="6" fill="transparent" r="110" cx="130" cy="130"/>
@@ -357,10 +411,22 @@
                         style="stroke-dasharray: 691; stroke-dashoffset: 691; stroke-linecap: round;"/>
             </svg>
             <div class="coef-text" id="coef-text">0.00x</div>
-            <div class="risk-block" id="risk-block">
-                <div class="risk-item">ACC: <span class="risk-val" id="acc-val">98%</span></div>
-                <div class="risk-item">RISK: <span class="risk-val" id="risk-val">LOW</span></div>
+        </div>
+
+        <!-- PENALTY GAME (GOAL) -->
+        <div class="penalty-container" id="penalty-view">
+            <div class="goal-post">
+                <div class="target-zone z1" id="z1"><div class="ball"></div></div>
+                <div class="target-zone z2" id="z2"><div class="ball"></div></div>
+                <div class="target-zone z3" id="z3"><div class="ball"></div></div>
+                <div class="target-zone z4" id="z4"><div class="ball"></div></div>
+                <div class="target-zone z5" id="z5"><div class="ball"></div></div>
             </div>
+        </div>
+
+        <div class="risk-block" id="risk-block">
+            <div class="risk-item">ACC: <span class="risk-val" id="acc-val">98%</span></div>
+            <div class="risk-item">RISK: <span class="risk-val" id="risk-val">LOW</span></div>
         </div>
 
         <button class="btn-signal" id="signal-btn" onclick="getSignal()" data-translate="get_signal">GET SIGNAL</button>
@@ -375,12 +441,7 @@
         window.Telegram.WebApp.expand();
 
         // --- PRELOADER SEQUENCE ---
-        const termLines = [
-            "INITIALIZING KERNEL...",
-            "LOADING NEURAL WEIGHTS...",
-            "CONNECTING TO SECURE SERVER...",
-            "ACCESS GRANTED."
-        ];
+        const termLines = ["INITIALIZING KERNEL...", "LOADING NEURAL WEIGHTS...", "CONNECTING TO SECURE SERVER...", "ACCESS GRANTED."];
         let lineIdx = 0;
         const termEl = document.getElementById('term-text');
         const preloader = document.getElementById('preloader');
@@ -423,17 +484,11 @@
         function changeLanguage() {
             const selector = document.getElementById('language-select');
             currentLang = selector.value;
-            
-            // RTL support for Arabic
             if (currentLang === 'ar') document.body.style.direction = 'rtl';
             else document.body.style.direction = 'ltr';
-
-            // Update all elements with data-translate attribute
             document.querySelectorAll('[data-translate]').forEach(el => {
                 const key = el.getAttribute('data-translate');
-                if (translations[currentLang][key]) {
-                    el.innerText = translations[currentLang][key];
-                }
+                if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
             });
         }
 
@@ -451,7 +506,7 @@
         let isVerifying = false;
 
         function loadState() {
-            const saved = localStorage.getItem('omar_credits_v3');
+            const saved = localStorage.getItem('omar_credits_v4');
             if (saved) {
                 const data = JSON.parse(saved);
                 aviatorCredits = data.av || 0;
@@ -460,7 +515,7 @@
             }
         }
         function saveState() {
-            localStorage.setItem('omar_credits_v3', JSON.stringify({ av: aviatorCredits, pen: penaltyCredits, used: usedCodes }));
+            localStorage.setItem('omar_credits_v4', JSON.stringify({ av: aviatorCredits, pen: penaltyCredits, used: usedCodes }));
         }
         loadState();
 
@@ -483,7 +538,6 @@
 
         function validateCode(code) {
             if (usedCodes.includes(code)) { endVerify(false, "ALREADY USED"); return; }
-            
             if (VALID_CODES.aviator.includes(code)) {
                 aviatorCredits += 3; usedCodes.push(code); endVerify(true, "AVIATOR +3");
             } else if (VALID_CODES.penalty.includes(code)) {
@@ -498,22 +552,21 @@
             pinDisplay.className = success ? "pin-display success" : "pin-display error";
             if(success) { saveState(); updateCreditsUI(); }
             window.Telegram.WebApp.HapticFeedback.notificationOccurred(success ? 'success' : 'error');
-            setTimeout(() => { 
-                if(success) closeModal(); 
-                isVerifying = false; clearPin(); 
-            }, 1500);
+            setTimeout(() => { if(success) closeModal(); isVerifying = false; clearPin(); }, 1500);
         }
 
-        // --- GAMEPLAY ---
+        // --- GAMEPLAY SWITCH ---
         function openGame(game) {
             activeGame = game;
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-game').classList.add('active');
-            
-            // Force translation update when entering game
             changeLanguage();
-            
             updateCreditsUI();
+            
+            // Switch Views
+            document.getElementById('aviator-view').style.display = (game === 'aviator') ? 'flex' : 'none';
+            document.getElementById('penalty-view').style.display = (game === 'penalty') ? 'block' : 'none';
+            
             resetGameUI();
         }
         function backToMenu() {
@@ -524,9 +577,18 @@
             triesDisplay.innerText = (activeGame === 'aviator' ? aviatorCredits : penaltyCredits);
         }
         function resetGameUI() {
-            document.getElementById('coef-text').innerText = "0.00x";
             document.getElementById('risk-block').style.opacity = '0';
-            setProgress(0);
+            document.getElementById('loader-text').innerText = "";
+            
+            if (activeGame === 'aviator') {
+                document.getElementById('coef-text').innerText = "0.00x";
+                setProgress(0);
+            } else {
+                // Reset penalty targets
+                document.querySelectorAll('.target-zone').forEach(el => {
+                    el.classList.remove('scanning', 'winner');
+                });
+            }
         }
 
         const circle = document.querySelector('.progress-ring__circle');
@@ -550,29 +612,61 @@
             // Deduct
             if(activeGame === 'aviator') aviatorCredits--; else penaltyCredits--;
             saveState(); updateCreditsUI();
+            
+            // Reset previous results
             resetGameUI();
 
             const loaderText = document.getElementById('loader-text');
             const t = translations[currentLang];
             loaderText.innerText = t.connecting;
             
-            // Animation
-            let p = 0;
-            let interval = setInterval(() => {
-                p += 2; setProgress(p);
-                if(p > 30) loaderText.innerText = t.analyzing;
-                if(p > 70) loaderText.innerText = t.predicting;
-                if(p > 100) {
-                    clearInterval(interval);
-                    showResult();
-                }
-            }, 30);
+            if (activeGame === 'aviator') {
+                // AVIATOR ANIMATION
+                let p = 0;
+                let interval = setInterval(() => {
+                    p += 2; setProgress(p);
+                    if(p > 30) loaderText.innerText = t.analyzing;
+                    if(p > 70) loaderText.innerText = t.predicting;
+                    if(p > 100) { clearInterval(interval); showResult(); }
+                }, 30);
+            } else {
+                // PENALTY ANIMATION (Scanning)
+                let steps = 0;
+                let maxSteps = 20;
+                let targets = document.querySelectorAll('.target-zone');
+                
+                let scanInterval = setInterval(() => {
+                    // Random blink
+                    targets.forEach(el => el.classList.remove('scanning'));
+                    let r = Math.floor(Math.random() * 5);
+                    targets[r].classList.add('scanning');
+                    
+                    loaderText.innerText = (steps % 2 === 0) ? t.analyzing : t.predicting;
+                    
+                    steps++;
+                    if (steps > maxSteps) {
+                        clearInterval(scanInterval);
+                        showPenaltyResult(targets);
+                    }
+                }, 100);
+            }
         }
 
         function showResult() {
             const result = (Math.random() * (5.0 - 1.2) + 1.2).toFixed(2);
             document.getElementById('coef-text').innerText = result + "x";
-            
+            finalizeSignal();
+        }
+
+        function showPenaltyResult(targets) {
+            // Pick random winner
+            targets.forEach(el => el.classList.remove('scanning'));
+            let r = Math.floor(Math.random() * 5);
+            targets[r].classList.add('winner');
+            finalizeSignal();
+        }
+
+        function finalizeSignal() {
             // Risk Analysis
             const riskBlock = document.getElementById('risk-block');
             const accVal = document.getElementById('acc-val');
@@ -582,8 +676,9 @@
             accVal.innerText = accuracy + "%";
 
             riskVal.className = "risk-val";
-            if (result < 2.0) { riskVal.innerText = "SAFE"; riskVal.classList.add('safe'); }
-            else if (result < 5.0) { riskVal.innerText = "MEDIUM"; riskVal.classList.add('medium'); }
+            const rnd = Math.random();
+            if (rnd > 0.6) { riskVal.innerText = "SAFE"; riskVal.classList.add('safe'); }
+            else if (rnd > 0.3) { riskVal.innerText = "MEDIUM"; riskVal.classList.add('medium'); }
             else { riskVal.innerText = "HIGH"; riskVal.classList.add('high'); }
 
             riskBlock.style.opacity = '1';
