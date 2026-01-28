@@ -731,7 +731,28 @@
             const p = Math.floor(Math.random() * (60 - 15) + 15);
             document.getElementById('ping-counter').innerText = p;
         }, 3000);
+// --- РЕЖИМ КАЛИБРОВКИ (ВРЕМЕННЫЙ) ---
+        // Когда ты кликаешь по полю, он показывает координаты
+        const penaltyArea = document.getElementById('penalty-view');
+        const debugText = document.getElementById('loader-text');
 
+        penaltyArea.addEventListener('click', function(e) {
+            const rect = penaltyArea.getBoundingClientRect();
+            
+            // Считаем куда ты нажал в процентах
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const xPercent = Math.round((x / rect.width) * 100);
+            const yPercent = Math.round((y / rect.height) * 100);
+
+            // Выводим результат на экран
+            debugText.style.color = "#ff0000";
+            debugText.style.fontSize = "14px";
+            debugText.innerText = `TOP: ${yPercent}% | LEFT: ${xPercent}%`;
+            
+            console.log(`Для CSS: top: ${yPercent}%; left: ${xPercent}%;`);
+        });
     </script>
 </body>
 </html>
