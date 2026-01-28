@@ -241,11 +241,20 @@
         }
 
         /* КООРДИНАТЫ (Подогнаны под скриншот) */
-        .z1 { top: 20%; left: 11%; } /* Top Left */
-        .z2 { top: 20%; right: 11%; } /* Top Right */
-        .z3 { top: 18%; left: 50%; transform: translateX(-50%); } /* Top Center */
-        .z4 { bottom: 28%; left: 11%; } /* Bottom Left */
-        .z5 { bottom: 28%; right: 11%; } /* Bottom Right */
+        /* Верхний левый */
+        .z1 { top: 12%; left: 6%; } 
+        
+        /* Верхний правый */
+        .z2 { top: 12%; right: 6%; } 
+        
+        /* Верхний центральный (поднят максимально вверх к перекладине) */
+        .z3 { top: 4%; left: 50%; transform: translateX(-50%); } 
+        
+        /* Нижний левый (опущен чуть ниже и левее) */
+        .z4 { bottom: 22%; left: 6%; } 
+        
+        /* Нижний правый (опущен чуть ниже и правее) */
+        .z5 { bottom: 22%; right: 6%; }
 
         /* Анимация сканирования (Мигает рамка) */
         .target-zone.scanning {
