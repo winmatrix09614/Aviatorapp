@@ -731,28 +731,73 @@
             const p = Math.floor(Math.random() * (60 - 15) + 15);
             document.getElementById('ping-counter').innerText = p;
         }, 3000);
-// --- РЕЖИМ КАЛИБРОВКИ (ВРЕМЕННЫЙ) ---
-        // Когда ты кликаешь по полю, он показывает координаты
-        const penaltyArea = document.getElementById('penalty-view');
-        const debugText = document.getElementById('loader-text');
+        </script>
+<!-- ВРЕМЕННЫЙ ПУЛЬТ УПРАВЛЕНИЯ -->
+<div id="debug-panel" style="position:fixed; bottom:0; left:0; width:100%; background:rgba(0,0,0,0.9); z-index:9999; padding:10px; border-top:2px solid #00f2ea; color:#fff; font-family:monospace; display:flex; flex-direction:column; gap:10px;">
+    
+    <!-- Выбор зоны -->
+    <div style="display:flex; justify-content:center; gap:10px;">
+        <button onclick="selectZ('z1')" style="padding:5px 10px; background:#333; color:#fff; border:1px solid #fff;">Z1</button>
+        <button onclick="selectZ('z2')" style="padding:5px 10px; background:#333; color:#fff; border:1px solid #fff;">Z2</button>
+        <button onclick="selectZ('z3')" style="padding:5px 10px; background:#333; color:#fff; border:1px solid #fff;">Z3</button>
+        <button onclick="selectZ('z4')" style="padding:5px 10px; background:#333; color:#fff; border:1px solid #fff;">Z4</button>
+        <button onclick="selectZ('z5')" style="padding:5px 10px; background:#333; color:#fff; border:1px solid #fff;">Z5</button>
+    </div>
 
-        penaltyArea.addEventListener('click', function(e) {
-            const rect = penaltyArea.getBoundingClientRect();
-            
-            // Считаем куда ты нажал в процентах
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const xPercent = Math.round((x / rect.width) * 100);
-            const yPercent = Math.round((y / rect.height) * 100);
+    <!-- Джойстик -->
+    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px; max-width:150px; margin:0 auto;">
+        <div></div><button onclick="move(0, -1)" style="padding:10px; background:#444;">⬆️</button><div></div>
+        <button onclick="move(-1, 0)" style="padding:10px; background:#444;">⬅️</button>
+        <div style="text-align:center; padding-top:10px;">move</div>
+        <button onclick="move(1, 0)" style="padding:10px; background:#444;">➡️</button>
+        <div></div><button onclick="move(0, 1)" style="padding:10px; background:#444;">⬇️</button><div></div>
+    </div>
 
-            // Выводим результат на экран
-            debugText.style.color = "#ff0000";
-            debugText.style.fontSize = "14px";
-            debugText.innerText = `TOP: ${yPercent}% | LEFT: ${xPercent}%`;
-            
-            console.log(`Для CSS: top: ${yPercent}%; left: ${xPercent}%;`);
-        });
-    </script>
+    <!-- Результат -->
+    <div id="debug-output" style="text-align:center; color:#00f2ea; font-weight:bold; font-size:14px;">
+        ВЫБЕРИ Z, ЧТОБЫ НАЧАТЬ
+    </div>
+</div>
+
+<script>
+    let activeZ = null;
+    let coords = {
+        z1: {t: 20, l: 10}, z2: {t: 20, l: 80},
+        z3: {t: 10, l: 50},
+        z4: {t: 60, l: 10}, z5: {t: 60, l: 80}
+    };
+
+    function selectZ(name) {
+        activeZ = name;
+        // Показываем текущий кружок красным
+        document.querySelectorAll('.target-zone').forEach(el => el.style.border = 'none');
+        document.querySelector('.' + name).style.border = '2px solid red';
+        updateDisplay();
+    }
+
+    function move(x, y) {
+        if (!activeZ) return;
+        coords[activeZ].l += x; // Left
+        coords[activeZ].t += y; // Top
+        applyCoords();
+        updateDisplay();
+    }
+
+    function applyCoords() {
+        const el = document.querySelector('.' + activeZ);
+        el.style.top = coords[activeZ].t + '%';
+        
+        // Для всех используем LEFT, чтобы не путаться
+        el.style.left = coords[activeZ].l + '%';
+        el.style.right = 'auto'; // Отключаем right
+        el.style.transform = 'none'; // Отключаем центровку
+    }
+
+    function updateDisplay() {
+        const c = coords[activeZ];
+        document.getElementById('debug-output').innerText = 
+            `.${activeZ} { top: ${c.t}%; left: ${c.l}%; }`;
+    }
+</script>
 </body>
 </html>
