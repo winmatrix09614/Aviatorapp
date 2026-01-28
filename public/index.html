@@ -22,7 +22,7 @@
         body {
             background-color: var(--bg-deep);
             color: var(--text-color);
-            font-family: 'Poppins', sans-serif; /* Вернули читабельный шрифт */
+            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
             overflow: hidden;
@@ -31,7 +31,7 @@
             position: relative;
         }
 
-        /* --- PRELOADER (TERMINAL) --- */
+        /* --- PRELOADER --- */
         #preloader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 9999;
@@ -42,7 +42,7 @@
             font-size: 12px; line-height: 1.6; text-align: left; width: 80%;
         }
 
-        /* --- ФОН (Вернули Hexagons, но аккуратнее) --- */
+        /* --- BACKGROUND --- */
         .cyber-wrapper {
             position: absolute; width: 100%; height: 100%; overflow: hidden;
             background: linear-gradient(to bottom, #020005 0%, #10002b 100%);
@@ -53,7 +53,7 @@
             background-image: 
                 linear-gradient(90deg, rgba(58, 134, 255, 0.15) 1px, transparent 1px),
                 linear-gradient(0deg, rgba(123, 44, 191, 0.15) 1px, transparent 1px);
-            background-size: 50px 50px; /* Вернули размер сетки как был */
+            background-size: 50px 50px;
             transform: rotateX(50deg);
             animation: cyberMove 3s linear infinite;
             mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
@@ -61,9 +61,11 @@
         }
         @keyframes cyberMove { 0% { background-position: 0 0; } 100% { background-position: 0 50px; } }
 
-        /* --- HUD --- */
+        /* --- HUD (Исправил отступы Пинга) --- */
         .hud-bar {
-            position: absolute; top: 0; left: 0; width: 100%; padding: 15px 20px;
+            position: absolute; top: 0; left: 0; width: 100%; 
+            /* Увеличил padding справа до 40px, чтобы пинг не улетал */
+            padding: 15px 40px 15px 20px; 
             display: flex; justify-content: space-between;
             font-family: 'Orbitron', sans-serif; font-size: 11px;
             color: rgba(255, 255, 255, 0.5); z-index: 50; pointer-events: none;
@@ -75,13 +77,22 @@
         }
         .ping-value { color: var(--accent-cyan); font-weight: bold; }
 
+        /* --- LANGUAGE SELECTOR (Теперь глобальный, виден везде) --- */
+        .lang-container { 
+            position: absolute; top: 50px; right: 20px; z-index: 60; /* z-index выше чем у экранов */
+        }
+        select {
+            background: rgba(0, 0, 0, 0.6); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 5px 10px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 12px;
+            outline: none; backdrop-filter: blur(10px); cursor: pointer;
+        }
+        option { background: #000; color: #fff; }
+
         /* --- SESSION ID --- */
         .session-id {
             position: absolute; bottom: 15px; left: 0; width: 100%;
-            text-align: center;
-            font-family: 'Orbitron', sans-serif; font-size: 10px;
-            color: rgba(255, 255, 255, 0.3);
-            letter-spacing: 1px;
+            text-align: center; font-family: 'Orbitron', sans-serif; font-size: 10px;
+            color: rgba(255, 255, 255, 0.3); letter-spacing: 1px;
             z-index: 5; pointer-events: none;
         }
 
@@ -116,7 +127,7 @@
         .pin-display.error { color: var(--brand-red); border-color: var(--brand-red); animation: shake 0.3s; }
         .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; }
         .key {
-            height: 55px; background: rgba(255,255,255,0.05); border-radius: 12px; /* Вернули квадратные кнопки */
+            height: 55px; background: rgba(255,255,255,0.05); border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.05); color: #fff;
             font-family: 'Orbitron', sans-serif; font-size: 18px;
             display: flex; justify-content: center; align-items: center;
@@ -133,13 +144,6 @@
         }
         .screen.active { display: flex; }
 
-        .lang-container { position: absolute; top: 50px; right: 20px; z-index: 20; }
-        select {
-            background: rgba(0, 0, 0, 0.6); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 5px 10px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 12px;
-            outline: none; backdrop-filter: blur(10px);
-        }
-
         .main-logo { text-align: center; margin-bottom: 30px; }
         .logo-title {
             font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 28px; color: #fff;
@@ -152,7 +156,14 @@
             text-transform: uppercase; margin-top: 5px; opacity: 0.8;
         }
 
+        .menu-header {
+            font-family: 'Orbitron', sans-serif; font-size: 14px; margin-bottom: 20px;
+            text-transform: uppercase; letter-spacing: 2px; color: rgba(255, 255, 255, 0.7); text-align: center;
+        }
+
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 90%; max-width: 400px; }
+        
+        /* КАРТОЧКИ ИГР */
         .game-card {
             background: var(--glass-panel); backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px;
@@ -163,7 +174,35 @@
         .game-img { width: 75px; height: 75px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .game-title { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 13px; color: #fff; letter-spacing: 0.5px; }
 
-        /* --- GAME UI (Исправлено выравнивание) --- */
+        /* LOCKED CARDS (Mines & Soon) */
+        .game-card.locked {
+            opacity: 0.7; cursor: not-allowed;
+            background: rgba(10, 10, 15, 0.4);
+        }
+        /* При наведении они светятся, но не кликаются */
+        .game-card.locked:hover {
+            opacity: 1;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 20px rgba(123, 44, 191, 0.3);
+            transform: translateY(-2px);
+        }
+        .lock-icon {
+            position: absolute; top: 10px; right: 10px; font-size: 14px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* --- GAME UI --- */
+        
+        /* Кнопка поддержки */
+        .telegram-link {
+            text-decoration: none; font-family: 'Orbitron', sans-serif; color: var(--accent-cyan);
+            border: 1px solid rgba(0, 242, 234, 0.3); padding: 8px 16px; border-radius: 20px;
+            font-size: 12px; letter-spacing: 1px; background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px); margin-bottom: 20px; transition: 0.3s;
+            display: inline-block;
+        }
+        .telegram-link:hover { background: rgba(0, 242, 234, 0.1); box-shadow: 0 0 15px rgba(0, 242, 234, 0.2); }
+
         .circle-container {
             position: relative; width: 260px; height: 260px; 
             display: flex; align-items: center; justify-content: center;
@@ -179,20 +218,15 @@
         .progress-ring { transform: rotate(-90deg); z-index: 1; }
         .progress-ring__circle { transition: stroke-dashoffset 0.5s ease-in-out; }
         
-        /* Исправлена центровка цифр */
         .coef-text {
-            position: absolute; 
-            top: 50%; left: 50%; 
-            transform: translate(-50%, -60%); /* Сдвиг чуть вверх, чтобы влез Risk Block */
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%);
             font-family: 'Orbitron', sans-serif; font-size: 52px; font-weight: 900;
             color: #fff; text-shadow: 0 0 30px rgba(255, 255, 255, 0.4); 
             z-index: 2; width: 100%; text-align: center;
         }
 
-        /* RISK BLOCK (Аккуратно под цифрами) */
         .risk-block {
-            position: absolute; 
-            top: 65%; left: 0; width: 100%;
+            position: absolute; top: 65%; left: 0; width: 100%;
             display: flex; justify-content: center; gap: 10px; 
             opacity: 0; transition: opacity 0.5s; z-index: 3;
         }
@@ -210,8 +244,7 @@
             border: none; width: 80%; max-width: 300px; padding: 16px; border-radius: 12px;
             color: white; font-family: 'Orbitron', sans-serif; font-size: 16px; letter-spacing: 1px;
             cursor: pointer; box-shadow: 0 5px 20px rgba(214, 0, 42, 0.25);
-            text-transform: uppercase; margin-top: 5px;
-            border: 1px solid rgba(255,255,255,0.1);
+            text-transform: uppercase; margin-top: 5px; border: 1px solid rgba(255,255,255,0.1);
         }
         .btn-signal:active { transform: scale(0.98); }
         .tries-info { font-family: 'Orbitron', sans-serif; font-size: 10px; color: #666; margin-top: 10px; letter-spacing: 1px; }
@@ -249,6 +282,16 @@
         <div>PING: <span id="ping-counter" class="ping-value">34</span>ms</div>
     </div>
 
+    <!-- GLOBAL LANGUAGE SELECTOR -->
+    <div class="lang-container">
+        <select id="language-select" onchange="changeLanguage()">
+            <option value="en">🇬🇧 EN</option>
+            <option value="ru">🇷🇺 RU</option>
+            <option value="es">🇪🇸 ES</option>
+            <option value="ar">🇸🇦 AR</option>
+        </select>
+    </div>
+
     <!-- PIN PAD MODAL -->
     <div id="security-modal" class="modal-overlay">
         <div class="pin-container">
@@ -266,20 +309,13 @@
 
     <!-- MENU SCREEN -->
     <div id="screen-menu" class="screen active">
-        <div class="lang-container">
-            <select id="language-select" onchange="changeLanguage()">
-                <option value="en">🇬🇧 EN</option>
-                <option value="es">🇪🇸 ES</option>
-                <option value="ms">🇲🇾 MS</option>
-                <option value="ar">🇸🇦 AR</option>
-            </select>
-        </div>
-
         <div class="main-logo">
             <h1 class="logo-title">AI PREDICTOR</h1>
             <div class="logo-subtitle">NEURAL CORE V3.7</div>
         </div>
         
+        <div class="menu-header" data-translate="choose_game">CHOOSE GAME</div>
+
         <div class="menu-grid">
             <div class="game-card" onclick="openGame('aviator')">
                 <img src="/img/menu_aviator.png" class="game-img">
@@ -289,6 +325,18 @@
                 <img src="/img/menu_penalty.png" class="game-img">
                 <div class="game-title">PENALTY</div>
             </div>
+            <!-- MINES (LOCKED) -->
+            <div class="game-card locked">
+                <div class="lock-icon">🔒</div>
+                <img src="/img/menu_mines.png" class="game-img">
+                <div class="game-title">MINES (SOON)</div>
+            </div>
+            <!-- SOON (LOCKED) -->
+            <div class="game-card locked">
+                <div class="lock-icon">🔒</div>
+                <div style="font-size: 40px; margin-bottom: 12px; opacity: 0.5;">🎲</div>
+                <div class="game-title">SOON...</div>
+            </div>
         </div>
 
         <!-- UNIQUE SESSION ID -->
@@ -297,6 +345,10 @@
 
     <!-- GAME SCREEN -->
     <div id="screen-game" class="screen">
+        
+        <!-- TELEGRAM LINK -->
+        <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
+
         <div class="circle-container">
             <div class="circle-glow"></div>
             <svg class="progress-ring" width="260" height="260">
@@ -304,10 +356,7 @@
                 <circle class="progress-ring__circle" stroke="#00f2ea" stroke-width="6" fill="transparent" r="110" cx="130" cy="130"
                         style="stroke-dasharray: 691; stroke-dashoffset: 691; stroke-linecap: round;"/>
             </svg>
-            <!-- Цифры теперь точно по центру -->
             <div class="coef-text" id="coef-text">0.00x</div>
-            
-            <!-- Risk block аккуратно под цифрами -->
             <div class="risk-block" id="risk-block">
                 <div class="risk-item">ACC: <span class="risk-val" id="acc-val">98%</span></div>
                 <div class="risk-item">RISK: <span class="risk-val" id="risk-val">LOW</span></div>
@@ -362,6 +411,32 @@
         }
         initSession();
 
+        // --- TRANSLATIONS ---
+        const translations = {
+            en: { choose_game: "CHOOSE GAME", get_signal: "GET SIGNAL", exit: "EXIT", connecting: "CALCULATING...", analyzing: "ANALYZING...", predicting: "PREDICTING...", wait: "WAIT", seconds: "s" },
+            ru: { choose_game: "ВЫБЕРИ ИГРУ", get_signal: "ПОЛУЧИТЬ СИГНАЛ", exit: "ВЫХОД", connecting: "ВЫЧИСЛЕНИЕ...", analyzing: "АНАЛИЗ...", predicting: "ПРОГНОЗ...", wait: "ЖДИ", seconds: "с" },
+            es: { choose_game: "ELIGE JUEGO", get_signal: "OBTENER SEÑAL", exit: "SALIR", connecting: "CALCULANDO...", analyzing: "ANALIZANDO...", predicting: "PREDICIENDO...", wait: "ESPERA", seconds: "s" },
+            ar: { choose_game: "اختر اللعبة", get_signal: "احصل على إشارة", exit: "خروج", connecting: "جار الحساب...", analyzing: "تحليل...", predicting: "تنبؤ...", wait: "انتظر", seconds: "ث" }
+        };
+        let currentLang = 'en';
+
+        function changeLanguage() {
+            const selector = document.getElementById('language-select');
+            currentLang = selector.value;
+            
+            // RTL support for Arabic
+            if (currentLang === 'ar') document.body.style.direction = 'rtl';
+            else document.body.style.direction = 'ltr';
+
+            // Update all elements with data-translate attribute
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (translations[currentLang][key]) {
+                    el.innerText = translations[currentLang][key];
+                }
+            });
+        }
+
         // --- GAME LOGIC ---
         const VALID_CODES = {
             aviator: ['112233', '999999', '123123', '550055', '101010', '887766', '258000', '774411', '369369', '445566'],
@@ -376,7 +451,7 @@
         let isVerifying = false;
 
         function loadState() {
-            const saved = localStorage.getItem('omar_credits_v3'); // v3 version
+            const saved = localStorage.getItem('omar_credits_v3');
             if (saved) {
                 const data = JSON.parse(saved);
                 aviatorCredits = data.av || 0;
@@ -434,6 +509,10 @@
             activeGame = game;
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-game').classList.add('active');
+            
+            // Force translation update when entering game
+            changeLanguage();
+            
             updateCreditsUI();
             resetGameUI();
         }
@@ -474,12 +553,15 @@
             resetGameUI();
 
             const loaderText = document.getElementById('loader-text');
-            loaderText.innerText = "CALCULATING PROBABILITIES...";
+            const t = translations[currentLang];
+            loaderText.innerText = t.connecting;
             
             // Animation
             let p = 0;
             let interval = setInterval(() => {
                 p += 2; setProgress(p);
+                if(p > 30) loaderText.innerText = t.analyzing;
+                if(p > 70) loaderText.innerText = t.predicting;
                 if(p > 100) {
                     clearInterval(interval);
                     showResult();
@@ -491,7 +573,7 @@
             const result = (Math.random() * (5.0 - 1.2) + 1.2).toFixed(2);
             document.getElementById('coef-text').innerText = result + "x";
             
-            // Risk Analysis Logic
+            // Risk Analysis
             const riskBlock = document.getElementById('risk-block');
             const accVal = document.getElementById('acc-val');
             const riskVal = document.getElementById('risk-val');
@@ -509,11 +591,12 @@
 
             // Cooldown
             const btn = document.getElementById('signal-btn');
+            const t = translations[currentLang];
             let cd = 5;
-            const t = setInterval(() => {
-                btn.innerText = `WAIT ${cd}s`;
+            const timer = setInterval(() => {
+                btn.innerText = `${t.wait} ${cd}${t.seconds}`;
                 cd--;
-                if(cd < 0) { clearInterval(t); btn.innerText = "GET SIGNAL"; btn.disabled = false; document.getElementById('loader-text').innerText=""; }
+                if(cd < 0) { clearInterval(timer); btn.innerText = t.get_signal; btn.disabled = false; document.getElementById('loader-text').innerText=""; }
             }, 1000);
         }
 
