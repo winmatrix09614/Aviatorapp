@@ -227,14 +227,17 @@
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
             background: transparent;
-            transition: 0.1s; /* Быстрая реакция на джойстик */
+            transition: 0.2s;
         }
 
-        /* НАЧАЛЬНЫЕ КООРДИНАТЫ (Пока примерные, ты их сейчас поправишь джойстиком) */
-        .z1 { top: 12%; left: 7%; } 
-        .z2 { top: 12%; left: 80%; } /* Используем left, так понятнее */
-        .z3 { top: 11%; left: 44%; } 
-        .z4 { top: 48%; left: 6%; } 
+        /* ================================================ */
+        /*   ОТКАЛИБРОВАННЫЕ КООРДИНАТЫ (ФИНАЛЬНЫЕ)         */
+        /* ================================================ */
+        
+        .z1 { top: 12%; left: 7%; }
+        .z2 { top: 12%; left: 80%; }
+        .z3 { top: 11%; left: 44%; }
+        .z4 { top: 48%; left: 6%; }
         .z5 { top: 49%; left: 81%; }
 
         /* Стили победы */
@@ -399,36 +402,6 @@
 
         <button class="btn-back" onclick="backToMenu()" data-translate="exit">EXIT</button>
     </div>
-
-    <!-- ============================================== -->
-    <!--          ПУЛЬТ УПРАВЛЕНИЯ (КАЛИБРОВКА)         -->
-    <!-- ============================================== -->
-    <div id="debug-panel" style="position:fixed; bottom:0; left:0; width:100%; background:rgba(0,0,0,0.95); z-index:99999; padding:15px; border-top:2px solid #00f2ea; color:#fff; font-family:monospace; display:flex; flex-direction:column; gap:10px;">
-        
-        <!-- Выбор зоны -->
-        <div style="display:flex; justify-content:center; gap:10px;">
-            <button onclick="selectZ('z1')" style="padding:10px; background:#333; color:#fff; border:1px solid #fff; border-radius:5px;">Z1</button>
-            <button onclick="selectZ('z2')" style="padding:10px; background:#333; color:#fff; border:1px solid #fff; border-radius:5px;">Z2</button>
-            <button onclick="selectZ('z3')" style="padding:10px; background:#333; color:#fff; border:1px solid #fff; border-radius:5px;">Z3</button>
-            <button onclick="selectZ('z4')" style="padding:10px; background:#333; color:#fff; border:1px solid #fff; border-radius:5px;">Z4</button>
-            <button onclick="selectZ('z5')" style="padding:10px; background:#333; color:#fff; border:1px solid #fff; border-radius:5px;">Z5</button>
-        </div>
-
-        <!-- Джойстик -->
-        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px; max-width:200px; margin:0 auto;">
-            <div></div><button onclick="move(0, -1)" style="padding:15px; background:#444; color:#fff; border-radius:5px;">⬆️</button><div></div>
-            <button onclick="move(-1, 0)" style="padding:15px; background:#444; color:#fff; border-radius:5px;">⬅️</button>
-            <div style="text-align:center; padding-top:10px; font-size:10px;">MOVE</div>
-            <button onclick="move(1, 0)" style="padding:15px; background:#444; color:#fff; border-radius:5px;">➡️</button>
-            <div></div><button onclick="move(0, 1)" style="padding:15px; background:#444; color:#fff; border-radius:5px;">⬇️</button><div></div>
-        </div>
-
-        <!-- Результат -->
-        <div id="debug-output" style="text-align:center; color:#00f2ea; font-weight:bold; font-size:12px; margin-top:5px; border:1px dashed #555; padding:5px;">
-            ВЫБЕРИ Z КНОПКОЙ ВЫШЕ
-        </div>
-    </div>
-
 
     <!-- MAIN SCRIPT -->
     <script>
