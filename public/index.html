@@ -61,10 +61,9 @@
         }
         @keyframes cyberMove { 0% { background-position: 0 0; } 100% { background-position: 0 50px; } }
 
-        /* --- HUD (ИСПРАВЛЕН ПИНГ) --- */
+        /* --- HUD --- */
         .hud-bar {
             position: absolute; top: 0; left: 0; width: 100%; 
-            /* Используем % для отступов, чтобы на любых экранах было далеко от края */
             padding: 15px 5%; 
             box-sizing: border-box;
             display: flex; justify-content: space-between;
@@ -208,87 +207,88 @@
             z-index: 2; width: 100%; text-align: center;
         }
 
-        /* --- PENALTY UI (HIGH TECH) --- */
+        /* --- PENALTY UI (1XBET STYLE) --- */
         .penalty-container {
-            position: relative; width: 300px; height: 180px;
+            position: relative; width: 320px; height: 200px;
             display: none;
             margin-bottom: 30px;
-            perspective: 600px; /* Для 3D эффекта */
+            perspective: 800px;
         }
         
-        /* Ворота - 3D проекция */
         .goal-post {
             width: 100%; height: 100%;
-            border: 3px solid rgba(0, 242, 234, 0.5); /* Неоновая рамка */
-            border-bottom: none; /* Убираем низ, там "земля" */
+            border: 4px solid rgba(255, 255, 255, 0.8); /* Белая рамка как в игре */
+            border-bottom: none;
             position: relative;
-            background: 
-                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 20px 20px; /* Мелкая сетка */
-            box-shadow: 0 0 30px rgba(0, 242, 234, 0.15);
+            background: rgba(0,0,0,0.3); /* Тень внутри ворот */
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
             border-radius: 8px 8px 0 0;
-            transform: rotateX(10deg); /* Наклон назад */
+            /* Сетка ворот */
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 15px 15px;
         }
         
-        /* Линия земли */
-        .goal-post::after {
-            content: ''; position: absolute; bottom: 0; left: -10%; width: 120%; height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(0, 242, 234, 0.8), transparent);
-            box-shadow: 0 0 15px rgba(0, 242, 234, 0.8);
-        }
-
-        /* Зоны */
+        /* Зоны-мишени (Круглые с мячом) */
         .target-zone {
-            position: absolute; width: 40px; height: 40px;
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        /* Уголки прицела (вместо кругов) */
-        .target-zone::before, .target-zone::after {
-            content: ''; position: absolute; width: 10px; height: 10px;
-            border-color: rgba(255,255,255,0.2); border-style: solid; transition: 0.2s;
-        }
-        .target-zone::before { top: 0; left: 0; border-width: 2px 0 0 2px; }
-        .target-zone::after { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
-        
-        /* Позиции (Исправлен центр) */
-        .z1 { top: 15px; left: 20px; } /* TL */
-        .z2 { top: 15px; right: 20px; } /* TR */
-        .z3 { top: 15px; left: 50%; transform: translateX(-50%); } /* TOP CENTER */
-        .z4 { bottom: 15px; left: 20px; } /* BL */
-        .z5 { bottom: 15px; right: 20px; } /* BR */
-
-        /* Активная зона (Скан) */
-        .target-zone.scanning::before, .target-zone.scanning::after {
-            border-color: var(--accent-cyan);
-            width: 100%; height: 100%; /* Уголки сходятся */
-        }
-
-        /* МЯЧ - "CYBER SPHERE" */
-        .ball {
-            width: 30px; height: 30px;
+            position: absolute; width: 50px; height: 50px;
             border-radius: 50%;
-            background: #fff;
-            display: none;
-            position: relative;
-            z-index: 10;
-            /* Мощный неоновый эффект вместо дешевого градиента */
-            box-shadow: 
-                0 0 10px #fff,
-                0 0 20px var(--accent-cyan),
-                0 0 40px var(--accent-cyan),
-                inset 0 0 10px rgba(0,0,0,0.5);
-            animation: impact 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid rgba(255, 255, 255, 0.2); /* Тусклая обводка */
+            display: flex; justify-content: center; align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            transition: 0.3s;
         }
-        
-        .target-zone.winner .ball { display: block; }
-        .target-zone.winner::before, .target-zone.winner::after { opacity: 0; } /* Убираем рамки при голе */
 
-        @keyframes impact { 
-            0% { transform: scale(3); opacity: 0; } 
-            100% { transform: scale(1); opacity: 1; } 
+        /* SVG Иконка мяча внутри */
+        .target-zone svg {
+            width: 30px; height: 30px;
+            fill: rgba(255, 255, 255, 0.2); /* Тусклый мяч */
+            transition: 0.3s;
         }
+
+        /* Позиции как на скриншоте */
+        .z1 { top: 15px; left: 15px; } /* TL */
+        .z2 { top: 15px; right: 15px; } /* TR */
+        .z3 { top: 10px; left: 50%; transform: translateX(-50%); } /* TOP CENTER */
+        .z4 { bottom: 15px; left: 15px; } /* BL */
+        .z5 { bottom: 15px; right: 15px; } /* BR */
+
+        /* Анимация сканирования */
+        .target-zone.scanning {
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        .target-zone.scanning svg {
+            fill: #fff;
+        }
+
+        /* ПОБЕДА (Мяч светится) */
+        .target-zone.winner {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 242, 234, 0.2);
+            box-shadow: 0 0 20px var(--accent-cyan), inset 0 0 10px var(--accent-cyan);
+            animation: pulseWin 1s infinite;
+        }
+        .target-zone.winner svg {
+            fill: #fff;
+            filter: drop-shadow(0 0 5px #fff);
+            transform: scale(1.2);
+        }
+
+        @keyframes pulseWin {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        /* Для центральной зоны своя анимация чтобы не сбивать translate */
+        .target-zone.z3.winner { animation: pulseWinCenter 1s infinite; }
+        @keyframes pulseWinCenter {
+            0% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
+            100% { transform: translateX(-50%) scale(1); }
+        }
+
 
         /* --- COMMON UI --- */
         .risk-block {
@@ -427,14 +427,21 @@
             <div class="coef-text" id="coef-text">0.00x</div>
         </div>
 
-        <!-- PENALTY GAME (CYBER GOAL) -->
+        <!-- PENALTY GAME (1XBET STYLE) -->
         <div class="penalty-container" id="penalty-view">
             <div class="goal-post">
-                <div class="target-zone z1" id="z1"><div class="ball"></div></div>
-                <div class="target-zone z2" id="z2"><div class="ball"></div></div>
-                <div class="target-zone z3" id="z3"><div class="ball"></div></div>
-                <div class="target-zone z4" id="z4"><div class="ball"></div></div>
-                <div class="target-zone z5" id="z5"><div class="ball"></div></div>
+                <!-- SVG MASK for Ball -->
+                <svg style="display: none;">
+                    <symbol id="icon-ball" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                    </symbol>
+                </svg>
+
+                <div class="target-zone z1" id="z1"><svg><use href="#icon-ball"></use></svg></div>
+                <div class="target-zone z2" id="z2"><svg><use href="#icon-ball"></use></svg></div>
+                <div class="target-zone z3" id="z3"><svg><use href="#icon-ball"></use></svg></div>
+                <div class="target-zone z4" id="z4"><svg><use href="#icon-ball"></use></svg></div>
+                <div class="target-zone z5" id="z5"><svg><use href="#icon-ball"></use></svg></div>
             </div>
         </div>
 
@@ -520,7 +527,7 @@
         let isVerifying = false;
 
         function loadState() {
-            const saved = localStorage.getItem('omar_credits_v5'); // New Version
+            const saved = localStorage.getItem('omar_credits_v5');
             if (saved) {
                 const data = JSON.parse(saved);
                 aviatorCredits = data.av || 0;
