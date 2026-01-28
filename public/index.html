@@ -61,10 +61,12 @@
         }
         @keyframes cyberMove { 0% { background-position: 0 0; } 100% { background-position: 0 50px; } }
 
-        /* --- HUD --- */
+        /* --- HUD (ИСПРАВЛЕН ПИНГ) --- */
         .hud-bar {
             position: absolute; top: 0; left: 0; width: 100%; 
-            padding: 15px 40px 15px 20px; 
+            /* Используем % для отступов, чтобы на любых экранах было далеко от края */
+            padding: 15px 5%; 
+            box-sizing: border-box;
             display: flex; justify-content: space-between;
             font-family: 'Orbitron', sans-serif; font-size: 11px;
             color: rgba(255, 255, 255, 0.5); z-index: 50; pointer-events: none;
@@ -76,6 +78,7 @@
         }
         .ping-value { color: var(--accent-cyan); font-weight: bold; }
 
+        /* --- LANGUAGE --- */
         .lang-container { 
             position: absolute; top: 50px; right: 20px; z-index: 60; 
         }
@@ -187,8 +190,7 @@
         /* --- AVIATOR UI --- */
         .circle-container {
             position: relative; width: 260px; height: 260px; 
-            display: none; /* Скрыто по умолчанию */
-            align-items: center; justify-content: center;
+            display: none; align-items: center; justify-content: center;
             margin-bottom: 25px;
         }
         .circle-glow {
@@ -206,75 +208,87 @@
             z-index: 2; width: 100%; text-align: center;
         }
 
-        /* --- PENALTY UI (GOAL) --- */
+        /* --- PENALTY UI (HIGH TECH) --- */
         .penalty-container {
-            position: relative; width: 280px; height: 200px;
-            display: none; /* Скрыто по умолчанию */
+            position: relative; width: 300px; height: 180px;
+            display: none;
             margin-bottom: 30px;
-            perspective: 800px;
+            perspective: 600px; /* Для 3D эффекта */
         }
         
-        /* Каркас ворот */
+        /* Ворота - 3D проекция */
         .goal-post {
             width: 100%; height: 100%;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-bottom: none;
+            border: 3px solid rgba(0, 242, 234, 0.5); /* Неоновая рамка */
+            border-bottom: none; /* Убираем низ, там "земля" */
             position: relative;
             background: 
-                linear-gradient(90deg, transparent 49%, rgba(255,255,255,0.1) 50%, transparent 51%),
-                linear-gradient(0deg, transparent 49%, rgba(255,255,255,0.1) 50%, transparent 51%);
-            background-size: 40px 40px; /* Сетка */
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-        }
-
-        /* Зоны для мяча (5 штук) */
-        .target-zone {
-            position: absolute; width: 50px; height: 50px;
-            border-radius: 50%;
-            background: rgba(255, 51, 75, 0.0); /* Скрыты */
-            border: 1px dashed rgba(255, 255, 255, 0.1);
-            transition: 0.2s;
-        }
-        /* Позиции */
-        .z1 { top: 10px; left: 10px; } /* TL */
-        .z2 { top: 10px; right: 10px; } /* TR */
-        .z3 { top: 50%; left: 50%; transform: translate(-50%, -50%); } /* Center */
-        .z4 { bottom: 10px; left: 10px; } /* BL */
-        .z5 { bottom: 10px; right: 10px; } /* BR */
-
-        /* Активная зона при сканировании */
-        .target-zone.scanning {
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 10px #fff;
-            border-style: solid;
-        }
-
-        /* МЯЧ (Результат) */
-        .ball {
-            width: 100%; height: 100%;
-            background: radial-gradient(circle at 30% 30%, #fff, #ddd, #333);
-            border-radius: 50%;
-            display: none; /* Скрыт */
-            box-shadow: 0 0 20px #fff, 0 0 40px var(--accent-cyan);
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-        }
-        /* Текстура мяча (условная) */
-        .ball::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                radial-gradient(circle at 50% 50%, transparent 60%, rgba(0,0,0,0.5) 100%);
-            border-radius: 50%;
+                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 20px 20px; /* Мелкая сетка */
+            box-shadow: 0 0 30px rgba(0, 242, 234, 0.15);
+            border-radius: 8px 8px 0 0;
+            transform: rotateX(10deg); /* Наклон назад */
         }
         
-        .target-zone.winner {
-            border: none;
-            background: transparent;
+        /* Линия земли */
+        .goal-post::after {
+            content: ''; position: absolute; bottom: 0; left: -10%; width: 120%; height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(0, 242, 234, 0.8), transparent);
+            box-shadow: 0 0 15px rgba(0, 242, 234, 0.8);
         }
+
+        /* Зоны */
+        .target-zone {
+            position: absolute; width: 40px; height: 40px;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* Уголки прицела (вместо кругов) */
+        .target-zone::before, .target-zone::after {
+            content: ''; position: absolute; width: 10px; height: 10px;
+            border-color: rgba(255,255,255,0.2); border-style: solid; transition: 0.2s;
+        }
+        .target-zone::before { top: 0; left: 0; border-width: 2px 0 0 2px; }
+        .target-zone::after { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+        
+        /* Позиции (Исправлен центр) */
+        .z1 { top: 15px; left: 20px; } /* TL */
+        .z2 { top: 15px; right: 20px; } /* TR */
+        .z3 { top: 15px; left: 50%; transform: translateX(-50%); } /* TOP CENTER */
+        .z4 { bottom: 15px; left: 20px; } /* BL */
+        .z5 { bottom: 15px; right: 20px; } /* BR */
+
+        /* Активная зона (Скан) */
+        .target-zone.scanning::before, .target-zone.scanning::after {
+            border-color: var(--accent-cyan);
+            width: 100%; height: 100%; /* Уголки сходятся */
+        }
+
+        /* МЯЧ - "CYBER SPHERE" */
+        .ball {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: #fff;
+            display: none;
+            position: relative;
+            z-index: 10;
+            /* Мощный неоновый эффект вместо дешевого градиента */
+            box-shadow: 
+                0 0 10px #fff,
+                0 0 20px var(--accent-cyan),
+                0 0 40px var(--accent-cyan),
+                inset 0 0 10px rgba(0,0,0,0.5);
+            animation: impact 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
         .target-zone.winner .ball { display: block; }
+        .target-zone.winner::before, .target-zone.winner::after { opacity: 0; } /* Убираем рамки при голе */
 
-        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
+        @keyframes impact { 
+            0% { transform: scale(3); opacity: 0; } 
+            100% { transform: scale(1); opacity: 1; } 
+        }
 
         /* --- COMMON UI --- */
         .risk-block {
@@ -282,9 +296,9 @@
             display: flex; justify-content: center; gap: 10px; 
             opacity: 0; transition: opacity 0.5s; z-index: 3;
         }
-        /* Для пенальти блок рисков чуть ниже ворот */
+        /* Для пенальти блок рисков */
         .penalty-container + .risk-block {
-            top: auto; bottom: -30px;
+            top: auto; bottom: -40px;
         }
 
         .risk-item {
@@ -413,7 +427,7 @@
             <div class="coef-text" id="coef-text">0.00x</div>
         </div>
 
-        <!-- PENALTY GAME (GOAL) -->
+        <!-- PENALTY GAME (CYBER GOAL) -->
         <div class="penalty-container" id="penalty-view">
             <div class="goal-post">
                 <div class="target-zone z1" id="z1"><div class="ball"></div></div>
@@ -506,7 +520,7 @@
         let isVerifying = false;
 
         function loadState() {
-            const saved = localStorage.getItem('omar_credits_v4');
+            const saved = localStorage.getItem('omar_credits_v5'); // New Version
             if (saved) {
                 const data = JSON.parse(saved);
                 aviatorCredits = data.av || 0;
@@ -515,7 +529,7 @@
             }
         }
         function saveState() {
-            localStorage.setItem('omar_credits_v4', JSON.stringify({ av: aviatorCredits, pen: penaltyCredits, used: usedCodes }));
+            localStorage.setItem('omar_credits_v5', JSON.stringify({ av: aviatorCredits, pen: penaltyCredits, used: usedCodes }));
         }
         loadState();
 
@@ -563,7 +577,6 @@
             changeLanguage();
             updateCreditsUI();
             
-            // Switch Views
             document.getElementById('aviator-view').style.display = (game === 'aviator') ? 'flex' : 'none';
             document.getElementById('penalty-view').style.display = (game === 'penalty') ? 'block' : 'none';
             
@@ -584,7 +597,6 @@
                 document.getElementById('coef-text').innerText = "0.00x";
                 setProgress(0);
             } else {
-                // Reset penalty targets
                 document.querySelectorAll('.target-zone').forEach(el => {
                     el.classList.remove('scanning', 'winner');
                 });
@@ -613,7 +625,6 @@
             if(activeGame === 'aviator') aviatorCredits--; else penaltyCredits--;
             saveState(); updateCreditsUI();
             
-            // Reset previous results
             resetGameUI();
 
             const loaderText = document.getElementById('loader-text');
@@ -636,13 +647,10 @@
                 let targets = document.querySelectorAll('.target-zone');
                 
                 let scanInterval = setInterval(() => {
-                    // Random blink
                     targets.forEach(el => el.classList.remove('scanning'));
                     let r = Math.floor(Math.random() * 5);
                     targets[r].classList.add('scanning');
-                    
                     loaderText.innerText = (steps % 2 === 0) ? t.analyzing : t.predicting;
-                    
                     steps++;
                     if (steps > maxSteps) {
                         clearInterval(scanInterval);
@@ -659,7 +667,6 @@
         }
 
         function showPenaltyResult(targets) {
-            // Pick random winner
             targets.forEach(el => el.classList.remove('scanning'));
             let r = Math.floor(Math.random() * 5);
             targets[r].classList.add('winner');
@@ -667,7 +674,6 @@
         }
 
         function finalizeSignal() {
-            // Risk Analysis
             const riskBlock = document.getElementById('risk-block');
             const accVal = document.getElementById('acc-val');
             const riskVal = document.getElementById('risk-val');
@@ -684,7 +690,6 @@
             riskBlock.style.opacity = '1';
             window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
 
-            // Cooldown
             const btn = document.getElementById('signal-btn');
             const t = translations[currentLang];
             let cd = 5;
