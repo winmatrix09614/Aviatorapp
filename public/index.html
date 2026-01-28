@@ -682,56 +682,6 @@
             document.getElementById('ping-counter').innerText = p;
         }, 3000);
 
-        
-        // ===========================================
-        // СКРИПТ ПУЛЬТА УПРАВЛЕНИЯ
-        // ===========================================
-        let activeZ = null;
-        // Начальные координаты
-        let coords = {
-            z1: {t: 12, l: 6}, 
-            z2: {t: 12, l: 82},
-            z3: {t: 8, l: 44},
-            z4: {t: 58, l: 6}, 
-            z5: {t: 58, l: 82}
-        };
-
-        function selectZ(name) {
-            activeZ = name;
-            // Убираем красную рамку у всех
-            document.querySelectorAll('.target-zone').forEach(el => el.style.border = 'none');
-            // Добавляем рамку выбранному
-            const el = document.querySelector('.' + name);
-            if(el) el.style.border = '3px solid #ff0000';
-            updateDisplay();
-        }
-
-        function move(x, y) {
-            if (!activeZ) {
-                document.getElementById('debug-output').innerText = "СНАЧАЛА НАЖМИ Z1..Z5!";
-                return;
-            }
-            coords[activeZ].l += x; // Left
-            coords[activeZ].t += y; // Top
-            applyCoords();
-            updateDisplay();
-        }
-
-        function applyCoords() {
-            const el = document.querySelector('.' + activeZ);
-            if (!el) return;
-            el.style.top = coords[activeZ].t + '%';
-            el.style.left = coords[activeZ].l + '%';
-            el.style.right = 'auto'; 
-            el.style.transform = 'none'; 
-        }
-
-        function updateDisplay() {
-            const c = coords[activeZ];
-            document.getElementById('debug-output').innerText = 
-                `.${activeZ} { top: ${c.t}%; left: ${c.l}%; }`;
-        }
-
     </script>
 </body>
 </html>
