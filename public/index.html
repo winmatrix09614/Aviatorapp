@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AI Signal Bot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -14,15 +14,15 @@
             --accent-blue: #3a86ff;
             --accent-cyan: #00f2ea;
             --text-color: #ffffff;
-            --brand-red: #ff334b; /* Оставляем для кнопок, чтобы был акцент */
+            --brand-red: #ff334b;
             --brand-green: #00ff41;
-            --glass-panel: rgba(15, 10, 30, 0.7);
+            --glass-panel: rgba(20, 20, 30, 0.6);
         }
 
         body {
             background-color: var(--bg-deep);
             color: var(--text-color);
-            font-family: 'Rajdhani', sans-serif;
+            font-family: 'Poppins', sans-serif; /* Вернули читабельный шрифт */
             margin: 0;
             padding: 0;
             overflow: hidden;
@@ -36,16 +36,13 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            font-family: 'Orbitron', monospace;
         }
         .terminal-text {
-            color: var(--accent-cyan); font-size: 12px; line-height: 1.6;
-            text-align: left; width: 80%;
+            color: var(--accent-cyan); font-family: 'Orbitron', monospace; 
+            font-size: 12px; line-height: 1.6; text-align: left; width: 80%;
         }
-        .blink-cursor { animation: blink 1s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        /* --- ФОН (PURPLE/BLUE CYBERSPACE) --- */
+        /* --- ФОН (Вернули Hexagons, но аккуратнее) --- */
         .cyber-wrapper {
             position: absolute; width: 100%; height: 100%; overflow: hidden;
             background: linear-gradient(to bottom, #020005 0%, #10002b 100%);
@@ -54,54 +51,51 @@
         .cyber-grid {
             position: absolute; bottom: -40%; left: -50%; width: 200%; height: 100%;
             background-image: 
-                linear-gradient(90deg, rgba(58, 134, 255, 0.2) 1px, transparent 1px),
-                linear-gradient(0deg, rgba(123, 44, 191, 0.2) 1px, transparent 1px);
-            background-size: 60px 60px;
+                linear-gradient(90deg, rgba(58, 134, 255, 0.15) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(123, 44, 191, 0.15) 1px, transparent 1px);
+            background-size: 50px 50px; /* Вернули размер сетки как был */
             transform: rotateX(50deg);
             animation: cyberMove 3s linear infinite;
             mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
             -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
-            box-shadow: 0 0 50px rgba(58, 134, 255, 0.2);
         }
-        @keyframes cyberMove { 0% { background-position: 0 0; } 100% { background-position: 0 60px; } }
+        @keyframes cyberMove { 0% { background-position: 0 0; } 100% { background-position: 0 50px; } }
 
         /* --- HUD --- */
         .hud-bar {
             position: absolute; top: 0; left: 0; width: 100%; padding: 15px 20px;
             display: flex; justify-content: space-between;
-            font-family: 'Orbitron', sans-serif; font-size: 10px; letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.6); z-index: 50; pointer-events: none;
+            font-family: 'Orbitron', sans-serif; font-size: 11px;
+            color: rgba(255, 255, 255, 0.5); z-index: 50; pointer-events: none;
         }
         .status-dot {
-            width: 6px; height: 6px; background-color: var(--accent-cyan);
-            border-radius: 50%; box-shadow: 0 0 8px var(--accent-cyan);
-            animation: blinkStatus 2s infinite; display: inline-block; margin-right: 5px;
+            width: 6px; height: 6px; background-color: var(--brand-green);
+            border-radius: 50%; box-shadow: 0 0 5px var(--brand-green);
+            display: inline-block; margin-right: 5px;
         }
         .ping-value { color: var(--accent-cyan); font-weight: bold; }
-        @keyframes blinkStatus { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        /* --- SESSION ID (UNIQUE WATERMARK) --- */
+        /* --- SESSION ID --- */
         .session-id {
             position: absolute; bottom: 15px; left: 0; width: 100%;
             text-align: center;
-            font-family: 'Orbitron', sans-serif; font-size: 9px;
-            color: rgba(255, 255, 255, 0.2);
-            letter-spacing: 2px;
+            font-family: 'Orbitron', sans-serif; font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 1px;
             z-index: 5; pointer-events: none;
         }
 
-        /* --- PIN PAD MODAL --- */
+        /* --- MODAL (Security) --- */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
             z-index: 1000; justify-content: center; align-items: center; flex-direction: column;
         }
         .pin-container {
-            background: rgba(10, 10, 20, 0.9);
-            border: 1px solid rgba(123, 44, 191, 0.5);
-            border-radius: 24px; padding: 25px; width: 300px;
-            box-shadow: 0 0 60px rgba(123, 44, 191, 0.2);
-            display: flex; flex-direction: column; align-items: center; position: relative;
+            background: #0a0a0a; border: 1px solid rgba(123, 44, 191, 0.5);
+            border-radius: 20px; padding: 25px; width: 280px; position: relative;
+            box-shadow: 0 0 40px rgba(123, 44, 191, 0.2);
+            display: flex; flex-direction: column; align-items: center;
         }
         .close-modal-btn {
             position: absolute; top: 15px; right: 20px; color: #fff; opacity: 0.5;
@@ -109,30 +103,28 @@
         }
         .pin-header {
             font-family: 'Orbitron', sans-serif; color: var(--accent-cyan);
-            font-size: 14px; letter-spacing: 2px; margin: 15px 0 20px 0;
+            font-size: 14px; letter-spacing: 2px; margin-bottom: 20px; margin-top: 10px;
         }
         .pin-display {
-            width: 100%; height: 50px; background: rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+            width: 100%; height: 50px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
             display: flex; justify-content: center; align-items: center;
-            font-family: 'Orbitron', sans-serif; font-size: 24px; color: #fff;
-            letter-spacing: 5px; margin-bottom: 25px;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            font-family: 'Orbitron', sans-serif; font-size: 22px; color: #fff;
+            letter-spacing: 5px; margin-bottom: 20px;
         }
         .pin-display.success { color: var(--brand-green); border-color: var(--brand-green); }
         .pin-display.error { color: var(--brand-red); border-color: var(--brand-red); animation: shake 0.3s; }
-        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; }
         .key {
-            height: 60px; background: rgba(255,255,255,0.03); border-radius: 50%;
+            height: 55px; background: rgba(255,255,255,0.05); border-radius: 12px; /* Вернули квадратные кнопки */
             border: 1px solid rgba(255,255,255,0.05); color: #fff;
-            font-family: 'Orbitron', sans-serif; font-size: 20px;
+            font-family: 'Orbitron', sans-serif; font-size: 18px;
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; transition: 0.2s;
         }
-        .key:active { background: rgba(123, 44, 191, 0.4); border-color: var(--accent-purple); transform: scale(0.95); }
-        .key-action { font-size: 14px; border-radius: 12px; }
+        .key:active { background: rgba(255,255,255,0.1); transform: scale(0.96); }
+        .key-action.enter { color: var(--brand-green); }
         .key-action.clear { color: var(--brand-red); }
-        .key-action.enter { color: var(--brand-green); background: rgba(0, 255, 65, 0.05); }
 
         /* --- MAIN SCREEN --- */
         .screen {
@@ -143,17 +135,17 @@
 
         .lang-container { position: absolute; top: 50px; right: 20px; z-index: 20; }
         select {
-            background: rgba(0, 0, 0, 0.6); color: #fff; border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.6); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 5px 10px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 12px;
             outline: none; backdrop-filter: blur(10px);
         }
 
-        .main-logo { text-align: center; margin-bottom: 40px; }
+        .main-logo { text-align: center; margin-bottom: 30px; }
         .logo-title {
-            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 28px;
-            background: linear-gradient(180deg, #fff 0%, #a0a0a0 100%);
+            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 28px; color: #fff;
+            text-shadow: 0 0 20px rgba(58, 134, 255, 0.6); letter-spacing: 1px;
+            background: linear-gradient(180deg, #fff 0%, #c0c0c0 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 25px rgba(58, 134, 255, 0.5); letter-spacing: 2px;
         }
         .logo-subtitle {
             font-size: 10px; color: var(--accent-cyan); letter-spacing: 4px;
@@ -162,75 +154,86 @@
 
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 90%; max-width: 400px; }
         .game-card {
-            background: var(--glass-panel); backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 20px;
+            background: var(--glass-panel); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px;
             text-align: center; cursor: pointer; transition: 0.3s;
-            position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-        .game-card:hover { transform: translateY(-5px); border-color: var(--accent-purple); box-shadow: 0 10px 40px rgba(123, 44, 191, 0.3); }
-        .game-img { width: 70px; height: 70px; border-radius: 14px; margin-bottom: 12px; }
-        .game-title { font-family: 'Orbitron', sans-serif; font-size: 12px; color: #fff; letter-spacing: 1px; }
+        .game-card:active { transform: scale(0.96); }
+        .game-img { width: 75px; height: 75px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .game-title { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 13px; color: #fff; letter-spacing: 0.5px; }
 
-        /* --- GAME UI (NEURAL CORE & RISK) --- */
+        /* --- GAME UI (Исправлено выравнивание) --- */
         .circle-container {
-            position: relative; width: 260px; height: 260px; display: flex; align-items: center;
-            justify-content: center; margin-bottom: 20px;
+            position: relative; width: 260px; height: 260px; 
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 25px;
         }
         .circle-glow {
-            position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            background: radial-gradient(circle, rgba(123,44,191,0.2) 0%, transparent 70%);
+            position: absolute; width: 220px; height: 220px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(58, 134, 255, 0.15) 0%, transparent 70%);
             animation: pulseCore 3s infinite alternate;
         }
-        @keyframes pulseCore { 0% { transform: scale(0.8); opacity: 0.5; } 100% { transform: scale(1.1); opacity: 0.8; } }
+        @keyframes pulseCore { 0% { opacity: 0.3; transform: scale(0.9); } 100% { opacity: 0.6; transform: scale(1.1); } }
 
-        .progress-ring { transform: rotate(-90deg); }
+        .progress-ring { transform: rotate(-90deg); z-index: 1; }
         .progress-ring__circle { transition: stroke-dashoffset 0.5s ease-in-out; }
+        
+        /* Исправлена центровка цифр */
         .coef-text {
-            position: absolute; font-family: 'Orbitron', sans-serif; font-size: 56px; font-weight: 900;
-            color: #fff; text-shadow: 0 0 40px rgba(255, 255, 255, 0.5); z-index: 2; top: 40%; transform: translateY(-50%);
+            position: absolute; 
+            top: 50%; left: 50%; 
+            transform: translate(-50%, -60%); /* Сдвиг чуть вверх, чтобы влез Risk Block */
+            font-family: 'Orbitron', sans-serif; font-size: 52px; font-weight: 900;
+            color: #fff; text-shadow: 0 0 30px rgba(255, 255, 255, 0.4); 
+            z-index: 2; width: 100%; text-align: center;
         }
 
-        /* RISK BLOCK */
+        /* RISK BLOCK (Аккуратно под цифрами) */
         .risk-block {
-            position: absolute; top: 65%; left: 0; width: 100%;
-            display: flex; justify-content: center; gap: 15px; opacity: 0; transition: opacity 0.5s;
+            position: absolute; 
+            top: 65%; left: 0; width: 100%;
+            display: flex; justify-content: center; gap: 10px; 
+            opacity: 0; transition: opacity 0.5s; z-index: 3;
         }
         .risk-item {
-            background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 6px;
-            font-family: 'Orbitron', sans-serif; font-size: 9px; color: #aaa; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.8); padding: 3px 8px; border-radius: 4px;
+            font-family: 'Orbitron', sans-serif; font-size: 9px; color: #888; border: 1px solid rgba(255,255,255,0.1);
         }
-        .risk-val { color: var(--accent-cyan); font-weight: bold; margin-left: 3px; }
+        .risk-val { color: #fff; font-weight: bold; margin-left: 4px; }
         .risk-val.safe { color: var(--brand-green); }
         .risk-val.medium { color: #ffd700; }
         .risk-val.high { color: var(--brand-red); }
 
         .btn-signal {
-            background: linear-gradient(90deg, #d6002a 0%, #ff334b 100%);
-            border: none; width: 80%; max-width: 300px; padding: 18px; border-radius: 14px;
-            color: white; font-family: 'Orbitron', sans-serif; font-size: 16px; letter-spacing: 2px;
-            cursor: pointer; box-shadow: 0 10px 30px rgba(214, 0, 42, 0.3);
-            text-transform: uppercase; margin-top: 10px;
+            background: linear-gradient(90deg, #d6002a 0%, #8a001a 100%);
+            border: none; width: 80%; max-width: 300px; padding: 16px; border-radius: 12px;
+            color: white; font-family: 'Orbitron', sans-serif; font-size: 16px; letter-spacing: 1px;
+            cursor: pointer; box-shadow: 0 5px 20px rgba(214, 0, 42, 0.25);
+            text-transform: uppercase; margin-top: 5px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         .btn-signal:active { transform: scale(0.98); }
-        .tries-info { font-family: 'Orbitron', sans-serif; font-size: 10px; color: #666; margin-top: 10px; }
+        .tries-info { font-family: 'Orbitron', sans-serif; font-size: 10px; color: #666; margin-top: 10px; letter-spacing: 1px; }
         
         .loader-text {
             font-family: 'Orbitron', monospace; font-size: 10px; color: var(--accent-cyan);
-            margin-top: 15px; height: 15px;
+            margin-top: 15px; height: 15px; letter-spacing: 1px;
         }
 
         .btn-back {
-            margin-top: 30px; background: transparent; border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 25px; background: transparent; border: 1px solid rgba(255, 255, 255, 0.2);
             color: #888; padding: 10px 30px; border-radius: 20px; font-size: 11px; cursor: pointer;
             font-family: 'Orbitron', sans-serif;
         }
+        .btn-back:hover { color: #fff; border-color: #fff; }
 
         @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } 100% { transform: translateX(0); } }
     </style>
 </head>
 <body>
 
-    <!-- PRELOADER (FAKE TERMINAL) -->
+    <!-- PRELOADER -->
     <div id="preloader">
         <div class="terminal-text" id="term-text"></div>
     </div>
@@ -250,7 +253,7 @@
     <div id="security-modal" class="modal-overlay">
         <div class="pin-container">
             <div class="close-modal-btn" onclick="closeModal()">✕</div>
-            <div class="pin-header">SECURITY CLEARANCE</div>
+            <div class="pin-header">SECURITY ACCESS</div>
             <div class="pin-display" id="pin-display">_ _ _ _</div>
             <div class="keypad">
                 <div class="key" onclick="enterDigit('1')">1</div><div class="key" onclick="enterDigit('2')">2</div><div class="key" onclick="enterDigit('3')">3</div>
@@ -273,7 +276,7 @@
         </div>
 
         <div class="main-logo">
-            <div class="logo-title">AI PREDICTOR</div>
+            <h1 class="logo-title">AI PREDICTOR</h1>
             <div class="logo-subtitle">NEURAL CORE V3.7</div>
         </div>
         
@@ -297,13 +300,14 @@
         <div class="circle-container">
             <div class="circle-glow"></div>
             <svg class="progress-ring" width="260" height="260">
-                <circle class="progress-ring__circle-bg" stroke="rgba(255,255,255,0.05)" stroke-width="4" fill="transparent" r="110" cx="130" cy="130"/>
-                <circle class="progress-ring__circle" stroke="#00f2ea" stroke-width="4" fill="transparent" r="110" cx="130" cy="130"
+                <circle class="progress-ring__circle-bg" stroke="rgba(255,255,255,0.05)" stroke-width="6" fill="transparent" r="110" cx="130" cy="130"/>
+                <circle class="progress-ring__circle" stroke="#00f2ea" stroke-width="6" fill="transparent" r="110" cx="130" cy="130"
                         style="stroke-dasharray: 691; stroke-dashoffset: 691; stroke-linecap: round;"/>
             </svg>
+            <!-- Цифры теперь точно по центру -->
             <div class="coef-text" id="coef-text">0.00x</div>
             
-            <!-- RISK ANALYSIS BLOCK -->
+            <!-- Risk block аккуратно под цифрами -->
             <div class="risk-block" id="risk-block">
                 <div class="risk-item">ACC: <span class="risk-val" id="acc-val">98%</span></div>
                 <div class="risk-item">RISK: <span class="risk-val" id="risk-val">LOW</span></div>
@@ -326,7 +330,6 @@
             "INITIALIZING KERNEL...",
             "LOADING NEURAL WEIGHTS...",
             "CONNECTING TO SECURE SERVER...",
-            "BYPASSING FIREWALL...",
             "ACCESS GRANTED."
         ];
         let lineIdx = 0;
@@ -337,7 +340,7 @@
             if (lineIdx < termLines.length) {
                 termEl.innerText = termLines[lineIdx];
                 lineIdx++;
-                setTimeout(runTerminal, 600); // Скорость строк
+                setTimeout(runTerminal, 500); 
             } else {
                 setTimeout(() => {
                     preloader.style.opacity = '0';
@@ -347,11 +350,10 @@
         }
         window.onload = runTerminal;
 
-        // --- SESSION ID GENERATOR ---
+        // --- SESSION ID ---
         function initSession() {
             let sid = localStorage.getItem('omar_session_id');
             if (!sid) {
-                // Генерируем уникальный ID
                 const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
                 sid = `SID-${randomPart}-X`;
                 localStorage.setItem('omar_session_id', sid);
@@ -374,7 +376,7 @@
         let isVerifying = false;
 
         function loadState() {
-            const saved = localStorage.getItem('omar_credits_v2');
+            const saved = localStorage.getItem('omar_credits_v3'); // v3 version
             if (saved) {
                 const data = JSON.parse(saved);
                 aviatorCredits = data.av || 0;
@@ -383,7 +385,7 @@
             }
         }
         function saveState() {
-            localStorage.setItem('omar_credits_v2', JSON.stringify({ av: aviatorCredits, pen: penaltyCredits, used: usedCodes }));
+            localStorage.setItem('omar_credits_v3', JSON.stringify({ av: aviatorCredits, pen: penaltyCredits, used: usedCodes }));
         }
         loadState();
 
