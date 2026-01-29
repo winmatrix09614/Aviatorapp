@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate</title>
+    <title>AI Signal Bot Ultimate Fixed</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
@@ -16,7 +16,7 @@
             --brand-red: #ff334b;
             --glass-panel: rgba(20, 20, 30, 0.6);
             
-            /* ЦВЕТА ДЛЯ MINES */
+            /* MINES */
             --mines-bg: #272749;
             --mines-tile: #2b2e55;
             --mines-active: #094e67;
@@ -55,7 +55,7 @@
         }
         .status-dot { width: 6px; height: 6px; background: var(--brand-green); border-radius: 50%; box-shadow: 0 0 5px var(--brand-green); display: inline-block; margin-right: 5px; }
 
-        /* --- LANGUAGE SELECT --- */
+        /* --- LANG & MODAL --- */
         .lang-container { position: absolute; top: 50px; right: 20px; z-index: 60; }
         select {
             background: rgba(0, 0, 0, 0.6); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2);
@@ -63,7 +63,6 @@
         }
         option { background: #000; }
 
-        /* --- FAKE ID MODAL --- */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; flex-direction: column;
@@ -101,46 +100,66 @@
         .game-title { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 12px; color: #fff; }
         .game-card.locked { opacity: 0.5; filter: grayscale(1); }
 
-        /* --- GAME COMMON --- */
+        /* --- GAME COMMON UI --- */
+        .telegram-link {
+            text-decoration: none; font-family: 'Orbitron', sans-serif; color: var(--accent-cyan);
+            border: 1px solid rgba(0, 242, 234, 0.3); padding: 8px 16px; border-radius: 20px;
+            font-size: 12px; letter-spacing: 1px; background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px); margin-bottom: 25px; transition: 0.3s;
+            display: inline-block;
+        }
+
+        .risk-block {
+            width: 100%; display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;
+            opacity: 0; transition: opacity 0.5s;
+        }
+        .risk-item {
+            background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 6px;
+            font-family: 'Orbitron', sans-serif; font-size: 10px; color: #aaa; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .risk-val { color: #fff; font-weight: bold; margin-left: 5px; }
+
         .btn-signal {
             background: linear-gradient(90deg, #d6002a 0%, #8a001a 100%);
             border: none; width: 80%; max-width: 300px; padding: 16px; border-radius: 12px;
             color: white; font-family: 'Orbitron', sans-serif; font-size: 16px; letter-spacing: 1px;
             cursor: pointer; box-shadow: 0 5px 20px rgba(214, 0, 42, 0.25);
-            text-transform: uppercase; margin-top: 20px; border: 1px solid rgba(255,255,255,0.1);
+            text-transform: uppercase; margin-top: 10px; border: 1px solid rgba(255,255,255,0.1);
         }
         .btn-signal:disabled { opacity: 0.7; transform: scale(0.98); }
-        .btn-back { margin-top: 15px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 25px; border-radius: 20px; font-size: 10px; font-family: 'Orbitron'; }
-        .loader-text { font-family: 'Orbitron'; font-size: 12px; color: var(--accent-cyan); margin-top: 10px; height: 20px; }
+        .btn-back { margin-top: 20px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 25px; border-radius: 20px; font-size: 10px; font-family: 'Orbitron'; }
+        .loader-text { font-family: 'Orbitron'; font-size: 12px; color: var(--accent-cyan); margin-top: 15px; height: 20px; }
 
-        /* ========================================= */
-        /*              GAME VIEWS                   */
-        /* ========================================= */
-
-        /* 1. AVIATOR */
-        .aviator-container { display: none; position: relative; width: 260px; height: 260px; align-items: center; justify-content: center; margin-bottom: 20px;}
-        .circle-glow { position: absolute; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(58,134,255,0.15) 0%, transparent 70%); animation: pulse 3s infinite; }
+        /* --- 1. AVIATOR --- */
+        .aviator-container { display: none; position: relative; width: 260px; height: 260px; align-items: center; justify-content: center; margin-bottom: 10px; }
+        .circle-glow { position: absolute; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(58,134,255,0.15) 0%, transparent 70%); }
         .coef-text { position: absolute; font-family: 'Orbitron'; font-size: 48px; font-weight: 900; color: #fff; z-index: 2; }
-        @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.5; } 100% { transform: scale(1.05); opacity: 0.8; } }
+        
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.1s linear;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
 
-        /* 2. PENALTY (ОТКАЛИБРОВАНО) */
+        /* --- 2. PENALTY --- */
         .penalty-container {
             position: relative; width: 320px; height: 210px; display: none; margin-bottom: 20px;
             background-image: url('/img/penalty_bg.png'); background-size: cover; background-position: center;
             border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
-        .target-zone { position: absolute; width: 40px; height: 40px; border-radius: 50%; transition: 0.2s; }
+        .target-zone { position: absolute; width: 40px; height: 40px; border-radius: 50%; transition: 0.1s; }
         
-        /* КООРДИНАТЫ ИЗ КАЛИБРОВКИ */
+        /* КООРДИНАТЫ */
         .z1 { top: 12%; left: 7%; }
         .z2 { top: 12%; left: 80%; }
         .z3 { top: 11%; left: 44%; }
         .z4 { top: 48%; left: 6%; }
         .z5 { top: 49%; left: 81%; }
 
+        .target-zone.scanning { border: 2px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.1); }
         .target-zone.winner { border: 3px solid #00f2ea; background: radial-gradient(circle, rgba(0,242,234,0.4) 0%, transparent 70%); box-shadow: 0 0 15px #00f2ea; }
 
-        /* 3. MINES (НОВОЕ) */
+        /* --- 3. MINES --- */
         .mines-wrapper { display: none; width: 90%; max-width: 300px; margin-bottom: 20px; }
         .mines-controls { display: flex; justify-content: space-between; margin-bottom: 10px; }
         .mines-btn-grid { background: #333; border: 1px solid #555; color: #fff; padding: 5px 10px; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; }
@@ -161,7 +180,7 @@
         .mine-tile.reveal { background-color: var(--mines-active); }
         .mine-tile.reveal img { display: block; }
 
-        /* 4. CHICKEN ROAD (НОВОЕ) */
+        /* --- 4. CHICKEN --- */
         .chicken-container {
             display: none; width: 90%; max-width: 320px; height: 100px;
             background: #2a2a2a; border-radius: 12px; margin-bottom: 20px;
@@ -176,41 +195,25 @@
         .chicken-step.safe { border-color: #00ff41; background: rgba(0,255,65,0.1); box-shadow: 0 0 10px #00ff41; }
         .chicken-step.safe::after { content: '✔'; color: #00ff41; font-weight: bold; font-size: 18px; }
         
-        /* PC MEDIA */
         @media (min-width: 768px) {
             .penalty-container { transform: scale(1.3); margin-bottom: 50px; }
         }
-
     </style>
 </head>
 <body>
 
-    <!-- PRELOADER -->
-    <div id="preloader">
-        <div class="terminal-text" id="term-text"></div>
-    </div>
-
+    <div id="preloader"><div class="terminal-text" id="term-text"></div></div>
     <div class="cyber-wrapper"></div>
-
-    <div class="hud-bar">
-        <div><span class="status-dot"></span>ONLINE</div>
-        <div id="session-id">SID: ...</div>
-    </div>
-
-    <!-- LANG -->
+    <div class="hud-bar"><div><span class="status-dot"></span>ONLINE</div><div id="session-id">SID: ...</div></div>
     <div class="lang-container">
-        <select onchange="changeLang(this.value)">
-            <option value="en">🇬🇧 EN</option>
-            <option value="ru">🇷🇺 RU</option>
-            <option value="es">🇪🇸 ES</option>
-        </select>
+        <select onchange="changeLang(this.value)"><option value="en">🇬🇧 EN</option><option value="ru">🇷🇺 RU</option><option value="es">🇪🇸 ES</option></select>
     </div>
 
-    <!-- FAKE ID MODAL -->
+    <!-- ID MODAL -->
     <div id="id-modal" class="modal-overlay">
         <div class="id-box">
             <h3 style="color:#00f2ea; font-family:'Orbitron'">SECURITY CHECK</h3>
-            <p style="font-size:12px; color:#aaa; margin-bottom:10px;">Enter your Account ID to sync:</p>
+            <p style="font-size:12px; color:#aaa; margin-bottom:10px;">Enter your Account ID:</p>
             <input type="tel" id="user-id-input" class="id-input" placeholder="123456789">
             <button class="id-btn" onclick="checkID()">CONNECT</button>
             <div id="id-error" style="color:#ff334b; font-size:10px; margin-top:10px; min-height:15px;"></div>
@@ -224,40 +227,32 @@
             <div style="font-size:10px; color:#00f2ea; letter-spacing:4px;">NEURAL V4.0</div>
         </div>
         <div class="menu-grid">
-            <div class="game-card" onclick="openGame('aviator')">
-                <img src="/img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div>
-            </div>
-            <div class="game-card" onclick="openGame('penalty')">
-                <img src="/img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div>
-            </div>
-            <div class="game-card" onclick="openGame('mines')">
-                <img src="/img/menu_mines.png" class="game-img"><div class="game-title">MINES</div>
-            </div>
-            <div class="game-card" onclick="openGame('chicken')">
-                <img src="/img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div>
-            </div>
+            <div class="game-card" onclick="openGame('aviator')"><img src="/img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
+            <div class="game-card" onclick="openGame('penalty')"><img src="/img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div>
+            <div class="game-card" onclick="openGame('mines')"><img src="/img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div>
+            <div class="game-card" onclick="openGame('chicken')"><img src="/img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div>
         </div>
     </div>
 
-    <!-- GAME SCREEN -->
+    <!-- GAME -->
     <div id="screen-game" class="screen">
         
+        <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
+
         <!-- AVIATOR -->
         <div id="aviator-view" class="aviator-container">
             <div class="circle-glow"></div>
-            <svg width="260" height="260" style="transform: rotate(-90deg);">
+            <svg width="260" height="260">
                 <circle cx="130" cy="130" r="110" stroke="rgba(255,255,255,0.05)" stroke-width="6" fill="transparent"/>
-                <circle id="prog-ring" cx="130" cy="130" r="110" stroke="#00f2ea" stroke-width="6" fill="transparent" stroke-dasharray="691" stroke-dashoffset="691"/>
+                <circle id="prog-ring" class="progress-ring__circle" cx="130" cy="130" r="110" stroke="#00f2ea" stroke-width="6" fill="transparent" stroke-dasharray="691" stroke-dashoffset="691"/>
             </svg>
             <div class="coef-text" id="coef-text">0.00x</div>
         </div>
 
         <!-- PENALTY -->
         <div id="penalty-view" class="penalty-container">
-            <div class="target-zone z1" id="pz1"></div>
-            <div class="target-zone z2" id="pz2"></div>
-            <div class="target-zone z3" id="pz3"></div>
-            <div class="target-zone z4" id="pz4"></div>
+            <div class="target-zone z1" id="pz1"></div><div class="target-zone z2" id="pz2"></div>
+            <div class="target-zone z3" id="pz3"></div><div class="target-zone z4" id="pz4"></div>
             <div class="target-zone z5" id="pz5"></div>
         </div>
 
@@ -268,21 +263,21 @@
                     <div class="mines-btn-grid active" id="btn-3x3" onclick="setMinesGrid(3)">3x3</div>
                     <div class="mines-btn-grid" id="btn-5x5" onclick="setMinesGrid(5)">5x5</div>
                 </div>
-                <div>
-                    <span style="font-size:10px; color:#aaa;">TRAPS:</span>
-                    <select class="mines-select"><option>1</option><option selected>3</option><option>5</option></select>
-                </div>
+                <div><span style="font-size:10px; color:#aaa;">TRAPS:</span><select class="mines-select"><option>1</option><option selected>3</option><option>5</option></select></div>
             </div>
             <div id="mines-board" class="mines-board"></div>
         </div>
 
         <!-- CHICKEN -->
         <div id="chicken-view" class="chicken-container">
-            <div class="chicken-step" id="ch1"></div>
-            <div class="chicken-step" id="ch2"></div>
-            <div class="chicken-step" id="ch3"></div>
-            <div class="chicken-step" id="ch4"></div>
+            <div class="chicken-step" id="ch1"></div><div class="chicken-step" id="ch2"></div>
+            <div class="chicken-step" id="ch3"></div><div class="chicken-step" id="ch4"></div>
             <div class="chicken-step" id="ch5"></div>
+        </div>
+
+        <div class="risk-block" id="risk-block">
+            <div class="risk-item">ACC: <span class="risk-val" id="acc-val">0%</span></div>
+            <div class="risk-item">RISK: <span class="risk-val" id="risk-val">LOW</span></div>
         </div>
 
         <div id="loader-text" class="loader-text"></div>
@@ -291,7 +286,7 @@
     </div>
 
     <script>
-        // --- PRELOADER ---
+        // --- INIT & PRELOADER ---
         const termLines = ["INITIALIZING...", "LOADING ASSETS...", "CONNECTING TO SERVER...", "DONE."];
         let lineIdx = 0;
         window.onload = function() {
@@ -299,35 +294,35 @@
             function typeLine() {
                 if(lineIdx < termLines.length) {
                     term.innerText = termLines[lineIdx++];
-                    setTimeout(typeLine, 400);
+                    setTimeout(typeLine, 300);
                 } else {
-                    setTimeout(() => { document.getElementById('preloader').style.display='none'; }, 500);
+                    setTimeout(() => { document.getElementById('preloader').style.display='none'; }, 400);
                 }
             }
             typeLine();
         };
 
-        // --- SESSION ---
         const sid = "SID-" + Math.random().toString(36).substr(2, 6).toUpperCase();
         document.getElementById('session-id').innerText = sid;
 
-        // --- TRANSLATIONS ---
+        // --- TRANS ---
         const trans = {
-            en: { get_signal: "GET SIGNAL", exit: "EXIT" },
-            ru: { get_signal: "ПОЛУЧИТЬ СИГНАЛ", exit: "МЕНЮ" },
-            es: { get_signal: "OBTENER SEÑAL", exit: "SALIR" }
+            en: { get_signal: "GET SIGNAL", exit: "EXIT", aviator: "AVIATOR", penalty: "PENALTY" },
+            ru: { get_signal: "ПОЛУЧИТЬ СИГНАЛ", exit: "МЕНЮ", aviator: "АВИАТОР", penalty: "ПЕНАЛЬТИ" },
+            es: { get_signal: "OBTENER SEÑAL", exit: "SALIR", aviator: "AVIATOR", penalty: "PENALTI" }
         };
         let curLang = 'en';
         function changeLang(l) {
             curLang = l;
             document.querySelectorAll('[data-tr]').forEach(el => {
-                el.innerText = trans[l][el.getAttribute('data-tr')];
+                const k = el.getAttribute('data-tr');
+                if(trans[l][k]) el.innerText = trans[l][k];
             });
         }
 
-        // --- GAME STATE ---
+        // --- STATE ---
         let activeGame = null;
-        let isIdVerified = false; // Поставь true если надоело вводить ID
+        let isIdVerified = false; // Поставь true для тестов без ID
         let minesSize = 3;
 
         // --- NAVIGATION ---
@@ -336,16 +331,23 @@
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-game').classList.add('active');
             
-            // Hide all
             ['aviator', 'penalty', 'mines', 'chicken'].forEach(id => {
                 document.getElementById(id+'-view').style.display = 'none';
             });
             
             document.getElementById('signal-btn').disabled = false;
             document.getElementById('loader-text').innerText = "";
+            document.getElementById('risk-block').style.opacity = '0';
 
-            if(g === 'aviator') document.getElementById('aviator-view').style.display = 'flex';
-            if(g === 'penalty') document.getElementById('penalty-view').style.display = 'block';
+            if(g === 'aviator') {
+                document.getElementById('aviator-view').style.display = 'flex';
+                document.getElementById('coef-text').innerText = "0.00x";
+                setProgress(0);
+            }
+            if(g === 'penalty') {
+                document.getElementById('penalty-view').style.display = 'block';
+                document.querySelectorAll('.target-zone').forEach(el => el.classList.remove('winner', 'scanning'));
+            }
             if(g === 'mines') {
                 document.getElementById('mines-view').style.display = 'block';
                 setMinesGrid(3);
@@ -361,10 +363,8 @@
             document.getElementById('screen-menu').classList.add('active');
         }
 
-        // --- FAKE ID CHECK ---
         function checkID() {
             const val = document.getElementById('user-id-input').value;
-            // Проверка: минимум 8 цифр
             if(val.length < 8 || isNaN(val)) {
                 document.getElementById('id-error').innerText = "INVALID ID (MIN 8 DIGITS)";
                 return;
@@ -376,7 +376,7 @@
 
         let pendingSignal = false;
 
-        // --- SIGNAL LOGIC ---
+        // --- MAIN LOGIC ---
         function getSignal() {
             if(!isIdVerified) {
                 pendingSignal = true;
@@ -388,44 +388,95 @@
             const loader = document.getElementById('loader-text');
             btn.disabled = true;
             loader.innerText = "ANALYZING...";
+            
+            // Clean UI before signal
+            document.getElementById('risk-block').style.opacity = '0';
+            if(activeGame === 'aviator') setProgress(0);
+            if(activeGame === 'penalty') document.querySelectorAll('.target-zone').forEach(el => el.classList.remove('winner'));
+            if(activeGame === 'mines') document.querySelectorAll('.mine-tile').forEach(el => el.classList.remove('reveal'));
+            if(activeGame === 'chicken') resetChicken();
 
-            setTimeout(() => {
-                loader.innerText = "";
-                if(activeGame === 'aviator') runAviator();
-                if(activeGame === 'penalty') runPenalty();
-                if(activeGame === 'mines') runMines();
-                if(activeGame === 'chicken') runChicken();
+            if(activeGame === 'aviator') {
+                runAviatorAnimation(loader, btn);
+            } else if (activeGame === 'penalty') {
+                runPenaltyAnimation(loader, btn);
+            } else {
+                // Mines & Chicken logic
+                setTimeout(() => {
+                    if(activeGame === 'mines') runMines();
+                    if(activeGame === 'chicken') runChicken();
+                    finishSignal(loader, btn);
+                }, 1500);
+            }
+        }
+
+        function finishSignal(loader, btn) {
+            loader.innerText = "";
+            // Show Risk
+            const acc = (Math.random()*(99-92)+92).toFixed(1);
+            document.getElementById('acc-val').innerText = acc + "%";
+            document.getElementById('risk-block').style.opacity = '1';
+
+            let cd = 5;
+            const t = setInterval(() => {
+                btn.innerText = `WAIT ${cd}s`;
+                cd--;
+                if(cd < 0) {
+                    clearInterval(t);
+                    btn.innerText = trans[curLang].get_signal || "GET SIGNAL";
+                    btn.disabled = false;
+                }
+            }, 1000);
+        }
+
+        // --- AVIATOR ANIMATION ---
+        function setProgress(percent) {
+            const circle = document.getElementById('prog-ring');
+            const radius = circle.r.baseVal.value;
+            const circumference = radius * 2 * Math.PI;
+            const offset = circumference - (percent / 100) * circumference;
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            circle.style.strokeDashoffset = offset;
+        }
+
+        function runAviatorAnimation(loader, btn) {
+            let p = 0;
+            const int = setInterval(() => {
+                p += 1;
+                setProgress(p);
+                if(p > 30) loader.innerText = "CALCULATING...";
+                if(p >= 100) {
+                    clearInterval(int);
+                    const val = (Math.random() * (5.0 - 1.2) + 1.2).toFixed(2);
+                    document.getElementById('coef-text').innerText = val + "x";
+                    finishSignal(loader, btn);
+                }
+            }, 30); // ~3 sec duration
+        }
+
+        // --- PENALTY ANIMATION (SCANNING) ---
+        function runPenaltyAnimation(loader, btn) {
+            const targets = document.querySelectorAll('.target-zone');
+            let steps = 0;
+            const maxSteps = 15;
+            
+            const int = setInterval(() => {
+                targets.forEach(el => el.classList.remove('scanning'));
+                const r = Math.floor(Math.random() * 5);
+                targets[r].classList.add('scanning');
+                steps++;
                 
-                // Cooldown
-                let cd = 5;
-                const timer = setInterval(() => {
-                    btn.innerText = `WAIT ${cd}s`;
-                    cd--;
-                    if(cd < 0) {
-                        clearInterval(timer);
-                        btn.innerText = trans[curLang].get_signal;
-                        btn.disabled = false;
-                    }
-                }, 1000);
-            }, 1500);
+                if(steps > maxSteps) {
+                    clearInterval(int);
+                    targets.forEach(el => el.classList.remove('scanning'));
+                    const win = Math.floor(Math.random() * 5) + 1;
+                    document.getElementById('pz'+win).classList.add('winner');
+                    finishSignal(loader, btn);
+                }
+            }, 150); // Fast switching
         }
 
-        // --- ALGORITHMS ---
-        
-        // 1. Aviator
-        function runAviator() {
-            const val = (Math.random() * (5.0 - 1.2) + 1.2).toFixed(2);
-            document.getElementById('coef-text').innerText = val + "x";
-        }
-
-        // 2. Penalty
-        function runPenalty() {
-            for(let i=1; i<=5; i++) document.getElementById('pz'+i).classList.remove('winner');
-            const r = Math.floor(Math.random() * 5) + 1;
-            document.getElementById('pz'+r).classList.add('winner');
-        }
-
-        // 3. Mines
+        // --- MINES ---
         function setMinesGrid(s) {
             minesSize = s;
             const b = document.getElementById('mines-board');
@@ -433,23 +484,19 @@
             b.innerHTML = "";
             document.getElementById('btn-3x3').classList.toggle('active', s===3);
             document.getElementById('btn-5x5').classList.toggle('active', s===5);
-            
             for(let i=0; i<s*s; i++) {
                 const d = document.createElement('div');
                 d.className = 'mine-tile';
                 d.id = 'mt-'+i;
-                // КАРТИНКА КРИСТАЛЛА ТУТ
                 d.innerHTML = '<img src="/img/mines_star.png">'; 
                 b.appendChild(d);
             }
         }
         function runMines() {
-            document.querySelectorAll('.mine-tile').forEach(e => e.classList.remove('reveal'));
-            const count = Math.floor(Math.random()*3)+2; // 2-4 stars
+            const count = Math.floor(Math.random()*3)+2;
             const total = minesSize*minesSize;
             let set = new Set();
             while(set.size < count) set.add(Math.floor(Math.random()*total));
-            
             let arr = Array.from(set);
             let i=0;
             let int = setInterval(() => {
@@ -459,12 +506,11 @@
             }, 400);
         }
 
-        // 4. Chicken
+        // --- CHICKEN ---
         function resetChicken() {
             for(let i=1; i<=5; i++) document.getElementById('ch'+i).className = 'chicken-step';
         }
         function runChicken() {
-            resetChicken();
             const steps = Math.floor(Math.random()*4)+1;
             let i=1;
             let int = setInterval(() => {
