@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v7.9</title>
+    <title>AI Signal Bot Ultimate v7.9.2</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
@@ -82,7 +82,7 @@
         }
 
         /* --- SCREENS --- */
-        .screen { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; position: absolute; z-index: 10; flex-grow: 1; top: 0; left: 0; }
+        .screen { display: none; flex-direction: column; align-items: center; justify-content: flex-start; height: 100%; width: 100%; position: absolute; z-index: 10; top: 0; left: 0; box-sizing: border-box; padding-top: 60px; }
         .screen.active { display: flex; }
 
         /* --- MENU --- */
@@ -135,6 +135,7 @@
         }
 
         /* --- GAME UI --- */
+        #screen-game { justify-content: center; }
         .telegram-link {
             text-decoration: none; font-family: 'Orbitron', sans-serif; color: var(--accent-cyan);
             border: 1px solid rgba(0, 242, 234, 0.3); padding: 8px 16px; border-radius: 20px;
@@ -182,15 +183,15 @@
     </div>
 
     <!-- MAIN MENU SCREEN -->
-    <div id="screen-menu" class="screen active">
+    <div id="screen-menu" class="screen">
         <div class="main-menu-content">
             <div class="main-logo">
                 <div class="logo-title">AI PREDICTOR</div>
-                <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL V7.9 POWERED BY OMAR</div>
+                <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL V7.9.2</div>
             </div>
             <div class="menu-grid">
-                <div class="game-card" onclick="openGame('aviator')"><img src="/img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
-                <div class="game-card" onclick="openGame('penalty')"><img src="/img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div>
+                <div class="game-card" onclick="openGame('aviator')"><img src="/img/menu_aviator.png" class="game-img"><div class="game-title">AVIATOR</div></div>
+                <div class="game-card" onclick="openGame('penalty')"><img src="/img/menu_penalty.png" class="game-img"><div class="game-title">PENALTY</div></div>
                 <div class="game-card" onclick="openGame('mines')"><img src="/img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div>
                 <div class="game-card" onclick="openGame('chicken')"><img src="/img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div>
                 <div class="game-card game-card-soon"><div class="soon-text">SOON</div></div>
@@ -205,32 +206,97 @@
 
     <!-- ID MODAL -->
     <div id="id-modal" class="modal-overlay">
-        <!-- ... (ID Modal content) ... -->
+        <div class="id-box">
+            <h3 style="color:#00f2ea; font-family:'Orbitron'; margin-bottom:5px;">AUTHORIZATION</h3>
+            <p style="font-size:11px; color:#aaa; margin-bottom:20px;">Secure connection to 1xBet Server</p>
+            <input type="tel" id="user-id-input" class="id-input" placeholder="Account ID (10 digits)" maxlength="10">
+            <button id="btn-connect" class="id-btn" onclick="validateAndConnect()">CONNECT ACCOUNT</button>
+            <div id="id-error" style="color:#ff334b; font-size:10px; margin-top:10px; min-height:15px; font-weight:bold;"></div>
+            <div id="sync-log" class="sync-log"></div>
+        </div>
     </div>
     
     <!-- GAME SCREEN -->
     <div id="screen-game" class="screen">
-        <!-- ... (Game Screen content, same as before) ... -->
+        <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
+
+        <div id="aviator-logo-view" style="display:none;">
+            <img src="/img/aviator_logo.png" class="aviator-logo-img">
+        </div>
+
+        <div id="aviator-view" class="aviator-wrapper">
+            <svg class="aviator-graph-svg" id="aviator-graph" viewBox="0 0 300 200" preserveAspectRatio="none">
+                <path d="M0,200 Q150,120 300,20 L300,200 Z" fill="rgba(255, 51, 75, 0.2)" />
+                <path d="M0,200 Q150,120 300,20" fill="none" stroke="#ff334b" stroke-width="4" />
+            </svg>
+            <img src="/img/plane.png" id="aviator-plane" class="aviator-plane-img">
+            <div class="coef-text" id="coef-text">0.00x</div>
+        </div>
+
+        <div class="risk-block" id="risk-block">
+            <div class="risk-item">ACC: <span class="risk-val" id="acc-val">0%</span></div>
+            <div class="risk-item">RISK: <span class="risk-val" id="risk-val">LOW</span></div>
+        </div>
+
+        <div id="loader-text" class="loader-text"></div>
+        <button id="signal-btn" class="btn-signal" onclick="getSignal()">GET SIGNAL</button>
+        <button class="btn-back" onclick="backMenu()">EXIT</button>
     </div>
 
     <script>
         // --- GLOBAL STATE & CONFIG ---
         let isMuted = false;
         const winSound = new Audio('/audio/win-blip.mp3');
-        winSound.volume = 0.5; // Adjust volume if needed
+        winSound.volume = 0.5;
 
         let activeGame = null;
-        // ... (other variables)
+        let minesSize = 3;
 
         // --- CORE FUNCTIONS (BOOT, SOUND, NAVIGATION) ---
         window.onload = function() {
-            // ... (preloader logic)
+            const term = document.getElementById('term-text');
+            const termLines = ["INITIALIZING...", "CHECKING RESOURCES...", "ESTABLISHING SECURE TUNNEL...", "READY."];
+            let lineIdx = 0;
+            function typeLine() {
+                if(lineIdx < termLines.length) {
+                    term.innerText = termLines[lineIdx++];
+                    setTimeout(typeLine, 400);
+                } else {
+                    setTimeout(() => { 
+                        document.getElementById('preloader').style.display='none'; 
+                        document.getElementById('id-modal').style.display='flex';
+                    }, 500);
+                }
+            }
+            typeLine();
+
+            const sid = "SID-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+            document.getElementById('session-id').innerText = sid;
+            
             if (localStorage.getItem('isMuted') === 'true') {
                 isMuted = true;
                 document.getElementById('sound-icon').src = '/img/icon_sound_off.svg';
             }
+            
             runLiveFeed();
         };
+        
+        function validateAndConnect() {
+            const val = document.getElementById('user-id-input').value;
+            const err = document.getElementById('id-error');
+            const btn = document.getElementById('btn-connect');
+            const log = document.getElementById('sync-log');
+
+            if (val.length !== 10 || isNaN(val)) { err.innerText = "ERROR: ID MUST BE 10 DIGITS"; return; }
+            if (parseInt(val.substring(0, 3)) < 155) { err.innerText = "ERROR: ID NOT FOUND IN DATABASE"; return; }
+
+            err.innerText = ""; btn.disabled = true; btn.style.background = "#333"; btn.innerText = "CONNECTING..."; log.style.display = "block";
+            setTimeout(() => { log.innerText = "> Handshake established..."; }, 500);
+            setTimeout(() => { log.innerText = "> Verifying hash tokens..."; }, 1500);
+            setTimeout(() => { log.innerText = "> Downloading betting history..."; }, 2500);
+            setTimeout(() => { log.innerText = "> SYNCHRONIZATION COMPLETE"; btn.innerText = "SUCCESS"; btn.style.background = "#00f2ea"; btn.style.color = "#000"; }, 3500);
+            setTimeout(() => { document.getElementById('id-modal').style.display = 'none'; document.getElementById('screen-menu').classList.add('active'); }, 4200);
+        }
 
         function toggleSound() {
             isMuted = !isMuted;
@@ -245,23 +311,35 @@
             }
         }
         
-        // ... (validateAndConnect, changeLang, backMenu functions are here)
+        function backMenu() {
+            document.getElementById('screen-game').classList.remove('active');
+            document.getElementById('screen-menu').classList.add('active');
+        }
 
         function openGame(g) {
             activeGame = g;
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-game').classList.add('active');
-            // ... (rest of the openGame logic)
+            
+            ['aviator-logo-view', 'aviator-view'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            
+            if (g === 'aviator') {
+                document.getElementById('aviator-logo-view').style.display = 'block';
+                document.getElementById('aviator-view').style.display = 'block';
+                const plane = document.getElementById('aviator-plane');
+                plane.classList.remove('visible', 'taking-off');
+                document.getElementById('coef-text').innerText="0.00x";
+                document.getElementById('coef-text').classList.remove('visible');
+                document.getElementById('aviator-graph').classList.remove('active');
+            }
         }
 
         // --- LIVE FEED LOGIC ---
         function generateFakeWin() {
-            const games = [
-                { name: 'AVIATOR', weight: 4 }, 
-                { name: 'PENALTY', weight: 2 }, 
-                { name: 'MINES', weight: 2 }, 
-                { name: 'CHICKEN', weight: 2 }
-            ];
+            const games = [ { name: 'AVIATOR', weight: 4 }, { name: 'PENALTY', weight: 2 }, { name: 'MINES', weight: 2 }, { name: 'CHICKEN', weight: 2 }];
             const weightedGames = games.flatMap(game => Array(game.weight).fill(game.name));
             const gameName = weightedGames[Math.floor(Math.random() * weightedGames.length)];
 
@@ -271,9 +349,9 @@
                 coef = parseFloat((Math.random() * (15 - 1.2) + 1.2).toFixed(2));
                 bet = Math.floor(Math.random() * (2000 - 50) + 50);
             } else if (gameName === 'PENALTY') {
-                coef = 5.88; // Placeholder
+                coef = 5.88;
                 bet = Math.floor(Math.random() * (3000 - 100) + 100);
-            } else { // Mines & Chicken
+            } else {
                 coef = parseFloat((Math.random() * (8 - 2) + 2).toFixed(2));
                 bet = Math.floor(Math.random() * (1000 - 100) + 100);
             }
@@ -305,26 +383,65 @@
         function runLiveFeed() {
             const randomInterval = Math.random() * (20000 - 10000) + 10000;
             setTimeout(() => {
-                updateLiveFeed();
+                if (document.getElementById('screen-menu').classList.contains('active')) {
+                    updateLiveFeed();
+                }
                 runLiveFeed();
             }, randomInterval);
         }
-
+        
         // --- SIGNAL GENERATION LOGIC ---
         function getSignal() {
-            // ... (getSignal logic remains the same)
+            const btn = document.getElementById('signal-btn');
+            const loader = document.getElementById('loader-text');
+            btn.disabled = true; loader.innerText = "ANALYZING...";
+            document.getElementById('risk-block').style.opacity = '0';
+            
+            if(activeGame === 'aviator') {
+                 const plane = document.getElementById('aviator-plane');
+                 plane.classList.remove('taking-off', 'visible');
+                 void plane.offsetWidth; 
+                 runAviatorAnimation(loader, btn);
+            }
         }
         
         function finishSignal(loader, btn) {
-            // ... (finishSignal logic remains the same)
+            loader.innerText = "";
+            const acc = (Math.random()*(99-92)+92).toFixed(1);
+            document.getElementById('acc-val').innerText = acc + "%";
+            document.getElementById('risk-block').style.opacity = '1';
+            let cd = 5;
+            const t = setInterval(() => {
+                btn.innerText = `WAIT ${cd}s`; cd--;
+                if(cd < 0) { clearInterval(t); btn.innerText = "GET SIGNAL"; btn.disabled = false; }
+            }, 1000);
         }
 
         function runAviatorAnimation(loader, btn) {
-            // ... (runAviatorAnimation logic with the coefficient fix)
+            document.getElementById('aviator-plane').classList.add('visible', 'taking-off');
+            document.getElementById('aviator-graph').classList.add('active');
+            
+            const textEl = document.getElementById('coef-text');
+            textEl.classList.add('visible');
+            
+            const finalVal = parseFloat((Math.random()*(5.0-1.2)+1.2).toFixed(2));
+            let currentVal = 1.00;
+            
+            const int = setInterval(() => {
+                currentVal += 0.05;
+                if (currentVal >= finalVal) {
+                    clearInterval(int);
+                    textEl.innerText = finalVal.toFixed(2) + "x";
+                    loader.innerText = "";
+                    finishSignal(loader, btn);
+                } else {
+                    textEl.innerText = currentVal.toFixed(2) + "x";
+                }
+            }, 50); 
         }
 
-        // ... (all other game logic functions: penalty, mines, chicken)
-
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
     </script>
 </body>
 </html>
