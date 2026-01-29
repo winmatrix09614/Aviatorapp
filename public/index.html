@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v7.2</title>
+    <title>AI Signal Bot Ultimate v7.3</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
@@ -126,48 +126,59 @@
         .btn-back { margin-top: 20px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 25px; border-radius: 20px; font-size: 10px; font-family: 'Orbitron'; }
         .loader-text { font-family: 'Orbitron'; font-size: 12px; color: var(--accent-cyan); margin-top: 15px; height: 20px; }
 
-        /* --- AVIATOR v7.2 (NEW ASSETS) --- */
-        .aviator-container { 
-            display: none; position: relative; width: 320px; height: 220px; 
+        /* --- AVIATOR v7.3 (OUTSIDE BRACKETS FIX) --- */
+        
+        /* 1. Main Wrapper: Holds everything, defines the "Stage" size */
+        .aviator-wrapper {
+            display: none; 
+            position: relative; 
+            width: 300px; 
+            height: 200px; 
             margin-bottom: 20px;
-            /* YOUR NEW GRID BACKGROUND */
-            background-image: url('/img/aviator_bg.png');
-            background-size: cover;
-            background-position: center bottom;
-            border-radius: 16px; 
-            box-shadow: 0 0 30px rgba(255, 0, 0, 0.1);
-            overflow: hidden; /* Clip everything inside */
+            /* No background here, transparent */
         }
 
-        /* BRACKETS (IMAGES) */
+        /* 2. Inner Box: Holds Plane & Graph. Hidden Overflow so plane doesn't fly off screen */
+        .aviator-inner {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, rgba(40,10,20,0.5) 0%, rgba(5,5,10,0) 70%);
+            border-radius: 16px;
+            overflow: hidden; /* Important! */
+            z-index: 5;
+        }
+
+        /* 3. Brackets: OUTSIDE the inner box */
         .bracket-img {
-            position: absolute; top: 10%; height: 80%; width: auto; 
-            filter: drop-shadow(0 0 5px #ff334b);
-            transition: all 0.5s ease-out;
+            position: absolute; 
+            top: -15%;       /* Taller than the box */
+            height: 130%;    /* Taller than the box */
+            width: auto; 
+            z-index: 10;     /* On top of everything */
+            filter: drop-shadow(0 0 8px #ff334b);
+            opacity: 0.9;
         }
 
-        /* Left Bracket: Draws Bottom -> Up */
+        /* Positioned outside using negative values */
         .bracket-left { 
-            left: 5px; 
-            clip-path: inset(100% 0 0 0); /* Hidden at start */
+            left: -40px; 
+            clip-path: inset(100% 0 0 0); 
         }
         .bracket-left.drawing {
-            clip-path: inset(0 0 0 0); /* Visible */
+            clip-path: inset(0 0 0 0); 
             transition: clip-path 0.8s ease-in-out;
         }
 
-        /* Right Bracket: Flipped Left Bracket */
         .bracket-right { 
-            right: 5px; 
-            transform: scaleX(-1); /* Mirror image */
-            clip-path: inset(0 0 100% 0); /* Hidden at start */
+            right: -40px; 
+            transform: scaleX(-1);
+            clip-path: inset(0 0 100% 0); 
         }
         .bracket-right.drawing {
-            clip-path: inset(0 0 0 0); /* Visible */
+            clip-path: inset(0 0 0 0); 
             transition: clip-path 0.8s ease-in-out;
         }
 
-        /* Graph & Plane */
+        /* Graph & Plane (Inside Inner) */
         .aviator-graph-svg {
             position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
             z-index: 2; opacity: 0; transition: opacity 0.5s;
@@ -188,7 +199,7 @@
         }
 
         .coef-text { 
-            position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);
+            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
             font-family: 'Orbitron'; font-size: 52px; font-weight: 900; color: #fff; z-index: 10; 
             text-shadow: 0 0 20px rgba(0,0,0,1);
             opacity: 0; transition: opacity 0.3s;
@@ -246,7 +257,7 @@
     <div id="screen-menu" class="screen">
         <div class="main-logo">
             <div class="logo-title">AI PREDICTOR</div>
-            <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL V7.2 POWERED BY OMAR</div>
+            <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL V7.3 POWERED BY OMAR</div>
         </div>
         <div class="menu-grid">
             <div class="game-card" onclick="openGame('aviator')"><img src="/img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
@@ -272,21 +283,23 @@
     <div id="screen-game" class="screen">
         <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
 
-        <!-- AVIATOR v7.2 -->
-        <div id="aviator-view" class="aviator-container">
-            <!-- Left Bracket (Image) -->
+        <!-- AVIATOR v7.3 FIXED -->
+        <div id="aviator-view" class="aviator-wrapper">
+            <!-- Brackets OUTSIDE (in the wrapper, but overlapping the inner box) -->
             <img src="/img/bracket.png" class="bracket-img bracket-left" id="bracket-l">
-            <!-- Right Bracket (Flipped Image) -->
             <img src="/img/bracket.png" class="bracket-img bracket-right" id="bracket-r">
             
-            <!-- Curve Graph -->
-            <svg class="aviator-graph-svg" id="aviator-graph" viewBox="0 0 300 200" preserveAspectRatio="none">
-                <path d="M0,200 Q150,150 280,30 L280,200 Z" fill="rgba(255, 51, 75, 0.2)" />
-                <path d="M0,200 Q150,150 280,30" fill="none" stroke="#ff334b" stroke-width="4" />
-            </svg>
-            
-            <img src="/img/plane.png" id="aviator-plane" class="aviator-plane-img">
-            <div class="coef-text" id="coef-text">0.00x</div>
+            <!-- Inner Content (Hidden Overflow) -->
+            <div class="aviator-inner">
+                <!-- Curve Graph -->
+                <svg class="aviator-graph-svg" id="aviator-graph" viewBox="0 0 300 200" preserveAspectRatio="none">
+                    <path d="M0,200 Q150,150 280,30 L280,200 Z" fill="rgba(255, 51, 75, 0.2)" />
+                    <path d="M0,200 Q150,150 280,30" fill="none" stroke="#ff334b" stroke-width="4" />
+                </svg>
+                
+                <img src="/img/plane.png" id="aviator-plane" class="aviator-plane-img">
+                <div class="coef-text" id="coef-text">0.00x</div>
+            </div>
         </div>
 
         <div id="penalty-view" class="penalty-container">
