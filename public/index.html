@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v5.0</title>
+    <title>AI Signal Bot Ultimate v5.1</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
@@ -154,41 +154,12 @@
         .mine-tile.reveal { background-color: var(--mines-active); }
         .mine-tile.reveal img { display: block; }
 
-        /* --- CHICKEN ROAD DYNAMIC --- */
+        /* --- CHICKEN ROAD --- */
         .chicken-wrapper { display: none; width: 95%; max-width: 340px; margin-bottom: 20px; flex-direction: column; align-items: center; }
         .chicken-controls { width: 100%; display: flex; justify-content: flex-end; margin-bottom: 10px; }
-        
-        .chicken-road-grid {
-            width: 100%;
-            display: grid;
-            grid-template-columns: repeat(5, 1fr); /* Всегда 5 в ряд */
-            gap: 10px;
-            padding: 15px;
-            background: #2b2b2b;
-            border-radius: 12px;
-            border: 2px dashed #444;
-            box-shadow: inset 0 0 20px #000;
-            transition: all 0.3s ease;
-        }
-
-        .chicken-step { 
-            width: 100%; aspect-ratio: 1; 
-            background: #1a1a1a; border-radius: 50%; 
-            display: flex; justify-content: center; align-items: center; 
-            border: 2px solid #333; position: relative; transition: 0.3s; 
-            box-shadow: 0 4px 5px rgba(0,0,0,0.5);
-            font-family: 'Orbitron'; font-size: 10px; color: #444;
-        }
-        
-        /* Свечение без галочки */
-        .chicken-step.safe { 
-            border-color: #00ff41; 
-            background: radial-gradient(circle, #004d13 0%, #002209 100%); 
-            box-shadow: 0 0 15px #00ff41; 
-            transform: scale(1.1);
-            color: transparent;
-        }
-        /* Убрал content: '✔' */
+        .chicken-road-grid { width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 15px; background: #2b2b2b; border-radius: 12px; border: 2px dashed #444; box-shadow: inset 0 0 20px #000; transition: all 0.3s ease; }
+        .chicken-step { width: 100%; aspect-ratio: 1; background: #1a1a1a; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid #333; position: relative; transition: 0.3s; box-shadow: 0 4px 5px rgba(0,0,0,0.5); font-family: 'Orbitron'; font-size: 10px; color: #444; }
+        .chicken-step.safe { border-color: #00ff41; background: radial-gradient(circle, #004d13 0%, #002209 100%); box-shadow: 0 0 15px #00ff41; transform: scale(1.1); color: transparent; }
 
         @media (min-width: 768px) { .penalty-container { transform: scale(1.3); margin-bottom: 50px; } }
     </style>
@@ -207,7 +178,6 @@
     <div id="screen-menu" class="screen">
         <div class="main-logo">
             <div class="logo-title">AI PREDICTOR</div>
-            <!-- UPDATED TEXT -->
             <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL V4.1 POWERED BY OMAR</div>
         </div>
         <div class="menu-grid">
@@ -251,31 +221,40 @@
             <div class="target-zone z5" id="pz5"></div>
         </div>
 
-        <!-- MINES -->
+        <!-- MINES (LOGIC FIXED) -->
         <div id="mines-view" class="mines-wrapper">
             <div class="mines-controls">
                 <div style="display:flex; gap:5px;">
                     <div class="mines-btn-grid active" id="btn-3x3" onclick="setMinesGrid(3)">3x3</div>
                     <div class="mines-btn-grid" id="btn-5x5" onclick="setMinesGrid(5)">5x5</div>
                 </div>
-                <div><span style="font-size:10px; color:#aaa;">TRAPS:</span><select class="mines-select"><option>1</option><option selected>3</option><option>5</option></select></div>
+                <div>
+                    <span style="font-size:10px; color:#aaa;">TRAPS:</span>
+                    <!-- EXPANDED TRAP OPTIONS -->
+                    <select class="mines-select" id="mines-count">
+                        <option value="1">1</option>
+                        <option value="3" selected>3</option>
+                        <option value="5">5</option>
+                        <option value="7">7</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
             </div>
             <div id="mines-board" class="mines-board"></div>
         </div>
 
-        <!-- CHICKEN ROAD (DYNAMIC GRID) -->
+        <!-- CHICKEN ROAD -->
         <div id="chicken-view" class="chicken-wrapper">
             <div class="chicken-controls">
-                <!-- Added onchange event -->
                 <select id="chicken-diff" class="mines-select" onchange="updateChickenGrid()">
                     <option value="easy">EASY</option>
                     <option value="medium" selected>MEDIUM</option>
                     <option value="hard">HARD</option>
                 </select>
             </div>
-            <div class="chicken-road-grid" id="chicken-grid">
-                <!-- Generated by JS -->
-            </div>
+            <div class="chicken-road-grid" id="chicken-grid"></div>
         </div>
 
         <div class="risk-block" id="risk-block">
@@ -362,7 +341,7 @@
             if(g === 'mines') { document.getElementById('mines-view').style.display='block'; setMinesGrid(3); }
             if(g === 'chicken') { 
                 document.getElementById('chicken-view').style.display='flex'; 
-                updateChickenGrid(); // Init grid
+                updateChickenGrid();
             }
         }
 
@@ -403,7 +382,7 @@
             }, 1000);
         }
 
-        // --- ANIMATIONS ---
+        // --- ANIMATIONS & ALGORITHMS ---
         function setProgress(percent) {
             const circle = document.getElementById('prog-ring');
             const radius = circle.r.baseVal.value;
@@ -439,20 +418,33 @@
                 const d = document.createElement('div'); d.className='mine-tile'; d.id='mt-'+i; d.innerHTML='<img src="/img/mines_star.png">'; b.appendChild(d);
             }
         }
+        // FIXED MINES MATH LOGIC
         function runMines() {
-            const count = Math.floor(Math.random()*3)+2;
-            let set = new Set(); while(set.size<count) set.add(Math.floor(Math.random()*(minesSize*minesSize)));
+            const traps = parseInt(document.getElementById('mines-count').value);
+            const totalCells = minesSize * minesSize;
+            let spots = 0;
+            
+            // Adaptive Algorithm
+            if(minesSize === 5) { // 25 cells
+                if(traps <= 5) spots = Math.floor(Math.random()*3)+5; // 5-7 (Safe)
+                else if(traps <= 10) spots = Math.floor(Math.random()*2)+3; // 3-4 (Medium)
+                else spots = Math.floor(Math.random()*2)+1; // 1-2 (Risky)
+            } else { // 3x3 (9 cells)
+                 if(traps <= 2) spots = 3;
+                 else spots = 1;
+            }
+
+            let set = new Set(); while(set.size<spots) set.add(Math.floor(Math.random()*totalCells));
             let arr = Array.from(set); let i=0;
             let int = setInterval(() => { if(i>=arr.length) clearInterval(int); else { document.getElementById('mt-'+arr[i]).classList.add('reveal'); i++; } }, 400);
         }
 
-        // --- NEW DYNAMIC CHICKEN LOGIC ---
+        // --- CHICKEN LOGIC ---
         function updateChickenGrid() {
             const val = document.getElementById('chicken-diff').value;
             const grid = document.getElementById('chicken-grid');
             grid.innerHTML = "";
-            let count = 15; // default medium
-            
+            let count = 15;
             if(val === 'easy') count = 25;
             if(val === 'medium') count = 15;
             if(val === 'hard') count = 10;
@@ -465,24 +457,18 @@
                 grid.appendChild(step);
             }
         }
-
         function resetChicken() {
-            // Reset styles for all potential steps
             const allSteps = document.querySelectorAll('.chicken-step');
-            allSteps.forEach(el => {
-                el.classList.remove('safe');
-                el.style.transform = "scale(1)";
-            });
+            allSteps.forEach(el => { el.classList.remove('safe'); el.style.transform = "scale(1)"; });
         }
-
         function runChicken() {
             const diff = document.getElementById('chicken-diff').value;
             let totalSteps = 10;
             let safePath = 0;
 
-            if (diff === 'easy') { totalSteps=25; safePath = Math.floor(Math.random()*(23-15)+15); } // 15-23 safe
-            else if (diff === 'medium') { totalSteps=15; safePath = Math.floor(Math.random()*(13-6)+6); } // 6-13 safe
-            else { totalSteps=10; safePath = Math.floor(Math.random()*(5-2)+2); } // 2-5 safe (hard)
+            if (diff === 'easy') { totalSteps=25; safePath = Math.floor(Math.random()*(23-15)+15); } 
+            else if (diff === 'medium') { totalSteps=15; safePath = Math.floor(Math.random()*(13-6)+6); } 
+            else { totalSteps=10; safePath = Math.floor(Math.random()*(5-2)+2); } 
 
             let i=1; 
             let int = setInterval(() => { 
