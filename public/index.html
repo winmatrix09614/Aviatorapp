@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v4.0</title>
+    <title>AI Signal Bot Ultimate v4.1</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
@@ -53,7 +53,7 @@
         }
         .status-dot { width: 6px; height: 6px; background: var(--brand-green); border-radius: 50%; box-shadow: 0 0 5px var(--brand-green); display: inline-block; margin-right: 5px; }
 
-        /* --- ID MODAL (FULL SCREEN) --- */
+        /* --- ID MODAL --- */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; flex-direction: column;
@@ -154,13 +154,39 @@
         .mine-tile.reveal { background-color: var(--mines-active); }
         .mine-tile.reveal img { display: block; }
 
-        .chicken-wrapper { display: none; width: 90%; max-width: 320px; margin-bottom: 20px; flex-direction: column; align-items: center; }
-        .chicken-road { width: 100%; height: 100px; background: #2b2b2b; border-radius: 12px; border-bottom: 4px dashed #666; display: flex; align-items: center; justify-content: space-around; padding: 0 10px; box-sizing: border-box; position: relative; box-shadow: inset 0 0 20px #000; }
-        .road-label { position: absolute; top: 5px; font-family: 'Orbitron'; font-size: 9px; color: #555; letter-spacing: 1px; }
-        .label-start { left: 10px; } .label-finish { right: 10px; }
-        .chicken-step { width: 45px; height: 45px; background: #1a1a1a; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 3px solid #333; position: relative; transition: 0.3s; box-shadow: 0 4px 5px rgba(0,0,0,0.5); }
-        .chicken-step.safe { border-color: #00ff41; background: radial-gradient(circle, #004d13 0%, #002209 100%); box-shadow: 0 0 15px #00ff41; transform: scale(1.1); }
-        .chicken-step.safe::after { content: '✔'; color: #00ff41; font-weight: bold; font-size: 20px; }
+        /* --- NEW CHICKEN 10-STEP UI --- */
+        .chicken-wrapper { display: none; width: 95%; max-width: 340px; margin-bottom: 20px; flex-direction: column; align-items: center; }
+        .chicken-controls { width: 100%; display: flex; justify-content: flex-end; margin-bottom: 10px; }
+        
+        .chicken-road-grid {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 5 в ряд */
+            gap: 10px;
+            padding: 15px;
+            background: #2b2b2b;
+            border-radius: 12px;
+            border: 2px dashed #444;
+            box-shadow: inset 0 0 20px #000;
+        }
+
+        .chicken-step { 
+            width: 100%; aspect-ratio: 1; 
+            background: #1a1a1a; border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; 
+            border: 2px solid #333; position: relative; transition: 0.3s; 
+            box-shadow: 0 4px 5px rgba(0,0,0,0.5);
+            font-family: 'Orbitron'; font-size: 10px; color: #444;
+        }
+        
+        .chicken-step.safe { 
+            border-color: #00ff41; 
+            background: radial-gradient(circle, #004d13 0%, #002209 100%); 
+            box-shadow: 0 0 10px #00ff41; 
+            transform: scale(1.1);
+            color: transparent; /* Скрываем номер шага */
+        }
+        .chicken-step.safe::after { content: '✔'; color: #00ff41; font-weight: bold; font-size: 18px; }
 
         @media (min-width: 768px) { .penalty-container { transform: scale(1.3); margin-bottom: 50px; } }
     </style>
@@ -175,11 +201,11 @@
         <select onchange="changeLang(this.value)"><option value="en">🇬🇧 EN</option><option value="ru">🇷🇺 RU</option><option value="es">🇪🇸 ES</option></select>
     </div>
 
-    <!-- MAIN MENU (HIDDEN BY DEFAULT) -->
+    <!-- MAIN MENU -->
     <div id="screen-menu" class="screen">
         <div class="main-logo">
             <div class="logo-title">AI PREDICTOR</div>
-            <div style="font-size:10px; color:#00f2ea; letter-spacing:4px;">NEURAL V4.0</div>
+            <div style="font-size:10px; color:#00f2ea; letter-spacing:4px;">NEURAL V4.1</div>
         </div>
         <div class="menu-grid">
             <div class="game-card" onclick="openGame('aviator')"><img src="/img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
@@ -189,14 +215,12 @@
         </div>
     </div>
 
-    <!-- ID VERIFICATION MODAL (OPENS AFTER PRELOADER) -->
+    <!-- ID MODAL -->
     <div id="id-modal" class="modal-overlay">
         <div class="id-box">
             <h3 style="color:#00f2ea; font-family:'Orbitron'; margin-bottom:5px;">AUTHORIZATION</h3>
             <p style="font-size:11px; color:#aaa; margin-bottom:20px;">Secure connection to 1xBet Server</p>
-            
             <input type="tel" id="user-id-input" class="id-input" placeholder="Account ID (10 digits)" maxlength="10">
-            
             <button id="btn-connect" class="id-btn" onclick="validateAndConnect()">CONNECT ACCOUNT</button>
             <div id="id-error" style="color:#ff334b; font-size:10px; margin-top:10px; min-height:15px; font-weight:bold;"></div>
             <div id="sync-log" class="sync-log"></div>
@@ -207,7 +231,7 @@
     <div id="screen-game" class="screen">
         <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
 
-        <!-- GAME VIEWS -->
+        <!-- AVIATOR -->
         <div id="aviator-view" class="aviator-container">
             <div class="circle-glow"></div>
             <svg width="260" height="260">
@@ -217,12 +241,14 @@
             <div class="coef-text" id="coef-text">0.00x</div>
         </div>
 
+        <!-- PENALTY -->
         <div id="penalty-view" class="penalty-container">
             <div class="target-zone z1" id="pz1"></div><div class="target-zone z2" id="pz2"></div>
             <div class="target-zone z3" id="pz3"></div><div class="target-zone z4" id="pz4"></div>
             <div class="target-zone z5" id="pz5"></div>
         </div>
 
+        <!-- MINES -->
         <div id="mines-view" class="mines-wrapper">
             <div class="mines-controls">
                 <div style="display:flex; gap:5px;">
@@ -234,12 +260,22 @@
             <div id="mines-board" class="mines-board"></div>
         </div>
 
+        <!-- CHICKEN ROAD (UPDATED: 10 STEPS + DIFFICULTY) -->
         <div id="chicken-view" class="chicken-wrapper">
-            <div class="chicken-road">
-                <div class="road-label label-start">START</div><div class="road-label label-finish">FINISH</div>
-                <div class="chicken-step" id="ch1"></div><div class="chicken-step" id="ch2"></div>
-                <div class="chicken-step" id="ch3"></div><div class="chicken-step" id="ch4"></div>
-                <div class="chicken-step" id="ch5"></div>
+            <div class="chicken-controls">
+                <select id="chicken-diff" class="mines-select">
+                    <option value="easy">EASY</option>
+                    <option value="medium" selected>MEDIUM</option>
+                    <option value="hard">HARD</option>
+                </select>
+            </div>
+            <div class="chicken-road-grid">
+                <!-- 10 шагов (генерируются JS) -->
+                <div class="chicken-step" id="ch1">1</div><div class="chicken-step" id="ch2">2</div>
+                <div class="chicken-step" id="ch3">3</div><div class="chicken-step" id="ch4">4</div>
+                <div class="chicken-step" id="ch5">5</div><div class="chicken-step" id="ch6">6</div>
+                <div class="chicken-step" id="ch7">7</div><div class="chicken-step" id="ch8">8</div>
+                <div class="chicken-step" id="ch9">9</div><div class="chicken-step" id="ch10">10</div>
             </div>
         </div>
 
@@ -254,19 +290,16 @@
     </div>
 
     <script>
-        // --- BOOT SEQUENCE ---
+        // --- BOOT ---
         const termLines = ["INITIALIZING...", "CHECKING RESOURCES...", "ESTABLISHING SECURE TUNNEL...", "READY."];
         let lineIdx = 0;
-        
         window.onload = function() {
-            // 1. Start Terminal Animation
             const term = document.getElementById('term-text');
             function typeLine() {
                 if(lineIdx < termLines.length) {
                     term.innerText = termLines[lineIdx++];
                     setTimeout(typeLine, 400);
                 } else {
-                    // 2. Preloader Done -> Open ID Modal immediately
                     setTimeout(() => { 
                         document.getElementById('preloader').style.display='none'; 
                         document.getElementById('id-modal').style.display='flex';
@@ -279,50 +312,22 @@
         const sid = "SID-" + Math.random().toString(36).substr(2, 6).toUpperCase();
         document.getElementById('session-id').innerText = sid;
 
-        // --- VALIDATION & SYNC ---
+        // --- AUTH ---
         function validateAndConnect() {
             const val = document.getElementById('user-id-input').value;
             const err = document.getElementById('id-error');
             const btn = document.getElementById('btn-connect');
             const log = document.getElementById('sync-log');
 
-            // RULE 1: Length must be 10
-            if (val.length !== 10 || isNaN(val)) {
-                err.innerText = "ERROR: ID MUST BE 10 DIGITS";
-                return;
-            }
+            if (val.length !== 10 || isNaN(val)) { err.innerText = "ERROR: ID MUST BE 10 DIGITS"; return; }
+            if (parseInt(val.substring(0, 3)) < 155) { err.innerText = "ERROR: ID NOT FOUND IN DATABASE"; return; }
 
-            // RULE 2: First 3 digits >= 155
-            const prefix = parseInt(val.substring(0, 3));
-            if (prefix < 155) {
-                err.innerText = "ERROR: ID NOT FOUND IN DATABASE";
-                return;
-            }
-
-            // SUCCESS -> Start Fake Sync
-            err.innerText = "";
-            btn.disabled = true;
-            btn.style.background = "#333";
-            btn.innerText = "CONNECTING...";
-            log.style.display = "block";
-
-            // Simulation of data sync
+            err.innerText = ""; btn.disabled = true; btn.style.background = "#333"; btn.innerText = "CONNECTING..."; log.style.display = "block";
             setTimeout(() => { log.innerText = "> Handshake established..."; }, 500);
             setTimeout(() => { log.innerText = "> Verifying hash tokens..."; }, 1500);
             setTimeout(() => { log.innerText = "> Downloading betting history..."; }, 2500);
-            setTimeout(() => { 
-                log.innerText = "> SYNCHRONIZATION COMPLETE"; 
-                log.style.color = "#00f2ea";
-                btn.innerText = "SUCCESS";
-                btn.style.background = "#00f2ea";
-                btn.style.color = "#000";
-            }, 3500);
-
-            // Go to Menu
-            setTimeout(() => {
-                document.getElementById('id-modal').style.display = 'none';
-                document.getElementById('screen-menu').classList.add('active');
-            }, 4200);
+            setTimeout(() => { log.innerText = "> SYNCHRONIZATION COMPLETE"; btn.innerText = "SUCCESS"; btn.style.background = "#00f2ea"; btn.style.color = "#000"; }, 3500);
+            setTimeout(() => { document.getElementById('id-modal').style.display = 'none'; document.getElementById('screen-menu').classList.add('active'); }, 4200);
         }
 
         // --- TRANS ---
@@ -348,9 +353,7 @@
             activeGame = g;
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-game').classList.add('active');
-            
             ['aviator', 'penalty', 'mines', 'chicken'].forEach(id => document.getElementById(id+'-view').style.display = 'none');
-            
             document.getElementById('signal-btn').disabled = false;
             document.getElementById('loader-text').innerText = "";
             document.getElementById('risk-block').style.opacity = '0';
@@ -369,10 +372,9 @@
         function getSignal() {
             const btn = document.getElementById('signal-btn');
             const loader = document.getElementById('loader-text');
-            btn.disabled = true;
-            loader.innerText = "ANALYZING...";
-            
+            btn.disabled = true; loader.innerText = "ANALYZING...";
             document.getElementById('risk-block').style.opacity = '0';
+            
             if(activeGame === 'aviator') setProgress(0);
             if(activeGame === 'penalty') document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner'));
             if(activeGame === 'mines') document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
@@ -394,8 +396,7 @@
             document.getElementById('risk-block').style.opacity = '1';
             let cd = 5;
             const t = setInterval(() => {
-                btn.innerText = `WAIT ${cd}s`;
-                cd--;
+                btn.innerText = `WAIT ${cd}s`; cd--;
                 if(cd < 0) { clearInterval(t); btn.innerText = trans[curLang].get_signal; btn.disabled = false; }
             }, 1000);
         }
@@ -411,8 +412,7 @@
         function runAviatorAnimation(loader, btn) {
             let p = 0;
             const int = setInterval(() => {
-                p++; setProgress(p);
-                if(p>30) loader.innerText="CALCULATING...";
+                p++; setProgress(p); if(p>30) loader.innerText="CALCULATING...";
                 if(p>=100) { clearInterval(int); document.getElementById('coef-text').innerText=(Math.random()*(5.0-1.2)+1.2).toFixed(2)+"x"; finishSignal(loader, btn); }
             }, 30);
         }
@@ -420,8 +420,7 @@
             const targets = document.querySelectorAll('.target-zone');
             let steps = 0;
             const int = setInterval(() => {
-                targets.forEach(el=>el.classList.remove('scanning'));
-                targets[Math.floor(Math.random()*5)].classList.add('scanning');
+                targets.forEach(el=>el.classList.remove('scanning')); targets[Math.floor(Math.random()*5)].classList.add('scanning');
                 steps++;
                 if(steps>15) {
                     clearInterval(int); targets.forEach(el=>el.classList.remove('scanning'));
@@ -431,8 +430,7 @@
             }, 150);
         }
         function setMinesGrid(s) {
-            minesSize = s;
-            const b = document.getElementById('mines-board');
+            minesSize = s; const b = document.getElementById('mines-board');
             b.style.gridTemplateColumns = `repeat(${s}, 1fr)`; b.innerHTML = "";
             document.getElementById('btn-3x3').classList.toggle('active', s===3); document.getElementById('btn-5x5').classList.toggle('active', s===5);
             for(let i=0; i<s*s; i++) {
@@ -445,10 +443,22 @@
             let arr = Array.from(set); let i=0;
             let int = setInterval(() => { if(i>=arr.length) clearInterval(int); else { document.getElementById('mt-'+arr[i]).classList.add('reveal'); i++; } }, 400);
         }
-        function resetChicken() { for(let i=1; i<=5; i++) document.getElementById('ch'+i).className = 'chicken-step'; }
+
+        // --- CHICKEN LOGIC UPDATED ---
+        function resetChicken() { for(let i=1; i<=10; i++) document.getElementById('ch'+i).className = 'chicken-step'; }
         function runChicken() {
-            const steps = Math.floor(Math.random()*4)+1;
-            let i=1; let int = setInterval(() => { if(i>steps) clearInterval(int); else { document.getElementById('ch'+i).classList.add('safe'); i++; } }, 500);
+            const diff = document.getElementById('chicken-diff').value;
+            let maxSteps = 0;
+            // Logic based on Difficulty
+            if(diff === 'easy') maxSteps = Math.floor(Math.random() * (10 - 6 + 1)) + 6; // 6 to 10
+            else if(diff === 'medium') maxSteps = Math.floor(Math.random() * (7 - 4 + 1)) + 4; // 4 to 7
+            else maxSteps = Math.floor(Math.random() * (4 - 1 + 1)) + 1; // 1 to 4 (Hard)
+
+            let i=1; 
+            let int = setInterval(() => { 
+                if(i > maxSteps) clearInterval(int); 
+                else { document.getElementById('ch'+i).classList.add('safe'); i++; } 
+            }, 300);
         }
 
         window.Telegram.WebApp.ready();
