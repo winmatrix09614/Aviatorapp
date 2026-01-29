@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v3.2</title>
+    <title>AI Signal Bot Ultimate v4.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
@@ -15,8 +15,6 @@
             --brand-green: #00ff41;
             --brand-red: #ff334b;
             --glass-panel: rgba(20, 20, 30, 0.6);
-            
-            /* MINES COLORS */
             --mines-bg: #272749;
             --mines-tile: #2b2e55;
             --mines-active: #094e67;
@@ -55,29 +53,36 @@
         }
         .status-dot { width: 6px; height: 6px; background: var(--brand-green); border-radius: 50%; box-shadow: 0 0 5px var(--brand-green); display: inline-block; margin-right: 5px; }
 
-        /* --- LANG & MODAL --- */
+        /* --- ID MODAL (FULL SCREEN) --- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+        .id-box {
+            background: #111; border: 1px solid var(--accent-cyan); padding: 30px 20px; border-radius: 16px; width: 85%; max-width: 320px; text-align: center;
+            box-shadow: 0 0 40px rgba(0, 242, 234, 0.15);
+        }
+        .id-input {
+            width: 100%; padding: 14px; margin: 20px 0; background: #1a1a1a; border: 1px solid #333; color: #fff; box-sizing: border-box;
+            font-family: 'Orbitron'; text-align: center; font-size: 18px; border-radius: 10px; outline: none; transition: 0.3s;
+        }
+        .id-input:focus { border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(0,242,234,0.2); }
+        .id-btn {
+            background: linear-gradient(90deg, #00f2ea 0%, #0080ff 100%); color: #000; border: none; width: 100%; padding: 14px; 
+            font-family: 'Orbitron'; font-weight: 900; cursor: pointer; border-radius: 10px; font-size: 14px; text-transform: uppercase;
+        }
+        .sync-log {
+            font-family: 'Orbitron'; font-size: 10px; color: #00ff41; margin-top: 15px; min-height: 15px; text-align: left; width: 100%; display: none;
+        }
+
+        /* --- LANG --- */
         .lang-container { position: absolute; top: 50px; right: 20px; z-index: 60; }
         select {
             background: rgba(0, 0, 0, 0.6); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 5px 10px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 12px; outline: none;
         }
         option { background: #000; }
-
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; flex-direction: column;
-        }
-        .id-box {
-            background: #111; border: 1px solid var(--accent-cyan); padding: 25px; border-radius: 15px; width: 80%; text-align: center;
-            box-shadow: 0 0 30px rgba(0, 242, 234, 0.2);
-        }
-        .id-input {
-            width: 90%; padding: 12px; margin: 15px 0; background: #222; border: 1px solid #444; color: #fff;
-            font-family: 'Orbitron'; text-align: center; font-size: 18px; border-radius: 8px; outline: none;
-        }
-        .id-btn {
-            background: var(--accent-cyan); color: #000; border: none; padding: 10px 25px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; border-radius: 5px;
-        }
 
         /* --- SCREENS --- */
         .screen { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100vh; width: 100%; position: relative; z-index: 10; }
@@ -98,27 +103,16 @@
         .game-card:active { transform: scale(0.96); border-color: var(--accent-cyan); }
         .game-img { width: 60px; height: 60px; margin-bottom: 8px; border-radius: 12px; object-fit: cover; }
         .game-title { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 12px; color: #fff; }
-        .game-card.locked { opacity: 0.5; filter: grayscale(1); }
 
-        /* --- GAME COMMON UI --- */
+        /* --- GAME UI --- */
         .telegram-link {
             text-decoration: none; font-family: 'Orbitron', sans-serif; color: var(--accent-cyan);
             border: 1px solid rgba(0, 242, 234, 0.3); padding: 8px 16px; border-radius: 20px;
             font-size: 12px; letter-spacing: 1px; background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(5px); 
-            margin-bottom: 45px; /* УВЕЛИЧИЛ ОТСТУП */
-            transition: 0.3s;
-            display: inline-block;
+            backdrop-filter: blur(5px); margin-bottom: 45px; transition: 0.3s; display: inline-block;
         }
-
-        .risk-block {
-            width: 100%; display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;
-            opacity: 0; transition: opacity 0.5s;
-        }
-        .risk-item {
-            background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 6px;
-            font-family: 'Orbitron', sans-serif; font-size: 10px; color: #aaa; border: 1px solid rgba(255,255,255,0.1);
-        }
+        .risk-block { width: 100%; display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; opacity: 0; transition: opacity 0.5s; }
+        .risk-item { background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; color: #aaa; border: 1px solid rgba(255,255,255,0.1); }
         .risk-val { color: #fff; font-weight: bold; margin-left: 5px; }
 
         .btn-signal {
@@ -132,89 +126,43 @@
         .btn-back { margin-top: 20px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 25px; border-radius: 20px; font-size: 10px; font-family: 'Orbitron'; }
         .loader-text { font-family: 'Orbitron'; font-size: 12px; color: var(--accent-cyan); margin-top: 15px; height: 20px; }
 
-        /* --- 1. AVIATOR --- */
+        /* GAMES STYLES */
         .aviator-container { display: none; position: relative; width: 260px; height: 260px; align-items: center; justify-content: center; margin-bottom: 10px; }
         .circle-glow { position: absolute; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(58,134,255,0.15) 0%, transparent 70%); }
         .coef-text { position: absolute; font-family: 'Orbitron'; font-size: 48px; font-weight: 900; color: #fff; z-index: 2; }
         .progress-ring__circle { transition: stroke-dashoffset 0.1s linear; transform: rotate(-90deg); transform-origin: 50% 50%; }
 
-        /* --- 2. PENALTY --- */
         .penalty-container {
             position: relative; width: 320px; height: 210px; display: none; margin-bottom: 20px;
             background-image: url('/img/penalty_bg.png'); background-size: cover; background-position: center;
             border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
         .target-zone { position: absolute; width: 40px; height: 40px; border-radius: 50%; transition: 0.1s; }
-        
         .z1 { top: 12%; left: 7%; } .z2 { top: 12%; left: 80%; } .z3 { top: 11%; left: 44%; } .z4 { top: 48%; left: 6%; } .z5 { top: 49%; left: 81%; }
-        
         .target-zone.scanning { border: 2px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.1); }
         .target-zone.winner { border: 3px solid #00f2ea; background: radial-gradient(circle, rgba(0,242,234,0.4) 0%, transparent 70%); box-shadow: 0 0 15px #00f2ea; }
 
-        /* --- 3. MINES --- */
         .mines-wrapper { display: none; width: 90%; max-width: 300px; margin-bottom: 20px; }
         .mines-controls { display: flex; justify-content: space-between; margin-bottom: 10px; }
         .mines-btn-grid { background: #333; border: 1px solid #555; color: #fff; padding: 5px 10px; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; }
         .mines-btn-grid.active { background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan); }
         .mines-select { background: #333; color: #fff; border: 1px solid #555; padding: 2px 5px; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; }
-        
-        .mines-board {
-            background: var(--mines-bg); padding: 10px; border-radius: 10px;
-            display: grid; gap: 8px; border: 2px solid #3d3d5c; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-        }
-        .mine-tile {
-            background-color: var(--mines-tile); border-radius: 8px; aspect-ratio: 1;
-            display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: transform 0.1s;
-        }
+        .mines-board { background: var(--mines-bg); padding: 10px; border-radius: 10px; display: grid; gap: 8px; border: 2px solid #3d3d5c; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        .mine-tile { background-color: var(--mines-tile); border-radius: 8px; aspect-ratio: 1; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: transform 0.1s; }
         .mine-tile img { width: 70%; height: 70%; object-fit: contain; display: none; animation: popIn 0.3s ease; }
         @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .mine-tile.reveal { background-color: var(--mines-active); }
         .mine-tile.reveal img { display: block; }
 
-        /* --- 4. CHICKEN ROAD (ОБНОВЛЕННЫЙ ДИЗАЙН) --- */
-        .chicken-wrapper {
-            display: none; width: 90%; max-width: 320px;
-            margin-bottom: 20px; flex-direction: column; align-items: center;
-        }
-        .chicken-road {
-            width: 100%; height: 100px;
-            background: #2b2b2b; /* Цвет асфальта */
-            border-radius: 12px;
-            border-bottom: 4px dashed #666; /* Разметка дороги */
-            display: flex; align-items: center; justify-content: space-around;
-            padding: 0 10px; box-sizing: border-box;
-            position: relative;
-            box-shadow: inset 0 0 20px #000;
-        }
-        .road-label {
-            position: absolute; top: 5px; font-family: 'Orbitron'; font-size: 9px; color: #555; letter-spacing: 1px;
-        }
-        .label-start { left: 10px; }
-        .label-finish { right: 10px; }
-
-        .chicken-step {
-            width: 45px; height: 45px; 
-            background: #1a1a1a; /* Цвет люка */
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            border: 3px solid #333; 
-            position: relative; transition: 0.3s;
-            box-shadow: 0 4px 5px rgba(0,0,0,0.5);
-        }
-        
-        /* Активный шаг (зеленый) */
-        .chicken-step.safe { 
-            border-color: #00ff41; 
-            background: radial-gradient(circle, #004d13 0%, #002209 100%);
-            box-shadow: 0 0 15px #00ff41; 
-            transform: scale(1.1);
-        }
+        .chicken-wrapper { display: none; width: 90%; max-width: 320px; margin-bottom: 20px; flex-direction: column; align-items: center; }
+        .chicken-road { width: 100%; height: 100px; background: #2b2b2b; border-radius: 12px; border-bottom: 4px dashed #666; display: flex; align-items: center; justify-content: space-around; padding: 0 10px; box-sizing: border-box; position: relative; box-shadow: inset 0 0 20px #000; }
+        .road-label { position: absolute; top: 5px; font-family: 'Orbitron'; font-size: 9px; color: #555; letter-spacing: 1px; }
+        .label-start { left: 10px; } .label-finish { right: 10px; }
+        .chicken-step { width: 45px; height: 45px; background: #1a1a1a; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 3px solid #333; position: relative; transition: 0.3s; box-shadow: 0 4px 5px rgba(0,0,0,0.5); }
+        .chicken-step.safe { border-color: #00ff41; background: radial-gradient(circle, #004d13 0%, #002209 100%); box-shadow: 0 0 15px #00ff41; transform: scale(1.1); }
         .chicken-step.safe::after { content: '✔'; color: #00ff41; font-weight: bold; font-size: 20px; }
 
-        @media (min-width: 768px) {
-            .penalty-container { transform: scale(1.3); margin-bottom: 50px; }
-        }
+        @media (min-width: 768px) { .penalty-container { transform: scale(1.3); margin-bottom: 50px; } }
     </style>
 </head>
 <body>
@@ -222,23 +170,13 @@
     <div id="preloader"><div class="terminal-text" id="term-text"></div></div>
     <div class="cyber-wrapper"></div>
     <div class="hud-bar"><div><span class="status-dot"></span>ONLINE</div><div id="session-id">SID: ...</div></div>
+    
     <div class="lang-container">
         <select onchange="changeLang(this.value)"><option value="en">🇬🇧 EN</option><option value="ru">🇷🇺 RU</option><option value="es">🇪🇸 ES</option></select>
     </div>
 
-    <!-- ID MODAL -->
-    <div id="id-modal" class="modal-overlay">
-        <div class="id-box">
-            <h3 style="color:#00f2ea; font-family:'Orbitron'">SECURITY CHECK</h3>
-            <p style="font-size:12px; color:#aaa; margin-bottom:10px;">Enter your Account ID:</p>
-            <input type="tel" id="user-id-input" class="id-input" placeholder="123456789">
-            <button class="id-btn" onclick="checkID()">CONNECT</button>
-            <div id="id-error" style="color:#ff334b; font-size:10px; margin-top:10px; min-height:15px;"></div>
-        </div>
-    </div>
-
-    <!-- MENU -->
-    <div id="screen-menu" class="screen active">
+    <!-- MAIN MENU (HIDDEN BY DEFAULT) -->
+    <div id="screen-menu" class="screen">
         <div class="main-logo">
             <div class="logo-title">AI PREDICTOR</div>
             <div style="font-size:10px; color:#00f2ea; letter-spacing:4px;">NEURAL V4.0</div>
@@ -247,17 +185,29 @@
             <div class="game-card" onclick="openGame('aviator')"><img src="/img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
             <div class="game-card" onclick="openGame('penalty')"><img src="/img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div>
             <div class="game-card" onclick="openGame('mines')"><img src="/img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div>
-            <!-- УБЕДИСЬ ЧТО КАРТИНКА menu_chicken.png СУЩЕСТВУЕТ В ПАПКЕ img -->
             <div class="game-card" onclick="openGame('chicken')"><img src="/img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div>
         </div>
     </div>
 
-    <!-- GAME -->
+    <!-- ID VERIFICATION MODAL (OPENS AFTER PRELOADER) -->
+    <div id="id-modal" class="modal-overlay">
+        <div class="id-box">
+            <h3 style="color:#00f2ea; font-family:'Orbitron'; margin-bottom:5px;">AUTHORIZATION</h3>
+            <p style="font-size:11px; color:#aaa; margin-bottom:20px;">Secure connection to 1xBet Server</p>
+            
+            <input type="tel" id="user-id-input" class="id-input" placeholder="Account ID (10 digits)" maxlength="10">
+            
+            <button id="btn-connect" class="id-btn" onclick="validateAndConnect()">CONNECT ACCOUNT</button>
+            <div id="id-error" style="color:#ff334b; font-size:10px; margin-top:10px; min-height:15px; font-weight:bold;"></div>
+            <div id="sync-log" class="sync-log"></div>
+        </div>
+    </div>
+
+    <!-- GAME SCREEN -->
     <div id="screen-game" class="screen">
-        
         <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
 
-        <!-- AVIATOR -->
+        <!-- GAME VIEWS -->
         <div id="aviator-view" class="aviator-container">
             <div class="circle-glow"></div>
             <svg width="260" height="260">
@@ -267,14 +217,12 @@
             <div class="coef-text" id="coef-text">0.00x</div>
         </div>
 
-        <!-- PENALTY -->
         <div id="penalty-view" class="penalty-container">
             <div class="target-zone z1" id="pz1"></div><div class="target-zone z2" id="pz2"></div>
             <div class="target-zone z3" id="pz3"></div><div class="target-zone z4" id="pz4"></div>
             <div class="target-zone z5" id="pz5"></div>
         </div>
 
-        <!-- MINES -->
         <div id="mines-view" class="mines-wrapper">
             <div class="mines-controls">
                 <div style="display:flex; gap:5px;">
@@ -286,15 +234,11 @@
             <div id="mines-board" class="mines-board"></div>
         </div>
 
-        <!-- CHICKEN ROAD (UPDATED) -->
         <div id="chicken-view" class="chicken-wrapper">
             <div class="chicken-road">
-                <div class="road-label label-start">START</div>
-                <div class="road-label label-finish">FINISH</div>
-                <div class="chicken-step" id="ch1"></div>
-                <div class="chicken-step" id="ch2"></div>
-                <div class="chicken-step" id="ch3"></div>
-                <div class="chicken-step" id="ch4"></div>
+                <div class="road-label label-start">START</div><div class="road-label label-finish">FINISH</div>
+                <div class="chicken-step" id="ch1"></div><div class="chicken-step" id="ch2"></div>
+                <div class="chicken-step" id="ch3"></div><div class="chicken-step" id="ch4"></div>
                 <div class="chicken-step" id="ch5"></div>
             </div>
         </div>
@@ -310,17 +254,23 @@
     </div>
 
     <script>
-        // --- INIT & PRELOADER ---
-        const termLines = ["INITIALIZING...", "LOADING ASSETS...", "CONNECTING TO SERVER...", "DONE."];
+        // --- BOOT SEQUENCE ---
+        const termLines = ["INITIALIZING...", "CHECKING RESOURCES...", "ESTABLISHING SECURE TUNNEL...", "READY."];
         let lineIdx = 0;
+        
         window.onload = function() {
+            // 1. Start Terminal Animation
             const term = document.getElementById('term-text');
             function typeLine() {
                 if(lineIdx < termLines.length) {
                     term.innerText = termLines[lineIdx++];
-                    setTimeout(typeLine, 300);
+                    setTimeout(typeLine, 400);
                 } else {
-                    setTimeout(() => { document.getElementById('preloader').style.display='none'; }, 400);
+                    // 2. Preloader Done -> Open ID Modal immediately
+                    setTimeout(() => { 
+                        document.getElementById('preloader').style.display='none'; 
+                        document.getElementById('id-modal').style.display='flex';
+                    }, 500);
                 }
             }
             typeLine();
@@ -328,6 +278,52 @@
 
         const sid = "SID-" + Math.random().toString(36).substr(2, 6).toUpperCase();
         document.getElementById('session-id').innerText = sid;
+
+        // --- VALIDATION & SYNC ---
+        function validateAndConnect() {
+            const val = document.getElementById('user-id-input').value;
+            const err = document.getElementById('id-error');
+            const btn = document.getElementById('btn-connect');
+            const log = document.getElementById('sync-log');
+
+            // RULE 1: Length must be 10
+            if (val.length !== 10 || isNaN(val)) {
+                err.innerText = "ERROR: ID MUST BE 10 DIGITS";
+                return;
+            }
+
+            // RULE 2: First 3 digits >= 155
+            const prefix = parseInt(val.substring(0, 3));
+            if (prefix < 155) {
+                err.innerText = "ERROR: ID NOT FOUND IN DATABASE";
+                return;
+            }
+
+            // SUCCESS -> Start Fake Sync
+            err.innerText = "";
+            btn.disabled = true;
+            btn.style.background = "#333";
+            btn.innerText = "CONNECTING...";
+            log.style.display = "block";
+
+            // Simulation of data sync
+            setTimeout(() => { log.innerText = "> Handshake established..."; }, 500);
+            setTimeout(() => { log.innerText = "> Verifying hash tokens..."; }, 1500);
+            setTimeout(() => { log.innerText = "> Downloading betting history..."; }, 2500);
+            setTimeout(() => { 
+                log.innerText = "> SYNCHRONIZATION COMPLETE"; 
+                log.style.color = "#00f2ea";
+                btn.innerText = "SUCCESS";
+                btn.style.background = "#00f2ea";
+                btn.style.color = "#000";
+            }, 3500);
+
+            // Go to Menu
+            setTimeout(() => {
+                document.getElementById('id-modal').style.display = 'none';
+                document.getElementById('screen-menu').classList.add('active');
+            }, 4200);
+        }
 
         // --- TRANS ---
         const trans = {
@@ -344,42 +340,25 @@
             });
         }
 
-        // --- STATE ---
+        // --- GAME LOGIC ---
         let activeGame = null;
-        let isIdVerified = false; 
         let minesSize = 3;
 
-        // --- NAVIGATION ---
         function openGame(g) {
             activeGame = g;
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-game').classList.add('active');
             
-            ['aviator', 'penalty', 'mines', 'chicken'].forEach(id => {
-                document.getElementById(id+'-view').style.display = 'none';
-            });
+            ['aviator', 'penalty', 'mines', 'chicken'].forEach(id => document.getElementById(id+'-view').style.display = 'none');
             
             document.getElementById('signal-btn').disabled = false;
             document.getElementById('loader-text').innerText = "";
             document.getElementById('risk-block').style.opacity = '0';
 
-            if(g === 'aviator') {
-                document.getElementById('aviator-view').style.display = 'flex';
-                document.getElementById('coef-text').innerText = "0.00x";
-                setProgress(0);
-            }
-            if(g === 'penalty') {
-                document.getElementById('penalty-view').style.display = 'block';
-                document.querySelectorAll('.target-zone').forEach(el => el.classList.remove('winner', 'scanning'));
-            }
-            if(g === 'mines') {
-                document.getElementById('mines-view').style.display = 'block';
-                setMinesGrid(3);
-            }
-            if(g === 'chicken') {
-                document.getElementById('chicken-view').style.display = 'flex';
-                resetChicken();
-            }
+            if(g === 'aviator') { document.getElementById('aviator-view').style.display='flex'; document.getElementById('coef-text').innerText="0.00x"; setProgress(0); }
+            if(g === 'penalty') { document.getElementById('penalty-view').style.display='block'; document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning')); }
+            if(g === 'mines') { document.getElementById('mines-view').style.display='block'; setMinesGrid(3); }
+            if(g === 'chicken') { document.getElementById('chicken-view').style.display='flex'; resetChicken(); }
         }
 
         function backMenu() {
@@ -387,50 +366,25 @@
             document.getElementById('screen-menu').classList.add('active');
         }
 
-        function checkID() {
-            const val = document.getElementById('user-id-input').value;
-            if(val.length < 8 || isNaN(val)) {
-                document.getElementById('id-error').innerText = "INVALID ID (MIN 8 DIGITS)";
-                return;
-            }
-            document.getElementById('id-modal').style.display = 'none';
-            isIdVerified = true;
-            if(pendingSignal) getSignal();
-        }
-
-        let pendingSignal = false;
-
-        // --- MAIN LOGIC ---
         function getSignal() {
-            if(!isIdVerified) {
-                pendingSignal = true;
-                document.getElementById('id-modal').style.display = 'flex';
-                return;
-            }
-            
             const btn = document.getElementById('signal-btn');
             const loader = document.getElementById('loader-text');
             btn.disabled = true;
             loader.innerText = "ANALYZING...";
             
-            // Clean UI
             document.getElementById('risk-block').style.opacity = '0';
             if(activeGame === 'aviator') setProgress(0);
-            if(activeGame === 'penalty') document.querySelectorAll('.target-zone').forEach(el => el.classList.remove('winner'));
-            if(activeGame === 'mines') document.querySelectorAll('.mine-tile').forEach(el => el.classList.remove('reveal'));
+            if(activeGame === 'penalty') document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner'));
+            if(activeGame === 'mines') document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
             if(activeGame === 'chicken') resetChicken();
 
-            if(activeGame === 'aviator') {
-                runAviatorAnimation(loader, btn);
-            } else if (activeGame === 'penalty') {
-                runPenaltyAnimation(loader, btn);
-            } else {
-                setTimeout(() => {
-                    if(activeGame === 'mines') runMines();
-                    if(activeGame === 'chicken') runChicken();
-                    finishSignal(loader, btn);
-                }, 1500);
-            }
+            if(activeGame === 'aviator') runAviatorAnimation(loader, btn);
+            else if(activeGame === 'penalty') runPenaltyAnimation(loader, btn);
+            else setTimeout(() => {
+                if(activeGame === 'mines') runMines();
+                if(activeGame === 'chicken') runChicken();
+                finishSignal(loader, btn);
+            }, 1500);
         }
 
         function finishSignal(loader, btn) {
@@ -438,107 +392,63 @@
             const acc = (Math.random()*(99-92)+92).toFixed(1);
             document.getElementById('acc-val').innerText = acc + "%";
             document.getElementById('risk-block').style.opacity = '1';
-
             let cd = 5;
             const t = setInterval(() => {
                 btn.innerText = `WAIT ${cd}s`;
                 cd--;
-                if(cd < 0) {
-                    clearInterval(t);
-                    btn.innerText = trans[curLang].get_signal || "GET SIGNAL";
-                    btn.disabled = false;
-                }
+                if(cd < 0) { clearInterval(t); btn.innerText = trans[curLang].get_signal; btn.disabled = false; }
             }, 1000);
         }
 
         // --- ANIMATIONS ---
-        
-        // Aviator
         function setProgress(percent) {
             const circle = document.getElementById('prog-ring');
             const radius = circle.r.baseVal.value;
-            const circumference = radius * 2 * Math.PI;
-            const offset = circumference - (percent / 100) * circumference;
-            circle.style.strokeDasharray = `${circumference} ${circumference}`;
-            circle.style.strokeDashoffset = offset;
+            const c = radius * 2 * Math.PI;
+            circle.style.strokeDasharray = `${c} ${c}`;
+            circle.style.strokeDashoffset = c - (percent/100)*c;
         }
-
         function runAviatorAnimation(loader, btn) {
             let p = 0;
             const int = setInterval(() => {
-                p += 1;
-                setProgress(p);
-                if(p > 30) loader.innerText = "CALCULATING...";
-                if(p >= 100) {
-                    clearInterval(int);
-                    const val = (Math.random() * (5.0 - 1.2) + 1.2).toFixed(2);
-                    document.getElementById('coef-text').innerText = val + "x";
-                    finishSignal(loader, btn);
-                }
+                p++; setProgress(p);
+                if(p>30) loader.innerText="CALCULATING...";
+                if(p>=100) { clearInterval(int); document.getElementById('coef-text').innerText=(Math.random()*(5.0-1.2)+1.2).toFixed(2)+"x"; finishSignal(loader, btn); }
             }, 30);
         }
-
-        // Penalty
         function runPenaltyAnimation(loader, btn) {
             const targets = document.querySelectorAll('.target-zone');
             let steps = 0;
             const int = setInterval(() => {
-                targets.forEach(el => el.classList.remove('scanning'));
-                const r = Math.floor(Math.random() * 5);
-                targets[r].classList.add('scanning');
+                targets.forEach(el=>el.classList.remove('scanning'));
+                targets[Math.floor(Math.random()*5)].classList.add('scanning');
                 steps++;
-                if(steps > 15) {
-                    clearInterval(int);
-                    targets.forEach(el => el.classList.remove('scanning'));
-                    const win = Math.floor(Math.random() * 5) + 1;
-                    document.getElementById('pz'+win).classList.add('winner');
+                if(steps>15) {
+                    clearInterval(int); targets.forEach(el=>el.classList.remove('scanning'));
+                    document.getElementById('pz'+(Math.floor(Math.random()*5)+1)).classList.add('winner');
                     finishSignal(loader, btn);
                 }
             }, 150);
         }
-
-        // Mines
         function setMinesGrid(s) {
             minesSize = s;
             const b = document.getElementById('mines-board');
-            b.style.gridTemplateColumns = `repeat(${s}, 1fr)`;
-            b.innerHTML = "";
-            document.getElementById('btn-3x3').classList.toggle('active', s===3);
-            document.getElementById('btn-5x5').classList.toggle('active', s===5);
+            b.style.gridTemplateColumns = `repeat(${s}, 1fr)`; b.innerHTML = "";
+            document.getElementById('btn-3x3').classList.toggle('active', s===3); document.getElementById('btn-5x5').classList.toggle('active', s===5);
             for(let i=0; i<s*s; i++) {
-                const d = document.createElement('div');
-                d.className = 'mine-tile';
-                d.id = 'mt-'+i;
-                d.innerHTML = '<img src="/img/mines_star.png">'; 
-                b.appendChild(d);
+                const d = document.createElement('div'); d.className='mine-tile'; d.id='mt-'+i; d.innerHTML='<img src="/img/mines_star.png">'; b.appendChild(d);
             }
         }
         function runMines() {
             const count = Math.floor(Math.random()*3)+2;
-            const total = minesSize*minesSize;
-            let set = new Set();
-            while(set.size < count) set.add(Math.floor(Math.random()*total));
-            let arr = Array.from(set);
-            let i=0;
-            let int = setInterval(() => {
-                if(i>=arr.length) { clearInterval(int); return; }
-                document.getElementById('mt-'+arr[i]).classList.add('reveal');
-                i++;
-            }, 400);
+            let set = new Set(); while(set.size<count) set.add(Math.floor(Math.random()*(minesSize*minesSize)));
+            let arr = Array.from(set); let i=0;
+            let int = setInterval(() => { if(i>=arr.length) clearInterval(int); else { document.getElementById('mt-'+arr[i]).classList.add('reveal'); i++; } }, 400);
         }
-
-        // Chicken
-        function resetChicken() {
-            for(let i=1; i<=5; i++) document.getElementById('ch'+i).className = 'chicken-step';
-        }
+        function resetChicken() { for(let i=1; i<=5; i++) document.getElementById('ch'+i).className = 'chicken-step'; }
         function runChicken() {
-            const steps = Math.floor(Math.random()*4)+1; // 1 to 4 safe steps
-            let i=1;
-            let int = setInterval(() => {
-                if(i>steps) { clearInterval(int); return; }
-                document.getElementById('ch'+i).classList.add('safe');
-                i++;
-            }, 500);
+            const steps = Math.floor(Math.random()*4)+1;
+            let i=1; let int = setInterval(() => { if(i>steps) clearInterval(int); else { document.getElementById('ch'+i).classList.add('safe'); i++; } }, 500);
         }
 
         window.Telegram.WebApp.ready();
