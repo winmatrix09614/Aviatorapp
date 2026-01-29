@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate Fixed</title>
+    <title>AI Signal Bot Ultimate v3.2</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
@@ -16,7 +16,7 @@
             --brand-red: #ff334b;
             --glass-panel: rgba(20, 20, 30, 0.6);
             
-            /* MINES */
+            /* MINES COLORS */
             --mines-bg: #272749;
             --mines-tile: #2b2e55;
             --mines-active: #094e67;
@@ -96,7 +96,7 @@
             text-align: center; cursor: pointer; transition: 0.2s;
         }
         .game-card:active { transform: scale(0.96); border-color: var(--accent-cyan); }
-        .game-img { width: 60px; height: 60px; margin-bottom: 8px; border-radius: 12px; }
+        .game-img { width: 60px; height: 60px; margin-bottom: 8px; border-radius: 12px; object-fit: cover; }
         .game-title { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 12px; color: #fff; }
         .game-card.locked { opacity: 0.5; filter: grayscale(1); }
 
@@ -105,7 +105,9 @@
             text-decoration: none; font-family: 'Orbitron', sans-serif; color: var(--accent-cyan);
             border: 1px solid rgba(0, 242, 234, 0.3); padding: 8px 16px; border-radius: 20px;
             font-size: 12px; letter-spacing: 1px; background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(5px); margin-bottom: 25px; transition: 0.3s;
+            backdrop-filter: blur(5px); 
+            margin-bottom: 45px; /* УВЕЛИЧИЛ ОТСТУП */
+            transition: 0.3s;
             display: inline-block;
         }
 
@@ -134,12 +136,7 @@
         .aviator-container { display: none; position: relative; width: 260px; height: 260px; align-items: center; justify-content: center; margin-bottom: 10px; }
         .circle-glow { position: absolute; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(58,134,255,0.15) 0%, transparent 70%); }
         .coef-text { position: absolute; font-family: 'Orbitron'; font-size: 48px; font-weight: 900; color: #fff; z-index: 2; }
-        
-        .progress-ring__circle {
-            transition: stroke-dashoffset 0.1s linear;
-            transform: rotate(-90deg);
-            transform-origin: 50% 50%;
-        }
+        .progress-ring__circle { transition: stroke-dashoffset 0.1s linear; transform: rotate(-90deg); transform-origin: 50% 50%; }
 
         /* --- 2. PENALTY --- */
         .penalty-container {
@@ -149,13 +146,8 @@
         }
         .target-zone { position: absolute; width: 40px; height: 40px; border-radius: 50%; transition: 0.1s; }
         
-        /* КООРДИНАТЫ */
-        .z1 { top: 12%; left: 7%; }
-        .z2 { top: 12%; left: 80%; }
-        .z3 { top: 11%; left: 44%; }
-        .z4 { top: 48%; left: 6%; }
-        .z5 { top: 49%; left: 81%; }
-
+        .z1 { top: 12%; left: 7%; } .z2 { top: 12%; left: 80%; } .z3 { top: 11%; left: 44%; } .z4 { top: 48%; left: 6%; } .z5 { top: 49%; left: 81%; }
+        
         .target-zone.scanning { border: 2px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.1); }
         .target-zone.winner { border: 3px solid #00f2ea; background: radial-gradient(circle, rgba(0,242,234,0.4) 0%, transparent 70%); box-shadow: 0 0 15px #00f2ea; }
 
@@ -180,21 +172,46 @@
         .mine-tile.reveal { background-color: var(--mines-active); }
         .mine-tile.reveal img { display: block; }
 
-        /* --- 4. CHICKEN --- */
-        .chicken-container {
-            display: none; width: 90%; max-width: 320px; height: 100px;
-            background: #2a2a2a; border-radius: 12px; margin-bottom: 20px;
-            display: flex; align-items: center; justify-content: space-around; padding: 0 10px;
-            border-bottom: 4px solid #1a1a1a;
+        /* --- 4. CHICKEN ROAD (ОБНОВЛЕННЫЙ ДИЗАЙН) --- */
+        .chicken-wrapper {
+            display: none; width: 90%; max-width: 320px;
+            margin-bottom: 20px; flex-direction: column; align-items: center;
         }
+        .chicken-road {
+            width: 100%; height: 100px;
+            background: #2b2b2b; /* Цвет асфальта */
+            border-radius: 12px;
+            border-bottom: 4px dashed #666; /* Разметка дороги */
+            display: flex; align-items: center; justify-content: space-around;
+            padding: 0 10px; box-sizing: border-box;
+            position: relative;
+            box-shadow: inset 0 0 20px #000;
+        }
+        .road-label {
+            position: absolute; top: 5px; font-family: 'Orbitron'; font-size: 9px; color: #555; letter-spacing: 1px;
+        }
+        .label-start { left: 10px; }
+        .label-finish { right: 10px; }
+
         .chicken-step {
-            width: 40px; height: 40px; background: #444; border-radius: 50%;
+            width: 45px; height: 45px; 
+            background: #1a1a1a; /* Цвет люка */
+            border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            border: 2px solid #555; position: relative; transition: 0.3s;
+            border: 3px solid #333; 
+            position: relative; transition: 0.3s;
+            box-shadow: 0 4px 5px rgba(0,0,0,0.5);
         }
-        .chicken-step.safe { border-color: #00ff41; background: rgba(0,255,65,0.1); box-shadow: 0 0 10px #00ff41; }
-        .chicken-step.safe::after { content: '✔'; color: #00ff41; font-weight: bold; font-size: 18px; }
         
+        /* Активный шаг (зеленый) */
+        .chicken-step.safe { 
+            border-color: #00ff41; 
+            background: radial-gradient(circle, #004d13 0%, #002209 100%);
+            box-shadow: 0 0 15px #00ff41; 
+            transform: scale(1.1);
+        }
+        .chicken-step.safe::after { content: '✔'; color: #00ff41; font-weight: bold; font-size: 20px; }
+
         @media (min-width: 768px) {
             .penalty-container { transform: scale(1.3); margin-bottom: 50px; }
         }
@@ -230,6 +247,7 @@
             <div class="game-card" onclick="openGame('aviator')"><img src="/img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
             <div class="game-card" onclick="openGame('penalty')"><img src="/img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div>
             <div class="game-card" onclick="openGame('mines')"><img src="/img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div>
+            <!-- УБЕДИСЬ ЧТО КАРТИНКА menu_chicken.png СУЩЕСТВУЕТ В ПАПКЕ img -->
             <div class="game-card" onclick="openGame('chicken')"><img src="/img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div>
         </div>
     </div>
@@ -268,11 +286,17 @@
             <div id="mines-board" class="mines-board"></div>
         </div>
 
-        <!-- CHICKEN -->
-        <div id="chicken-view" class="chicken-container">
-            <div class="chicken-step" id="ch1"></div><div class="chicken-step" id="ch2"></div>
-            <div class="chicken-step" id="ch3"></div><div class="chicken-step" id="ch4"></div>
-            <div class="chicken-step" id="ch5"></div>
+        <!-- CHICKEN ROAD (UPDATED) -->
+        <div id="chicken-view" class="chicken-wrapper">
+            <div class="chicken-road">
+                <div class="road-label label-start">START</div>
+                <div class="road-label label-finish">FINISH</div>
+                <div class="chicken-step" id="ch1"></div>
+                <div class="chicken-step" id="ch2"></div>
+                <div class="chicken-step" id="ch3"></div>
+                <div class="chicken-step" id="ch4"></div>
+                <div class="chicken-step" id="ch5"></div>
+            </div>
         </div>
 
         <div class="risk-block" id="risk-block">
@@ -322,7 +346,7 @@
 
         // --- STATE ---
         let activeGame = null;
-        let isIdVerified = false; // Поставь true для тестов без ID
+        let isIdVerified = false; 
         let minesSize = 3;
 
         // --- NAVIGATION ---
@@ -389,7 +413,7 @@
             btn.disabled = true;
             loader.innerText = "ANALYZING...";
             
-            // Clean UI before signal
+            // Clean UI
             document.getElementById('risk-block').style.opacity = '0';
             if(activeGame === 'aviator') setProgress(0);
             if(activeGame === 'penalty') document.querySelectorAll('.target-zone').forEach(el => el.classList.remove('winner'));
@@ -401,7 +425,6 @@
             } else if (activeGame === 'penalty') {
                 runPenaltyAnimation(loader, btn);
             } else {
-                // Mines & Chicken logic
                 setTimeout(() => {
                     if(activeGame === 'mines') runMines();
                     if(activeGame === 'chicken') runChicken();
@@ -412,7 +435,6 @@
 
         function finishSignal(loader, btn) {
             loader.innerText = "";
-            // Show Risk
             const acc = (Math.random()*(99-92)+92).toFixed(1);
             document.getElementById('acc-val').innerText = acc + "%";
             document.getElementById('risk-block').style.opacity = '1';
@@ -429,7 +451,9 @@
             }, 1000);
         }
 
-        // --- AVIATOR ANIMATION ---
+        // --- ANIMATIONS ---
+        
+        // Aviator
         function setProgress(percent) {
             const circle = document.getElementById('prog-ring');
             const radius = circle.r.baseVal.value;
@@ -451,32 +475,29 @@
                     document.getElementById('coef-text').innerText = val + "x";
                     finishSignal(loader, btn);
                 }
-            }, 30); // ~3 sec duration
+            }, 30);
         }
 
-        // --- PENALTY ANIMATION (SCANNING) ---
+        // Penalty
         function runPenaltyAnimation(loader, btn) {
             const targets = document.querySelectorAll('.target-zone');
             let steps = 0;
-            const maxSteps = 15;
-            
             const int = setInterval(() => {
                 targets.forEach(el => el.classList.remove('scanning'));
                 const r = Math.floor(Math.random() * 5);
                 targets[r].classList.add('scanning');
                 steps++;
-                
-                if(steps > maxSteps) {
+                if(steps > 15) {
                     clearInterval(int);
                     targets.forEach(el => el.classList.remove('scanning'));
                     const win = Math.floor(Math.random() * 5) + 1;
                     document.getElementById('pz'+win).classList.add('winner');
                     finishSignal(loader, btn);
                 }
-            }, 150); // Fast switching
+            }, 150);
         }
 
-        // --- MINES ---
+        // Mines
         function setMinesGrid(s) {
             minesSize = s;
             const b = document.getElementById('mines-board');
@@ -506,12 +527,12 @@
             }, 400);
         }
 
-        // --- CHICKEN ---
+        // Chicken
         function resetChicken() {
             for(let i=1; i<=5; i++) document.getElementById('ch'+i).className = 'chicken-step';
         }
         function runChicken() {
-            const steps = Math.floor(Math.random()*4)+1;
+            const steps = Math.floor(Math.random()*4)+1; // 1 to 4 safe steps
             let i=1;
             let int = setInterval(() => {
                 if(i>steps) { clearInterval(int); return; }
