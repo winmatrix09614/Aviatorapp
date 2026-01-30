@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v14.0</title>
+    <title>AI Signal Bot Ultimate v15.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     
@@ -24,14 +24,13 @@
             color: var(--text-color);
             font-family: 'Poppins', sans-serif;
             margin: 0; padding: 0; overflow: hidden; user-select: none; height: 100vh;
-            /* Center on PC */
             display: flex; justify-content: center; align-items: flex-start;
         }
 
-        /* --- MOBILE WRAPPER FOR PC --- */
+        /* --- MOBILE WRAPPER --- */
         #app-wrapper {
             width: 100%;
-            max-width: 450px; /* Limits width on PC */
+            max-width: 450px;
             height: 100%;
             position: relative;
             background: transparent;
@@ -40,7 +39,6 @@
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
 
-        /* ARABIC FONT SUPPORT */
         body.lang-ar { font-family: 'Cairo', sans-serif; direction: rtl; }
         body.lang-ar .hud-bar { direction: ltr; }
 
@@ -107,7 +105,7 @@
         .screen { 
             display: none; flex-direction: column; align-items: center; justify-content: center; 
             height: 100%; width: 100%; position: relative; z-index: 10; 
-            padding-bottom: 120px; /* Space for Live Wins + Buttons */
+            padding-bottom: 80px; /* Adjusted padding */
             box-sizing: border-box;
         }
         .screen.active { display: flex; }
@@ -132,18 +130,9 @@
             transform: translateY(-5px); border-color: var(--accent-cyan);
             box-shadow: 0 0 20px rgba(0, 242, 234, 0.3);
         }
-        
-        /* SOON BLOCKS */
-        .game-card.soon {
-            cursor: default; opacity: 0.5; border-color: rgba(255,255,255,0.05);
-        }
-        .game-card.soon:hover, .game-card.soon:active {
-            transform: none; box-shadow: none; border-color: rgba(255,255,255,0.05);
-        }
-        .soon-text {
-            font-family: 'Orbitron'; font-size: 18px; font-weight: bold; color: #666; letter-spacing: 2px;
-        }
-
+        .game-card.soon { cursor: default; opacity: 0.5; border-color: rgba(255,255,255,0.05); }
+        .game-card.soon:hover, .game-card.soon:active { transform: none; box-shadow: none; border-color: rgba(255,255,255,0.05); }
+        .soon-text { font-family: 'Orbitron'; font-size: 18px; font-weight: bold; color: #666; letter-spacing: 2px; }
         .game-img { width: 60px; height: 60px; margin-bottom: 8px; border-radius: 12px; object-fit: cover; }
         .game-title { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 12px; color: #fff; }
 
@@ -176,28 +165,23 @@
         
         .btn-back { margin-top: 15px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 25px; border-radius: 20px; font-size: 10px; font-family: 'Orbitron'; cursor: pointer; z-index: 100; }
 
-        /* --- AVIATOR (FIXED) --- */
+        /* --- AVIATOR --- */
         .aviator-wrapper {
             position: relative; width: 100%; height: 200px; margin-bottom: 10px;
             overflow: hidden;
         }
         .aviator-graph-svg {
             position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; z-index: 2; opacity: 0; transition: opacity 0.5s;
-            mask-image: linear-gradient(to right, black 70%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%);
+            mask-image: linear-gradient(to right, black 70%, transparent 100%); -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%);
         }
         .aviator-graph-svg.active { opacity: 1; }
         .aviator-plane-img {
             position: absolute; width: 60px; height: auto; z-index: 5; opacity: 0;
             filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
-            offset-path: path("M20,200 Q300,100 800,-100"); 
-            offset-rotate: auto;
+            offset-path: path("M20,200 Q300,100 800,-100"); offset-rotate: auto;
         }
         .aviator-plane-img.taking-off { opacity: 1; animation: flyOffScreen 3s forwards ease-in; }
-        @keyframes flyOffScreen { 
-            0% { offset-distance: 0%; transform: scale(0.6); } 
-            100% { offset-distance: 100%; transform: scale(1.2); } 
-        }
+        @keyframes flyOffScreen { 0% { offset-distance: 0%; transform: scale(0.6); } 100% { offset-distance: 100%; transform: scale(1.2); } }
         .coef-text { 
             position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
             font-family: 'Orbitron'; font-size: 48px; font-weight: 900; color: #fff; z-index: 10; 
@@ -205,21 +189,17 @@
         }
         .coef-text.visible { opacity: 1; }
 
-        /* --- PENALTY (FINAL FIX) --- */
+        /* --- PENALTY (ADJUSTED ZONES & STRATEGY) --- */
         .penalty-container {
             position: relative; width: 300px; height: 190px; margin-bottom: 10px;
             background-image: url('img/penalty_bg.png'); background-size: cover; background-position: center;
             border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
-        
         .target-zone { position: absolute; width: 45px; height: 45px; border-radius: 50%; transition: 0.1s; display: flex; justify-content: center; align-items: center; }
-        
-        .z1 { top: 20px; left: 20px; } 
-        .z2 { top: 20px; right: 20px; } 
-        .z3 { top: 20px; left: 50%; transform: translateX(-50%); } 
-        /* WIDER AND HIGHER */
-        .z4 { bottom: 25%; left: 5px; } 
-        .z5 { bottom: 25%; right: 5px; }
+        .z1 { top: 20px; left: 20px; } .z2 { top: 20px; right: 20px; } .z3 { top: 20px; left: 50%; transform: translateX(-50%); } 
+        /* UPDATED BOTTOM ZONES */
+        .z4 { bottom: 30px; left: 15px; } 
+        .z5 { bottom: 30px; right: 15px; }
         
         .target-effect {
             width: 100%; height: 100%; border-radius: 50%;
@@ -232,7 +212,13 @@
         .target-zone.winner .target-effect { transform: scale(1.1); opacity: 1; animation: pulseTarget 1s infinite; }
         @keyframes pulseTarget { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
-        /* --- MINES (FIXED) --- */
+        /* PENALTY STRATEGY BAR */
+        .penalty-strategy { display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: 10px; height: 25px; }
+        .strat-dot { width: 12px; height: 12px; border-radius: 50%; background: #333; transition: 0.3s; box-shadow: 0 0 5px #000; }
+        .strat-dot.win { background: #00ff41; box-shadow: 0 0 8px #00ff41; }
+        .strat-dot.cashout { width: auto; height: auto; border-radius: 4px; padding: 2px 6px; background: #ff334b; color: #fff; font-size: 9px; font-family: 'Orbitron'; font-weight: bold; box-shadow: 0 0 8px #ff334b; }
+
+        /* --- MINES --- */
         .mines-wrapper { width: 90%; max-width: 320px; margin-bottom: 20px; }
         .mines-mode-switch { display: flex; background: #222; border-radius: 20px; padding: 4px; margin-bottom: 15px; border: 1px solid #444; position: relative; }
         .mode-opt { flex: 1; text-align: center; padding: 8px; font-family: 'Orbitron'; font-size: 11px; z-index: 2; cursor: pointer; color: #888; transition: 0.3s; }
@@ -255,106 +241,74 @@
         .mines-wrapper.risk-mode .mine-tile.reveal { background-color: #4a1a25; box-shadow: inset 0 0 10px #ff334b; }
         .mine-tile.reveal img { display: block; }
         
-        /* --- CHICKEN ROAD (REDESIGN v14) --- */
+        /* --- CHICKEN ROAD --- */
         .chicken-wrapper { width: 95%; max-width: 360px; margin-bottom: 20px; flex-direction: column; align-items: center; position: relative; }
-        
-        /* HORIZONTAL SCROLL CONTAINER */
         .chicken-road-horizontal {
-            width: 100%;
-            height: 180px;
-            background: #2b2b2b;
-            border-radius: 12px;
-            border: 2px dashed #444;
-            box-shadow: inset 0 0 20px #000;
-            overflow-x: auto; /* ENABLE HORIZONTAL SCROLL */
-            overflow-y: hidden;
-            white-space: nowrap; /* KEEP ITEMS IN LINE */
-            padding: 20px 10px;
-            box-sizing: border-box;
-            display: flex;
-            align-items: center;
-            /* Hide scrollbar for cleaner look */
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+            width: 100%; height: 180px; background: #2b2b2b; border-radius: 12px; border: 2px dashed #444; box-shadow: inset 0 0 20px #000;
+            overflow-x: auto; overflow-y: hidden; white-space: nowrap; padding: 20px 10px; box-sizing: border-box; display: flex; align-items: center;
+            cursor: grab; /* PC CURSOR */
+            -ms-overflow-style: none; scrollbar-width: none;
         }
-        .chicken-road-horizontal::-webkit-scrollbar { display: none; } /* Chrome, Safari, Opera */
+        .chicken-road-horizontal::-webkit-scrollbar { display: none; }
+        .chicken-road-horizontal.active { cursor: grabbing; }
 
-        .road-step-wrapper {
-            display: inline-flex;
-            align-items: center;
-            position: relative;
-        }
-
+        .road-step-wrapper { display: inline-flex; align-items: center; position: relative; }
         .road-step {
-            width: 60px; height: 60px;
-            background: #1a1a1a; border: 3px solid #333; border-radius: 50%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            position: relative; transition: 0.3s;
-            box-shadow: 0 4px 5px rgba(0,0,0,0.5);
-            flex-shrink: 0; /* Prevent shrinking */
+            width: 60px; height: 60px; background: #1a1a1a; border: 3px solid #333; border-radius: 50%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; transition: 0.3s;
+            box-shadow: 0 4px 5px rgba(0,0,0,0.5); flex-shrink: 0; user-select: none;
         }
-
         .step-coef { font-family: 'Orbitron'; font-size: 11px; color: #fff; font-weight: bold; }
         .step-label { font-family: 'Poppins'; font-size: 8px; color: #666; }
-
-        /* SAFE STATE */
-        .road-step.safe {
-            border-color: var(--brand-green);
-            background: radial-gradient(circle, #004d13 0%, #002209 100%);
-            box-shadow: 0 0 15px var(--brand-green);
-            transform: scale(1.1); z-index: 2;
-        }
+        .road-step.safe { border-color: var(--brand-green); background: radial-gradient(circle, #004d13 0%, #002209 100%); box-shadow: 0 0 15px var(--brand-green); transform: scale(1.1); z-index: 2; }
         .road-step.safe .step-coef { text-shadow: 0 0 5px var(--brand-green); }
-
-        /* CONNECTOR LINE */
-        .road-connector {
-            width: 30px; height: 4px;
-            background: repeating-linear-gradient(90deg, #444, #444 5px, transparent 5px, transparent 10px);
-            flex-shrink: 0;
-        }
-        .road-step.safe + .road-connector {
-             background: repeating-linear-gradient(90deg, var(--brand-green), var(--brand-green) 5px, transparent 5px, transparent 10px);
-             box-shadow: 0 0 5px var(--brand-green);
-        }
-
-        /* CASHOUT LABEL */
-        .cashout-label {
-            position: absolute; top: -35px; left: 50%; transform: translateX(-50%);
-            background: var(--brand-green); color: #000; font-family: 'Orbitron'; font-weight: 900;
-            font-size: 12px; padding: 4px 10px; border-radius: 12px;
-            box-shadow: 0 0 15px var(--brand-green);
-            opacity: 0; transition: 0.3s; pointer-events: none;
-        }
+        .road-connector { width: 30px; height: 4px; background: repeating-linear-gradient(90deg, #444, #444 5px, transparent 5px, transparent 10px); flex-shrink: 0; }
+        .road-step.safe + .road-connector { background: repeating-linear-gradient(90deg, var(--brand-green), var(--brand-green) 5px, transparent 5px, transparent 10px); box-shadow: 0 0 5px var(--brand-green); }
+        .cashout-label { position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background: var(--brand-green); color: #000; font-family: 'Orbitron'; font-weight: 900; font-size: 12px; padding: 4px 10px; border-radius: 12px; box-shadow: 0 0 15px var(--brand-green); opacity: 0; transition: 0.3s; pointer-events: none; }
         .road-step.safe.final .cashout-label { opacity: 1; top: -45px; }
 
-
-        /* --- LIVE WINS LIST --- */
-        .live-wins-list {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 160px;
-            background: linear-gradient(to top, #000 20%, transparent 100%);
-            display: flex; flex-direction: column; justify-content: flex-end; padding: 10px 20px; box-sizing: border-box;
-            z-index: 50; overflow: hidden; pointer-events: none;
+        /* --- LIVE WINS BOTTOM SHEET --- */
+        .backdrop-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 200; 
+            opacity: 0; pointer-events: none; transition: 0.3s;
         }
+        .backdrop-overlay.active { opacity: 1; pointer-events: all; }
+
+        .live-sheet {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: auto;
+            max-height: 50px; /* Collapsed Height */
+            background: #111; border-top: 2px solid #333; border-radius: 20px 20px 0 0;
+            z-index: 250; transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            overflow: hidden; box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+        }
+        .live-sheet.expanded { max-height: 50vh; border-color: var(--accent-cyan); }
+
+        .sheet-handle {
+            width: 100%; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+            cursor: pointer; box-sizing: border-box; background: #161616;
+        }
+        .sheet-title { font-family: 'Orbitron'; font-size: 12px; color: #fff; display: flex; align-items: center; }
+        .sheet-title span { color: var(--brand-green); margin-left: 5px; }
+        .sheet-icon { color: #888; transition: 0.3s; }
+        .live-sheet.expanded .sheet-icon { transform: rotate(180deg); }
+
+        .sheet-content { padding: 10px 20px; overflow-y: auto; max-height: calc(50vh - 50px); }
         .win-row {
             display: flex; justify-content: space-between; align-items: center;
             font-family: 'Orbitron'; font-size: 11px; color: #ccc;
-            margin-bottom: 6px; opacity: 0; transform: translateY(20px);
-            animation: slideUp 0.5s forwards;
-            background: rgba(0, 0, 0, 0.5); padding: 4px 8px; border-radius: 4px; border-left: 2px solid var(--brand-green);
+            margin-bottom: 8px; background: rgba(255,255,255,0.05); padding: 8px 10px; border-radius: 6px; border-left: 2px solid var(--brand-green);
         }
-        .win-row.out { animation: fadeOut 0.5s forwards; }
-        .win-row.big-win { border-left: 2px solid #ff9d00; background: rgba(255, 157, 0, 0.2); }
-        @keyframes slideUp { 100% { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeOut { 100% { opacity: 0; transform: translateY(-10px); } }
-        .win-name { color: #fff; font-weight: bold; font-family: 'Orbitron'; letter-spacing: 1px; }
-        .win-amt { color: var(--brand-green); text-shadow: 0 0 5px rgba(0,255,65,0.5); }
-        .win-game { font-size: 9px; color: #888; margin-right: auto; margin-left: 10px; }
+        .win-row.big-win { border-left-color: #ff9d00; background: rgba(255, 157, 0, 0.1); }
+        .win-name { color: #fff; font-weight: bold; }
+        .win-amt { color: var(--brand-green); }
 
     </style>
 </head>
 <body class="lang-en">
 
     <div class="cyber-wrapper"></div>
+    <div id="backdrop" class="backdrop-overlay" onclick="toggleLiveWins()"></div>
     
     <div id="app-wrapper">
         
@@ -376,7 +330,7 @@
         <div id="screen-menu" class="screen">
             <div class="main-logo">
                 <div class="logo-title">AI PREDICTOR</div>
-                <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL v14.0</div>
+                <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL v15.0</div>
                 <div class="brand-sub">powered by Omar</div>
             </div>
             <div class="menu-grid">
@@ -384,13 +338,8 @@
                 <div class="game-card" onclick="openGame('penalty')"><img src="img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div>
                 <div class="game-card" onclick="openGame('mines')"><img src="img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div>
                 <div class="game-card" onclick="openGame('chicken')"><img src="img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div>
-                
-                <div class="game-card soon">
-                    <div class="soon-text" data-tr="soon">SOON</div>
-                </div>
-                <div class="game-card soon">
-                    <div class="soon-text" data-tr="soon">SOON</div>
-                </div>
+                <div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div>
+                <div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div>
             </div>
         </div>
 
@@ -427,6 +376,8 @@
                     <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
                     <img src="img/menu_penalty.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
                 </div>
+                <div class="penalty-strategy" id="pen-strat"></div>
+                
                 <div class="penalty-container">
                     <div class="target-zone z1" id="pz1"><div class="target-effect"></div></div>
                     <div class="target-zone z2" id="pz2"><div class="target-effect"></div></div>
@@ -488,7 +439,13 @@
             <button class="btn-back" onclick="backMenu()" data-tr="exit">EXIT</button>
         </div>
 
-        <div id="live-list" class="live-wins-list"></div>
+        <div id="live-sheet" class="live-sheet">
+            <div class="sheet-handle" onclick="toggleLiveWins()">
+                <div class="sheet-title">🏆 LIVE WINS <span id="last-win-name"></span></div>
+                <div class="sheet-icon">▲</div>
+            </div>
+            <div class="sheet-content" id="live-list"></div>
+        </div>
 
     </div>
 
@@ -500,27 +457,24 @@
     </div>
 
     <script>
-        // --- LOCALIZATION DATA ---
+        // --- CONSTANTS ---
         const trans = {
             en: { get_signal: "GET SIGNAL", exit: "EXIT", aviator: "AVIATOR", penalty: "PENALTY", soon: "SOON" },
             es: { get_signal: "OBTENER SEÑAL", exit: "SALIR", aviator: "AVIATOR", penalty: "PENALTI", soon: "PRONTO" },
             ar: { get_signal: "احصل على إشارة", exit: "خروج", aviator: "طيار", penalty: "ضربة جزاء", soon: "قريباً" }
         };
         const currData = { en: "$", es: "€", ar: "EGP" };
-        let curLang = 'en';
-
-        // --- CHICKEN ROAD DATA (PROVIDED) ---
         const CHICKEN_DATA = {
             easy: ["1.03x", "1.07x", "1.12x", "1.17x", "1.23x", "1.29x", "1.36x", "1.44x", "1.53x", "1.63x", "1.75x", "1.88x", "2.04x", "2.22x", "2.45x", "2.72x", "3.06x", "3.50x", "4.08x", "4.90x", "6.13x", "6.61x", "9.81x", "19.44x"],
             medium: ["1.12x", "1.28x", "1.47x", "1.70x", "1.98x", "2.33x", "2.76x", "3.32x", "4.03x", "4.96x", "6.20x", "6.91x", "8.90x", "11.76x", "15.99x", "22.61x", "33.58x", "53.20x", "92.17x", "182.51x", "451.71x", "1778.80x"],
             hard: ["1.23x", "1.55x", "1.98x", "2.56x", "3.36x", "4.49x", "5.49x", "7.53x", "10.56x", "15.21x", "22.59x", "34.79x", "55.97x", "94.99x", "172.42x", "341.40x", "760.46x", "2007.63x", "6956.47x", "41321.43x"],
             hardcore: ["1.63x", "2.80x", "4.95x", "9.08x", "15.21x", "30.12x", "62.96x", "140.24x", "337.19x", "890.19x", "2643.89x", "9161.08x", "39301.05x", "233448.29x", "254112.51x"]
         };
-
-        // --- BOOT ---
-        const termLines = ["INITIALIZING...", "CHECKING RESOURCES...", "ESTABLISHING SECURE TUNNEL...", "READY."];
-        let lineIdx = 0;
+        const PENALTY_COEFFS = ["1.92x", "3.84x", "7.68x", "15.36x", "30.72x"];
         
+        let curLang = 'en';
+
+        // --- INIT ---
         window.onload = function() {
             const savedId = localStorage.getItem('user_id');
             if(savedId) document.getElementById('user-id-input').value = savedId;
@@ -531,20 +485,19 @@
                 document.getElementById('online-users').innerText = c;
             }, 3000);
 
-            addLiveWinItem(); 
-            setInterval(addLiveWinItem, 3500);
+            // Populate Live Wins
+            for(let i=0; i<15; i++) addLiveWinItem();
+            setInterval(addLiveWinItem, 3000);
 
+            // Init Drag Scroll
+            initDragScroll();
+
+            const termLines = ["INITIALIZING...", "CHECKING RESOURCES...", "ESTABLISHING SECURE TUNNEL...", "READY."];
+            let lineIdx = 0;
             const term = document.getElementById('term-text');
             function typeLine() {
-                if(lineIdx < termLines.length) {
-                    term.innerText = termLines[lineIdx++];
-                    setTimeout(typeLine, 300);
-                } else {
-                    setTimeout(() => { 
-                        document.getElementById('preloader').style.display='none'; 
-                        document.getElementById('id-modal').style.display='flex';
-                    }, 500);
-                }
+                if(lineIdx < termLines.length) { term.innerText = termLines[lineIdx++]; setTimeout(typeLine, 300); }
+                else { setTimeout(() => { document.getElementById('preloader').style.display='none'; document.getElementById('id-modal').style.display='flex'; }, 500); }
             }
             typeLine();
         };
@@ -552,304 +505,200 @@
         const sid = "SID-" + Math.random().toString(36).substr(2, 6).toUpperCase();
         document.getElementById('session-id').innerText = sid;
 
-        // --- AUTH ---
         function validateAndConnect() {
             const val = document.getElementById('user-id-input').value;
             const err = document.getElementById('id-error');
             const btn = document.getElementById('btn-connect');
-            const log = document.getElementById('sync-log');
-
             if (val.length < 5) { err.innerText = "ERROR: INVALID ID"; return; }
             localStorage.setItem('user_id', val);
-
-            err.innerText = ""; btn.disabled = true; btn.style.background = "#333"; btn.innerText = "CONNECTING..."; log.style.display = "block";
-            
-            setTimeout(() => { log.innerText = "> Handshake established..."; }, 600);
-            setTimeout(() => { log.innerText = "> Verifying hash tokens..."; }, 1200);
-            setTimeout(() => { log.innerText = "> Downloading betting history..."; }, 2000);
-            setTimeout(() => { 
-                log.innerText = "> SYNCHRONIZATION COMPLETE"; 
-                btn.innerText = "SUCCESS"; btn.style.background = "#00f2ea"; btn.style.color = "#000"; 
-            }, 2800);
-            setTimeout(() => { 
-                document.getElementById('id-modal').style.display = 'none'; 
-                document.getElementById('screen-menu').classList.add('active'); 
-            }, 3500);
+            err.innerText = ""; btn.disabled = true; btn.style.background = "#333"; btn.innerText = "CONNECTING..."; document.getElementById('sync-log').style.display = "block";
+            setTimeout(() => { document.getElementById('sync-log').innerText = "> SYNCHRONIZED"; btn.innerText = "SUCCESS"; btn.style.background = "#00f2ea"; btn.style.color = "#000"; }, 2500);
+            setTimeout(() => { document.getElementById('id-modal').style.display = 'none'; document.getElementById('screen-menu').classList.add('active'); }, 3200);
         }
 
-        // --- TRANS ---
         function changeLang(l) {
-            curLang = l;
-            document.body.className = "lang-" + l;
+            curLang = l; document.body.className = "lang-" + l;
             const cont = document.getElementById('lang-cont');
             if(l === 'ar') cont.classList.add('ar-pos'); else cont.classList.remove('ar-pos');
-
-            document.querySelectorAll('[data-tr]').forEach(el => {
-                const k = el.getAttribute('data-tr');
-                if(trans[l][k]) el.innerText = trans[l][k];
-            });
+            document.querySelectorAll('[data-tr]').forEach(el => { if(trans[l][el.getAttribute('data-tr')]) el.innerText = trans[l][el.getAttribute('data-tr')]; });
         }
 
-        // --- LIVE WINS LIST LOGIC ---
+        // --- LIVE WINS ---
+        function toggleLiveWins() {
+            document.getElementById('live-sheet').classList.toggle('expanded');
+            document.getElementById('backdrop').classList.toggle('active');
+        }
         function addLiveWinItem() {
             const list = document.getElementById('live-list');
-            const prefixes = ['155', '156', '157', '158', '159', '160'];
-            const p = prefixes[Math.floor(Math.random()*prefixes.length)];
+            const p = ['155','156','157'][Math.floor(Math.random()*3)];
             const id = `${p}****${Math.floor(Math.random()*90)+10}`;
-
-            let amt = Math.floor(Math.random() * 290) + 10;
-            let isBigWin = false;
-            if(Math.random() > 0.95) {
-                amt = Math.floor(Math.random() * 2000) + 1000;
-                isBigWin = true;
-            }
-
-            const games = ["Aviator", "Mines", "Penalty"];
-            const game = games[Math.floor(Math.random()*games.length)];
+            let amt = Math.floor(Math.random()*290)+10;
+            let isBig = Math.random()>0.95;
+            if(isBig) amt = Math.floor(Math.random()*2000)+1000;
+            const game = ["Aviator","Mines","Penalty"][Math.floor(Math.random()*3)];
             
             const div = document.createElement('div');
-            div.className = 'win-row';
-            if(isBigWin) div.classList.add('big-win');
-
-            div.innerHTML = `<div><span class="win-name">${id}</span> <span class="win-game">${game}</span></div> <div class="win-amt">+${amt}${currData[curLang]}</div>`;
+            div.className = 'win-row'; if(isBig) div.classList.add('big-win');
+            div.innerHTML = `<div><span class="win-name">${id}</span> <span style="font-size:9px;color:#888;margin-left:5px">${game}</span></div><div class="win-amt">+${amt}${currData[curLang]}</div>`;
+            
             list.prepend(div);
-            if(list.children.length > 5) {
-                const last = list.lastElementChild; last.classList.add('out');
-                setTimeout(() => last.remove(), 500);
-            }
+            if(list.children.length > 20) list.lastElementChild.remove();
+            
+            // Update Mini Label
+            document.getElementById('last-win-name').innerText = `• ${id} +${amt}${currData[curLang]}`;
+        }
+
+        // --- DRAG SCROLL FOR PC ---
+        function initDragScroll() {
+            const slider = document.getElementById('chicken-road-container');
+            let isDown = false; let startX; let scrollLeft;
+            slider.addEventListener('mousedown', (e) => { isDown = true; slider.classList.add('active'); startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
+            slider.addEventListener('mouseleave', () => { isDown = false; slider.classList.remove('active'); });
+            slider.addEventListener('mouseup', () => { isDown = false; slider.classList.remove('active'); });
+            slider.addEventListener('mousemove', (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 2; slider.scrollLeft = scrollLeft - walk; });
         }
 
         // --- GAME LOGIC ---
-        let activeGame = null;
-        let minesSize = 3;
-        let minesCount = 3;
-        let minesMode = 'safe';
+        let activeGame = null; let minesSize=3; let minesCount=3; let minesMode='safe';
 
         function openGame(g) {
             activeGame = g;
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-game').classList.add('active');
             ['aviator', 'penalty', 'mines', 'chicken'].forEach(id => document.getElementById(id+'-view').style.display = 'none');
-            
             document.getElementById('signal-btn').disabled = false;
             document.getElementById('signal-btn').innerText = trans[curLang].get_signal;
             document.getElementById(g+'-view').style.display = 'flex';
 
-            // Reset States
-            if(g === 'aviator') { 
-                const plane = document.getElementById('aviator-plane');
-                plane.classList.remove('taking-off');
-                document.getElementById('coef-text').classList.remove('visible');
-            }
-            if(g === 'penalty') {
+            if(g==='aviator') { document.getElementById('aviator-plane').classList.remove('taking-off'); document.getElementById('coef-text').classList.remove('visible'); }
+            if(g==='penalty') { 
                 document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning'));
+                document.getElementById('pen-strat').innerHTML = ''; // Clear strategy
             }
-            if(g === 'mines') setMinesGrid(3);
-            if(g === 'chicken') renderChickenRoad();
+            if(g==='mines') setMinesGrid(3);
+            if(g==='chicken') renderChickenRoad();
         }
-
         function backMenu() {
             document.getElementById('screen-game').classList.remove('active');
             document.getElementById('screen-menu').classList.add('active');
         }
 
-        // --- MINES FUNCTIONS ---
+        // --- MINES ---
         function setMinesGrid(s) {
-            minesSize = s;
-            const b = document.getElementById('mines-board');
+            minesSize = s; const b = document.getElementById('mines-board');
             b.style.gridTemplateColumns = `repeat(${s}, 1fr)`; b.innerHTML = "";
-            document.getElementById('btn-3').classList.remove('active');
-            document.getElementById('btn-5').classList.remove('active');
-            document.getElementById(`btn-${s}`).classList.add('active');
+            document.getElementById('btn-3').classList.remove('active'); document.getElementById('btn-5').classList.remove('active'); document.getElementById(`btn-${s}`).classList.add('active');
             for(let i=0; i<s*s; i++) {
                 const d = document.createElement('div'); d.className='mine-tile'; d.id='mt-'+i; 
                 d.innerHTML='<img src="img/mines_star.png">'; b.appendChild(d);
             }
-            minesCount = 3; document.getElementById('mines-val').innerText = minesCount;
         }
-        function stepMines(d) {
-            const max = (minesSize * minesSize) - 1;
-            minesCount += d;
-            if(minesCount < 1) minesCount = 1;
-            if(minesCount > max) minesCount = max;
-            document.getElementById('mines-val').innerText = minesCount;
-        }
+        function stepMines(d) { minesCount+=d; if(minesCount<1) minesCount=1; document.getElementById('mines-val').innerText = minesCount; }
         function setMinesMode(m) {
-            minesMode = m;
-            const el = document.getElementById('mines-mode');
-            const wrap = document.getElementById('mines-wrap');
-            el.setAttribute('data-mode', m);
+            minesMode = m; const el = document.getElementById('mines-mode');
             document.querySelectorAll('.mode-opt').forEach(o => o.classList.remove('active'));
-            if(m==='safe') { el.children[1].classList.add('active'); wrap.classList.remove('risk-mode'); }
-            else { el.children[2].classList.add('active'); wrap.classList.add('risk-mode'); }
+            if(m==='safe') { el.children[1].classList.add('active'); document.getElementById('mines-wrap').classList.remove('risk-mode'); }
+            else { el.children[2].classList.add('active'); document.getElementById('mines-wrap').classList.add('risk-mode'); }
         }
 
-        // --- CHICKEN ROAD RENDERER ---
+        // --- CHICKEN ---
         function renderChickenRoad() {
             const diff = document.getElementById('chicken-diff').value;
             const data = CHICKEN_DATA[diff];
             const container = document.getElementById('chicken-road-container');
-            container.innerHTML = ""; // Clear
-            container.scrollLeft = 0; // Reset scroll
-
-            data.forEach((coef, index) => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'road-step-wrapper';
-                
-                const step = document.createElement('div');
-                step.className = 'road-step';
-                step.id = 'road-step-' + index;
-                step.innerHTML = `<span class="step-coef">${coef}</span><span class="step-label">STEP ${index+1}</span><div class="cashout-label">CASHOUT</div>`;
-                
-                wrapper.appendChild(step);
-
-                // Add connector if not last
-                if(index < data.length - 1) {
-                    const connector = document.createElement('div');
-                    connector.className = 'road-connector';
-                    wrapper.appendChild(connector);
-                }
-                container.appendChild(wrapper);
+            container.innerHTML = ""; container.scrollLeft = 0;
+            data.forEach((coef, i) => {
+                const w = document.createElement('div'); w.className = 'road-step-wrapper';
+                w.innerHTML = `<div class="road-step" id="rs-${i}"><span class="step-coef">${coef}</span><span class="step-label">STEP ${i+1}</span><div class="cashout-label">CASHOUT</div></div>`;
+                if(i < data.length-1) w.innerHTML += `<div class="road-connector"></div>`;
+                container.appendChild(w);
             });
         }
 
-        // --- SIGNAL LOGIC ---
+        // --- SIGNAL ---
         function getSignal() {
             const btn = document.getElementById('signal-btn');
             btn.disabled = true;
-
-            // 1. HARD RESET VISUALS
-            if(activeGame === 'aviator') {
-                 const plane = document.getElementById('aviator-plane');
-                 const graph = document.getElementById('aviator-graph');
-                 plane.classList.remove('taking-off');
-                 graph.classList.remove('active');
-                 document.getElementById('coef-text').classList.remove('visible');
-                 void plane.offsetWidth; 
-            }
-            if(activeGame === 'penalty') {
-                 document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner', 'scanning'));
-            }
-            if(activeGame === 'mines') {
-                 document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
-            }
-            if(activeGame === 'chicken') {
-                document.querySelectorAll('.road-step').forEach(el => el.classList.remove('safe', 'final'));
-                document.getElementById('chicken-road-container').scrollLeft = 0;
-            }
-
-            // 2. WARMING SEQUENCE
-            let steps = ["CONNECTING...", "ANALYZING ID...", "PREDICTING..."];
-            if(curLang === 'ar') steps = ["جار الاتصال...", "تحليل...", "تنبؤ..."];
             
-            let stepI = 0;
-            btn.innerText = steps[0];
-            
-            const stepInt = setInterval(() => {
-                stepI++;
-                if(stepI < steps.length) {
-                    btn.innerText = steps[stepI];
-                } else {
-                    clearInterval(stepInt);
-                    showResult(btn);
-                }
+            // RESET
+            if(activeGame==='aviator') { const p = document.getElementById('aviator-plane'); p.classList.remove('taking-off'); void p.offsetWidth; document.getElementById('coef-text').classList.remove('visible'); }
+            if(activeGame==='penalty') { document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning')); document.getElementById('pen-strat').innerHTML=''; }
+            if(activeGame==='mines') document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
+            if(activeGame==='chicken') { document.querySelectorAll('.road-step').forEach(el=>el.classList.remove('safe','final')); document.getElementById('chicken-road-container').scrollLeft=0; }
+
+            let steps = ["CONNECTING...","ANALYZING...","PREDICTING..."]; if(curLang==='ar') steps=["جار الاتصال","تحليل","تنبؤ"];
+            let i = 0; btn.innerText = steps[0];
+            const t = setInterval(() => {
+                i++; if(i<steps.length) btn.innerText=steps[i];
+                else { clearInterval(t); showResult(btn); }
             }, 600);
         }
 
         function showResult(btn) {
-            if(activeGame === 'aviator') {
-                 const finalVal = (Math.random() * (5.0 - 1.2) + 1.2).toFixed(2);
-                 const duration = 3000; 
-                 const steps = duration / 50;
-                 const increment = (finalVal - 1.00) / steps;
-                 
-                 const plane = document.getElementById('aviator-plane');
-                 plane.classList.add('taking-off'); // START FLIGHT
-                 
-                 document.getElementById('aviator-graph').classList.add('active');
-                 const textEl = document.getElementById('coef-text');
-                 textEl.classList.add('visible');
-                 
-                 let currentVal = 1.00;
-                 const int = setInterval(() => {
-                    currentVal += increment;
-                    if(currentVal >= finalVal) {
-                        currentVal = finalVal;
-                        clearInterval(int);
-                        textEl.innerText = finalVal + "x";
-                        cooldown(btn);
-                    } else {
-                        textEl.innerText = currentVal.toFixed(2) + "x";
-                    }
-                 }, 50);
+            if(activeGame==='aviator') {
+                const final = (Math.random()*(5.0-1.2)+1.2).toFixed(2);
+                document.getElementById('aviator-plane').classList.add('taking-off');
+                const txt = document.getElementById('coef-text'); txt.classList.add('visible');
+                let val = 1.00;
+                const t = setInterval(() => { val+=0.05; if(val>=final) { clearInterval(t); txt.innerText=final+"x"; cooldown(btn); } else txt.innerText=val.toFixed(2)+"x"; }, 50);
             }
-            else if(activeGame === 'penalty') {
+            else if(activeGame==='penalty') {
+                // Strategy Generation
+                const stratLen = Math.floor(Math.random()*3)+2; // 2 to 4 steps
+                const sBar = document.getElementById('pen-strat');
+                for(let k=0; k<stratLen; k++) {
+                    const d = document.createElement('div');
+                    if(k === stratLen-1) { d.className = 'strat-dot cashout'; d.innerText="CASHOUT"; }
+                    else { d.className = 'strat-dot win'; }
+                    sBar.appendChild(d);
+                }
+
+                // Animation
                 const targets = document.querySelectorAll('.target-zone');
-                let scanSteps = 0;
-                const scanInt = setInterval(() => {
-                    targets.forEach(el => el.classList.remove('scanning'));
-                    targets[Math.floor(Math.random()*5)].classList.add('scanning');
-                    scanSteps++;
-                    if(scanSteps > 10) {
-                        clearInterval(scanInt);
-                        targets.forEach(el => el.classList.remove('scanning'));
-                        const r = Math.floor(Math.random()*5)+1;
-                        document.getElementById('pz'+r).classList.add('winner');
+                let step = 0;
+                const t = setInterval(() => {
+                    targets.forEach(e=>e.classList.remove('scanning')); targets[Math.floor(Math.random()*5)].classList.add('scanning');
+                    step++;
+                    if(step>12) {
+                        clearInterval(t); targets.forEach(e=>e.classList.remove('scanning'));
+                        document.getElementById('pz'+(Math.floor(Math.random()*5)+1)).classList.add('winner');
                         cooldown(btn);
                     }
                 }, 100);
             }
-            else if(activeGame === 'mines') {
-                const total = minesSize * minesSize;
-                let toReveal = 0;
-                if(minesMode === 'safe') toReveal = Math.floor(Math.random()*2)+3; // 3-4
-                else toReveal = total - minesCount; // All safe cells
-                let set = new Set();
-                while(set.size < toReveal) { set.add(Math.floor(Math.random() * total)); }
-                let arr = Array.from(set); let i=0;
-                let int = setInterval(() => { 
-                    if(i>=arr.length) { clearInterval(int); cooldown(btn); } 
-                    else { document.getElementById('mt-'+arr[i]).classList.add('reveal'); i++; } 
+            else if(activeGame==='mines') {
+                const tot = minesSize*minesSize;
+                let open = minesMode==='safe' ? Math.floor(Math.random()*2)+3 : tot-minesCount;
+                let idxs = new Set(); while(idxs.size<open) idxs.add(Math.floor(Math.random()*tot));
+                let arr = Array.from(idxs); let k=0;
+                const t = setInterval(() => {
+                    if(k>=arr.length) { clearInterval(t); cooldown(btn); }
+                    else { document.getElementById('mt-'+arr[k]).classList.add('reveal'); k++; }
                 }, 100);
             }
-            else if(activeGame === 'chicken') {
-                const diff = document.getElementById('chicken-diff').value;
-                const totalSteps = CHICKEN_DATA[diff].length;
-                const container = document.getElementById('chicken-road-container');
-
-                // Smart path logic
-                let safeSteps = Math.floor(Math.random() * 4) + 3; // Default 3-6
-                if(Math.random() > 0.8) safeSteps = Math.floor(Math.random() * 5) + 8; // Lucky 8-12
-                if(safeSteps > totalSteps) safeSteps = totalSteps;
-
-                let i = 0;
-                const int = setInterval(() => {
-                    if(i >= safeSteps) {
-                        clearInterval(int);
-                        if(i > 0) document.getElementById('road-step-' + (i-1)).classList.add('final'); // Mark last as cashout
-                        cooldown(btn);
-                    } else {
-                        const stepEl = document.getElementById('road-step-' + i);
-                        stepEl.classList.add('safe');
-                        // Auto-scroll to center the active step
-                        const scrollPos = stepEl.offsetLeft - container.clientWidth / 2 + stepEl.clientWidth / 2;
-                        container.scrollTo({ left: scrollPos, behavior: 'smooth' });
-                        i++;
+            else if(activeGame==='chicken') {
+                const c = document.getElementById('chicken-road-container');
+                const max = CHICKEN_DATA[document.getElementById('chicken-diff').value].length;
+                let safe = Math.floor(Math.random()*5)+3; if(Math.random()>0.8) safe+=5; if(safe>max) safe=max;
+                let k=0;
+                const t = setInterval(() => {
+                    if(k>=safe) { clearInterval(t); if(k>0) document.getElementById('rs-'+(k-1)).classList.add('final'); cooldown(btn); }
+                    else {
+                        const el = document.getElementById('rs-'+k); el.classList.add('safe');
+                        c.scrollTo({ left: el.offsetLeft - c.clientWidth/2 + 30, behavior: 'smooth' });
+                        k++;
                     }
-                }, 600);
+                }, 500);
             }
         }
 
         function cooldown(btn) {
-            let cd = 4;
+            let s = 4;
             const t = setInterval(() => {
-                btn.innerText = `WAIT ${cd}s`; cd--;
-                if(cd < 0) { clearInterval(t); btn.innerText = trans[curLang].get_signal; btn.disabled = false; }
+                btn.innerText = `WAIT ${s}s`; s--;
+                if(s<0) { clearInterval(t); btn.innerText = trans[curLang].get_signal; btn.disabled = false; }
             }, 1000);
         }
-
-        window.Telegram.WebApp.ready();
-        window.Telegram.WebApp.expand();
     </script>
 </body>
 </html>
