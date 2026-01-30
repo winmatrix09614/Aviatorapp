@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v8.0</title>
+    <title>AI Signal Bot Ultimate v9.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -14,6 +14,7 @@
             --text-color: #ffffff;
             --brand-green: #00ff41;
             --brand-red: #ff334b;
+            --brand-orange: #ff9d00;
             --glass-panel: rgba(20, 20, 30, 0.6);
             --mines-bg: #272749;
             --mines-tile: #2b2e55;
@@ -26,6 +27,10 @@
             font-family: 'Poppins', sans-serif;
             margin: 0; padding: 0; overflow: hidden; user-select: none; height: 100vh;
         }
+
+        /* ARABIC FONT SUPPORT */
+        body.lang-ar { font-family: 'Cairo', sans-serif; direction: rtl; }
+        body.lang-ar .hud-bar { direction: ltr; } /* Keep HUD LTR for aesthetics */
 
         /* --- PRELOADER --- */
         #preloader {
@@ -49,9 +54,10 @@
         .hud-bar {
             position: absolute; top: 0; left: 0; width: 100%; height: 60px; padding: 0 20px; box-sizing: border-box;
             display: flex; align-items: center; justify-content: space-between;
-            font-family: 'Orbitron', sans-serif; font-size: 11px; color: rgba(255, 255, 255, 0.5); z-index: 50; pointer-events: none;
+            font-family: 'Orbitron', sans-serif; font-size: 10px; color: rgba(255, 255, 255, 0.5); z-index: 50; pointer-events: none;
         }
         .status-dot { width: 6px; height: 6px; background: var(--brand-green); border-radius: 50%; box-shadow: 0 0 5px var(--brand-green); display: inline-block; margin-right: 5px; }
+        .online-count { color: var(--accent-cyan); font-weight: bold; margin-left: 5px; }
 
         /* --- ID MODAL --- */
         .modal-overlay {
@@ -78,6 +84,7 @@
 
         /* --- LANG --- */
         .lang-container { position: absolute; top: 50px; right: 20px; z-index: 60; }
+        .lang-container.ar-pos { right: auto; left: 20px; } /* Flip for AR */
         select {
             background: rgba(0, 0, 0, 0.6); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 5px 10px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 12px; outline: none;
@@ -86,16 +93,9 @@
 
         /* --- SCREENS --- */
         .screen { 
-            display: none; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-            width: 100%; 
-            position: relative; 
-            z-index: 10; 
-            padding-bottom: 40px; /* Safe area for bottom button */
-            box-sizing: border-box;
+            display: none; flex-direction: column; align-items: center; justify-content: center; 
+            height: 100vh; width: 100%; position: relative; z-index: 10; 
+            padding-bottom: 60px; box-sizing: border-box;
         }
         .screen.active { display: flex; }
 
@@ -112,172 +112,188 @@
             text-align: center; cursor: pointer; transition: all 0.3s ease;
             position: relative; overflow: hidden;
         }
-        /* HOVER EFFECT ADDED */
-        .game-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-cyan);
+        .game-card:hover, .game-card:active {
+            transform: translateY(-5px); border-color: var(--accent-cyan);
             box-shadow: 0 0 20px rgba(0, 242, 234, 0.3);
         }
-        .game-card:active { transform: scale(0.96); }
-        
         .game-img { width: 60px; height: 60px; margin-bottom: 8px; border-radius: 12px; object-fit: cover; }
         .game-title { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 12px; color: #fff; }
 
         /* --- GAME UI COMMON --- */
-        .game-header {
-            display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; width: 100%;
-        }
+        .game-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; width: 100%; }
         .telegram-link {
             text-decoration: none; font-family: 'Orbitron', sans-serif; color: var(--accent-cyan);
             border: 1px solid rgba(0, 242, 234, 0.3); padding: 8px 16px; border-radius: 20px;
             font-size: 12px; letter-spacing: 1px; background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(5px); margin-bottom: 15px; transition: 0.3s; display: inline-block;
+            backdrop-filter: blur(5px); margin-bottom: 10px; display: inline-block;
         }
         .game-logo-hero {
-            width: 120px; height: auto; display: block; 
+            width: 100px; height: auto; display: block; 
             filter: drop-shadow(0 0 15px rgba(255,255,255,0.1));
-            animation: floatLogo 4s infinite ease-in-out;
+            animation: floatLogo 4s infinite ease-in-out; margin-bottom: 10px;
         }
         @keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-
-        .risk-block { width: 100%; display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; opacity: 0; transition: opacity 0.5s; }
-        .risk-item { background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; color: #aaa; border: 1px solid rgba(255,255,255,0.1); }
-        .risk-val { color: #fff; font-weight: bold; margin-left: 5px; }
 
         .btn-signal {
             background: linear-gradient(90deg, #d6002a 0%, #8a001a 100%);
             border: none; width: 85%; max-width: 320px; padding: 18px; border-radius: 14px;
             color: white; font-family: 'Orbitron', sans-serif; font-size: 16px; letter-spacing: 1px;
             cursor: pointer; box-shadow: 0 5px 20px rgba(214, 0, 42, 0.25);
-            text-transform: uppercase; margin-top: 15px; border: 1px solid rgba(255,255,255,0.1);
-            position: relative; overflow: hidden;
+            text-transform: uppercase; margin-top: 10px; border: 1px solid rgba(255,255,255,0.1);
+            position: relative; overflow: hidden; transition: 0.3s;
         }
-        .btn-signal:disabled { opacity: 0.7; transform: scale(0.98); cursor: not-allowed; }
+        .btn-signal:active { transform: scale(0.98); }
+        .btn-signal:disabled { opacity: 0.8; cursor: not-allowed; background: #333; color: #888; box-shadow: none; }
+        
         .btn-back { margin-top: 15px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 25px; border-radius: 20px; font-size: 10px; font-family: 'Orbitron'; cursor: pointer; }
-        .loader-text { font-family: 'Orbitron'; font-size: 12px; color: var(--accent-cyan); margin-top: 10px; height: 20px; }
 
-        /* --- AVIATOR v8.0 MOTION PATH --- */
+        /* --- AVIATOR SEAMLESS --- */
         .aviator-wrapper {
-            position: relative; width: 300px; height: 200px; 
-            margin-bottom: 20px;
-            background: radial-gradient(circle at center, rgba(40,10,20,0.6) 0%, rgba(5,5,10,0.2) 80%);
-            border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);
-            overflow: hidden;
-            box-shadow: 0 0 30px rgba(255, 51, 75, 0.05);
+            position: relative; width: 100%; height: 220px; margin-bottom: 10px;
+            overflow: hidden; /* Only hide vertical overflow if needed, but we want seamless horizontal */
         }
         .aviator-graph-svg {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
-            z-index: 2; opacity: 0; transition: opacity 0.5s;
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; z-index: 2; opacity: 0; transition: opacity 0.5s;
+            mask-image: linear-gradient(to right, black 80%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
         }
         .aviator-graph-svg.active { opacity: 1; }
-        
         .aviator-plane-img {
-            position: absolute; width: 50px; height: auto; z-index: 5;
-            opacity: 0; filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
-            /* Default position bottom left */
-            offset-path: path("M0,200 Q150,120 300,20");
+            position: absolute; width: 60px; height: auto; z-index: 5; opacity: 0;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+            offset-path: path("M20,200 Q150,150 350,20"); /* Path goes off screen */
             offset-rotate: auto;
         }
-        
-        .aviator-plane-img.taking-off {
-            opacity: 1;
-            animation: flyPath 2.5s forwards cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        @keyframes flyPath {
-            0% { offset-distance: 0%; transform: scale(0.8); }
-            100% { offset-distance: 100%; transform: scale(1.2); }
-        }
-
+        .aviator-plane-img.taking-off { opacity: 1; animation: flySeamless 2.5s forwards cubic-bezier(0.2, 0.8, 0.2, 1); }
+        @keyframes flySeamless { 0% { offset-distance: 0%; transform: scale(0.8); } 100% { offset-distance: 100%; transform: scale(1.2); } }
         .coef-text { 
             position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
             font-family: 'Orbitron'; font-size: 52px; font-weight: 900; color: #fff; z-index: 10; 
-            text-shadow: 0 0 20px rgba(0,0,0,1);
-            opacity: 0; transition: opacity 0.3s;
+            text-shadow: 0 0 20px rgba(0,0,0,1); opacity: 0; transition: opacity 0.3s;
         }
         .coef-text.visible { opacity: 1; }
 
-        /* --- PENALTY --- */
+        /* --- PENALTY PRO --- */
         .penalty-container {
-            position: relative; width: 320px; height: 210px; margin-bottom: 20px;
+            position: relative; width: 320px; height: 210px; margin-bottom: 10px;
             background-image: url('/img/penalty_bg.png'); background-size: cover; background-position: center;
             border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
-        .target-zone { position: absolute; width: 40px; height: 40px; border-radius: 50%; transition: 0.1s; }
-        .z1 { top: 12%; left: 7%; } .z2 { top: 12%; left: 80%; } .z3 { top: 11%; left: 44%; } .z4 { top: 48%; left: 6%; } .z5 { top: 49%; left: 81%; }
-        .target-zone.scanning { border: 2px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.1); }
-        .target-zone.winner { border: 3px solid #00f2ea; background: radial-gradient(circle, rgba(0,242,234,0.4) 0%, transparent 70%); box-shadow: 0 0 15px #00f2ea; transform: scale(1.2); }
+        .history-dots {
+            display: flex; gap: 5px; justify-content: center; margin-bottom: 10px; width: 100%;
+        }
+        .h-dot { width: 8px; height: 8px; border-radius: 50%; background: #333; box-shadow: 0 0 2px #000; }
+        .h-dot.win { background: #00ff41; box-shadow: 0 0 5px #00ff41; }
+        .h-dot.lose { background: #ff334b; }
 
-        /* --- MINES --- */
+        .target-zone { position: absolute; width: 45px; height: 45px; border-radius: 50%; transition: 0.2s; display: flex; justify-content: center; align-items: center; }
+        .z1 { top: 25px; left: 25px; } .z2 { top: 25px; right: 25px; } 
+        .z3 { top: 25px; left: 50%; transform: translateX(-50%); } 
+        .z4 { bottom: 25px; left: 25px; } .z5 { bottom: 25px; right: 25px; }
+        
+        .target-effect {
+            width: 100%; height: 100%; border-radius: 50%;
+            border: 2px solid var(--accent-cyan);
+            background: radial-gradient(circle, rgba(0,242,234,0.6) 0%, transparent 70%);
+            box-shadow: 0 0 15px var(--accent-cyan);
+            transform: scale(0); opacity: 0; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .target-zone.winner .target-effect { transform: scale(1.2); opacity: 1; }
+
+        /* --- MINES 2.0 --- */
         .mines-wrapper { width: 90%; max-width: 340px; margin-bottom: 20px; }
-        .mines-grid-select { display: flex; justify-content: space-between; margin-bottom: 10px; gap: 5px; }
-        .mines-btn-grid { flex: 1; background: #333; border: 1px solid #555; color: #fff; padding: 8px 0; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; text-align: center; transition: 0.2s; }
-        .mines-btn-grid.active { background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan); font-weight: bold; }
-        .mines-input-box { display: flex; align-items: center; justify-content: space-between; background: #222; padding: 5px 10px; border-radius: 8px; border: 1px solid #444; margin-bottom: 15px; }
-        .mines-label { font-family: 'Orbitron'; font-size: 11px; color: #aaa; }
-        .mines-val-input { background: transparent; border: none; color: #fff; font-family: 'Orbitron'; font-size: 14px; text-align: right; width: 60px; outline: none; }
-        .mines-board { background: var(--mines-bg); padding: 10px; border-radius: 10px; display: grid; gap: 5px; border: 2px solid #3d3d5c; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); transition: all 0.3s; }
-        .mine-tile { background-color: var(--mines-tile); border-radius: 4px; aspect-ratio: 1; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; box-shadow: 0 2px 0 rgba(0,0,0,0.3); transition: transform 0.1s; }
-        .mine-tile img { width: 70%; height: 70%; object-fit: contain; display: none; animation: popIn 0.3s ease; }
+        
+        /* New Mode Switch */
+        .mines-mode-switch {
+            display: flex; background: #222; border-radius: 20px; padding: 4px; margin-bottom: 15px; border: 1px solid #444; position: relative;
+        }
+        .mode-opt { flex: 1; text-align: center; padding: 8px; font-family: 'Orbitron'; font-size: 11px; z-index: 2; cursor: pointer; color: #888; transition: 0.3s; }
+        .mode-opt.active { color: #fff; text-shadow: 0 0 5px rgba(255,255,255,0.5); }
+        .mode-bg { 
+            position: absolute; top: 4px; left: 4px; width: 50%; height: calc(100% - 8px); 
+            background: var(--brand-green); border-radius: 16px; transition: 0.3s; z-index: 1; opacity: 0.8;
+        }
+        .mines-mode-switch[data-mode="risk"] .mode-bg { left: 50%; background: var(--brand-red); width: calc(50% - 4px); }
+
+        /* Grid Select */
+        .mines-grid-select { display: flex; gap: 10px; margin-bottom: 15px; }
+        .mines-btn-grid { 
+            flex: 1; background: #333; border: 1px solid #555; color: #fff; padding: 12px 0; border-radius: 8px; 
+            font-family: 'Orbitron'; font-size: 12px; cursor: pointer; text-align: center; transition: 0.2s; 
+        }
+        .mines-btn-grid.active { background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan); font-weight: 900; box-shadow: 0 0 10px rgba(0,242,234,0.2); }
+
+        /* Custom Stepper */
+        .mines-stepper { display: flex; align-items: center; justify-content: space-between; background: #222; border-radius: 12px; border: 1px solid #444; padding: 5px; margin-bottom: 15px; }
+        .step-btn {
+            width: 45px; height: 45px; background: #333; border: none; border-radius: 8px; color: #fff; font-size: 20px; cursor: pointer; transition: 0.2s;
+        }
+        .step-btn:active { background: var(--accent-cyan); color: #000; }
+        .mines-count-display { font-family: 'Orbitron'; font-size: 20px; font-weight: bold; color: #fff; }
+        .mines-label-sm { font-size: 10px; color: #888; font-family: 'Poppins'; }
+
+        .mines-board { background: var(--mines-bg); padding: 10px; border-radius: 10px; display: grid; gap: 6px; border: 2px solid #3d3d5c; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); transition: all 0.3s; }
+        .mine-tile { background-color: var(--mines-tile); border-radius: 6px; aspect-ratio: 1; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 0 rgba(0,0,0,0.3); }
+        .mine-tile img { width: 70%; height: 70%; object-fit: contain; display: none; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .mine-tile.reveal { background-color: var(--mines-active); }
         .mine-tile.reveal img { display: block; }
-
-        /* --- CHICKEN ROAD (FIXED GRID) --- */
+        /* Risk Mode Color */
+        .mines-wrapper.risk-mode .mine-tile.reveal { background-color: #4a1a25; } 
+        
+        /* --- CHICKEN (FIXED) --- */
         .chicken-wrapper { width: 90%; max-width: 340px; margin-bottom: 20px; flex-direction: column; align-items: center; }
-        .chicken-controls { width: 100%; display: flex; justify-content: flex-end; margin-bottom: 10px; }
-        /* FIXED GRID FOR CHICKEN */
         .chicken-road-grid { 
-            width: 100%; 
-            display: grid; 
-            grid-template-columns: repeat(5, 1fr); 
-            gap: 8px; 
-            padding: 15px; 
-            background: #2b2b2b; 
-            border-radius: 12px; 
-            border: 2px dashed #444; 
-            box-shadow: inset 0 0 20px #000; 
-            box-sizing: border-box;
+            width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 15px; 
+            background: #2b2b2b; border-radius: 12px; border: 2px dashed #444; box-shadow: inset 0 0 20px #000; box-sizing: border-box;
         }
         .chicken-step { 
-            width: 100%; 
-            aspect-ratio: 1; /* Ensures perfect circle */
-            background: #1a1a1a; 
-            border-radius: 50%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            border: 2px solid #333; 
-            position: relative; 
-            transition: 0.3s; 
-            box-shadow: 0 4px 5px rgba(0,0,0,0.5); 
+            width: 100%; aspect-ratio: 1; background: #1a1a1a; border-radius: 50%; display: flex; justify-content: center; align-items: center; 
+            border: 2px solid #333; position: relative; transition: 0.3s; box-shadow: 0 4px 5px rgba(0,0,0,0.5); 
             font-family: 'Orbitron'; font-size: 10px; color: #444; 
         }
         .chicken-step.safe { 
-            border-color: #00ff41; 
-            background: radial-gradient(circle, #004d13 0%, #002209 100%); 
-            box-shadow: 0 0 10px #00ff41; 
-            transform: scale(1.05); 
-            color: transparent; 
+            border-color: #00ff41; background: radial-gradient(circle, #004d13 0%, #002209 100%); 
+            box-shadow: 0 0 10px #00ff41; transform: scale(1.05); color: transparent; 
         }
+
+        /* --- LIVE WINS --- */
+        .live-wins-bar {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background: rgba(0,0,0,0.9); border-top: 1px solid #333;
+            display: flex; align-items: center; overflow: hidden; white-space: nowrap; padding-left: 10px; z-index: 100;
+        }
+        .win-item {
+            display: inline-flex; align-items: center; font-family: 'Orbitron'; font-size: 10px; color: #aaa; margin-right: 20px; opacity: 0.8;
+            animation: slideLeft 10s linear infinite;
+        }
+        @keyframes slideLeft { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+        .win-name { color: #fff; font-weight: bold; margin-right: 5px; }
+        .win-amt { color: var(--brand-green); margin-left: 5px; }
 
         @media (min-width: 768px) { .penalty-container { transform: scale(1.2); margin-bottom: 40px; } }
     </style>
 </head>
-<body>
+<body class="lang-en">
 
     <div id="preloader"><div class="terminal-text" id="term-text"></div></div>
     <div class="cyber-wrapper"></div>
-    <div class="hud-bar"><div><span class="status-dot"></span>ONLINE</div><div id="session-id">SID: ...</div></div>
+    <div class="hud-bar">
+        <div><span class="status-dot"></span>ONLINE <span id="online-users" class="online-count">1420</span></div>
+        <div id="session-id">SID: ...</div>
+    </div>
     
-    <div class="lang-container">
-        <select onchange="changeLang(this.value)"><option value="en">🇬🇧 EN</option><option value="ru">🇷🇺 RU</option><option value="es">🇪🇸 ES</option></select>
+    <div class="lang-container" id="lang-cont">
+        <select onchange="changeLang(this.value)" id="lang-select">
+            <option value="en">🇬🇧 EN</option>
+            <option value="es">🇪🇸 ES</option>
+            <option value="ar">🇦🇪 AR</option>
+        </select>
     </div>
 
     <div id="screen-menu" class="screen">
         <div class="main-logo">
             <div class="logo-title">AI PREDICTOR</div>
-            <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL V8.0 ULTIMATE</div>
+            <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL v9.0</div>
         </div>
         <div class="menu-grid">
             <div class="game-card" onclick="openGame('aviator')"><img src="/img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
@@ -290,7 +306,7 @@
     <div id="id-modal" class="modal-overlay">
         <div class="id-box">
             <h3 style="color:#00f2ea; font-family:'Orbitron'; margin-bottom:5px;">AUTHORIZATION</h3>
-            <p style="font-size:11px; color:#aaa; margin-bottom:20px;">Secure connection to 1xBet Server</p>
+            <p style="font-size:11px; color:#aaa; margin-bottom:20px;">Secure connection to Server</p>
             <input type="tel" id="user-id-input" class="id-input" placeholder="Account ID" maxlength="12">
             <button id="btn-connect" class="id-btn" onclick="validateAndConnect()">CONNECT ACCOUNT</button>
             <div id="id-error" style="color:#ff334b; font-size:10px; margin-top:10px; min-height:15px; font-weight:bold;"></div>
@@ -306,9 +322,9 @@
                 <img src="/img/aviator_logo.png" class="game-logo-hero">
             </div>
             <div class="aviator-wrapper">
-                <svg class="aviator-graph-svg" id="aviator-graph" viewBox="0 0 300 200" preserveAspectRatio="none">
-                    <path d="M0,200 Q150,120 300,20 L300,200 Z" fill="rgba(255, 51, 75, 0.2)" />
-                    <path d="M0,200 Q150,120 300,20" fill="none" stroke="#ff334b" stroke-width="4" />
+                <svg class="aviator-graph-svg" id="aviator-graph" viewBox="0 0 350 200" preserveAspectRatio="none">
+                    <path d="M0,200 Q150,150 350,20 L350,200 Z" fill="rgba(255, 51, 75, 0.2)" />
+                    <path d="M0,200 Q150,150 350,20" fill="none" stroke="#ff334b" stroke-width="4" />
                 </svg>
                 <img src="/img/plane.png" id="aviator-plane" class="aviator-plane-img">
                 <div class="coef-text" id="coef-text">0.00x</div>
@@ -318,31 +334,46 @@
         <div id="penalty-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
             <div class="game-header">
                 <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
-                <img src="/img/menu_penalty.png" class="game-logo-hero" style="width:80px; height:80px; border-radius:12px; margin-bottom:10px;">
+                <img src="/img/menu_penalty.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
             </div>
+            <div class="history-dots" id="pen-history"></div>
             <div class="penalty-container">
-                <div class="target-zone z1" id="pz1"></div><div class="target-zone z2" id="pz2"></div>
-                <div class="target-zone z3" id="pz3"></div><div class="target-zone z4" id="pz4"></div>
-                <div class="target-zone z5" id="pz5"></div>
+                <div class="target-zone z1" id="pz1"><div class="target-effect"></div></div>
+                <div class="target-zone z2" id="pz2"><div class="target-effect"></div></div>
+                <div class="target-zone z3" id="pz3"><div class="target-effect"></div></div>
+                <div class="target-zone z4" id="pz4"><div class="target-effect"></div></div>
+                <div class="target-zone z5" id="pz5"><div class="target-effect"></div></div>
             </div>
         </div>
 
         <div id="mines-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
             <div class="game-header">
                 <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
-                <img src="/img/menu_mines.png" class="game-logo-hero" style="width:80px; height:80px; border-radius:12px; margin-bottom:10px;">
+                <img src="/img/menu_mines.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
             </div>
-            <div class="mines-wrapper">
+            <div class="mines-wrapper" id="mines-wrap">
+                <div class="mines-mode-switch" id="mines-mode" data-mode="safe">
+                    <div class="mode-bg"></div>
+                    <div class="mode-opt active" onclick="setMinesMode('safe')">SAFE</div>
+                    <div class="mode-opt" onclick="setMinesMode('risk')">HIGH RISK</div>
+                </div>
+
                 <div class="mines-grid-select">
                     <div class="mines-btn-grid active" id="btn-3" onclick="setMinesGrid(3)">3x3</div>
                     <div class="mines-btn-grid" id="btn-5" onclick="setMinesGrid(5)">5x5</div>
-                    <div class="mines-btn-grid" id="btn-7" onclick="setMinesGrid(7)">7x7</div>
-                    <div class="mines-btn-grid" id="btn-9" onclick="setMinesGrid(9)">9x9</div>
                 </div>
-                <div class="mines-input-box">
-                    <span class="mines-label">MINES:</span>
-                    <input type="number" id="mines-input" class="mines-val-input" value="3" min="1">
+
+                <div class="mines-stepper">
+                    <div style="display:flex; flex-direction:column; padding-left:5px;">
+                        <span class="mines-count-display" id="mines-val">3</span>
+                        <span class="mines-label-sm">TRAPS</span>
+                    </div>
+                    <div style="display:flex; gap:5px;">
+                        <button class="step-btn" onclick="stepMines(-1)">−</button>
+                        <button class="step-btn" onclick="stepMines(1)">+</button>
+                    </div>
                 </div>
+                
                 <div id="mines-board" class="mines-board"></div>
             </div>
         </div>
@@ -350,11 +381,11 @@
         <div id="chicken-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
             <div class="game-header">
                 <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
-                <img src="/img/menu_chicken.png" class="game-logo-hero" style="width:80px; height:80px; border-radius:12px; margin-bottom:10px;">
+                <img src="/img/menu_chicken.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
             </div>
             <div class="chicken-wrapper">
-                <div class="chicken-controls">
-                    <select id="chicken-diff" class="mines-select" onchange="updateChickenGrid()">
+                <div style="width:100%; text-align:right; margin-bottom:5px;">
+                    <select id="chicken-diff" onchange="updateChickenGrid()">
                         <option value="easy">EASY</option>
                         <option value="medium" selected>MEDIUM</option>
                         <option value="hard">HARD</option>
@@ -364,38 +395,55 @@
             </div>
         </div>
 
-        <div class="risk-block" id="risk-block">
-            <div class="risk-item">ACC: <span class="risk-val" id="acc-val">0%</span></div>
-            <div class="risk-item">RISK: <span class="risk-val" id="risk-val">LOW</span></div>
-        </div>
-
-        <div id="loader-text" class="loader-text"></div>
         <button id="signal-btn" class="btn-signal" onclick="getSignal()" data-tr="get_signal">GET SIGNAL</button>
         <button class="btn-back" onclick="backMenu()" data-tr="exit">EXIT</button>
     </div>
 
+    <div class="live-wins-bar">
+        <div class="win-item" id="win-ticker">
+            </div>
+    </div>
+
     <div style="display:none;">
-        <img src="/img/menu_aviator.png">
-        <img src="/img/menu_penalty.png">
-        <img src="/img/menu_mines.png">
-        <img src="/img/menu_chicken.png">
-        <img src="/img/plane.png">
-        <img src="/img/penalty_bg.png">
-        <img src="/img/aviator_logo.png">
-        <img src="/img/mines_star.png">
+        <img src="/img/menu_aviator.png"><img src="/img/menu_penalty.png">
+        <img src="/img/menu_mines.png"><img src="/img/menu_chicken.png">
+        <img src="/img/plane.png"><img src="/img/penalty_bg.png">
+        <img src="/img/aviator_logo.png"><img src="/img/mines_star.png">
     </div>
 
     <script>
+        // --- LOCALIZATION DATA ---
+        const trans = {
+            en: { get_signal: "GET SIGNAL", exit: "EXIT", aviator: "AVIATOR", penalty: "PENALTY" },
+            es: { get_signal: "OBTENER SEÑAL", exit: "SALIR", aviator: "AVIATOR", penalty: "PENALTI" },
+            ar: { get_signal: "احصل على إشارة", exit: "خروج", aviator: "طيار", penalty: "ضربة جزاء" }
+        };
+        const namesData = {
+            en: ["John", "Mike", "Alex", "David", "Chris", "Sarah", "James"],
+            es: ["Carlos", "Juan", "Pedro", "Luis", "Miguel", "Maria", "Jose"],
+            ar: ["Ahmed", "Ali", "Mohamed", "Omar", "Youssef", "Ibrahim", "Hassan"]
+        };
+        const currData = { en: "$", es: "€", ar: "EGP" };
+        let curLang = 'en';
+
         // --- BOOT ---
         const termLines = ["INITIALIZING...", "CHECKING RESOURCES...", "ESTABLISHING SECURE TUNNEL...", "READY."];
         let lineIdx = 0;
         
         window.onload = function() {
-            // Check LocalStorage for ID
             const savedId = localStorage.getItem('user_id');
-            if(savedId) {
-                document.getElementById('user-id-input').value = savedId;
-            }
+            if(savedId) document.getElementById('user-id-input').value = savedId;
+            
+            // Random User Count loop
+            setInterval(() => {
+                let c = parseInt(document.getElementById('online-users').innerText);
+                c += Math.floor(Math.random() * 5) - 2;
+                document.getElementById('online-users').innerText = c;
+            }, 3000);
+
+            // Live Wins Loop
+            updateLiveWins();
+            setInterval(updateLiveWins, 4000);
 
             const term = document.getElementById('term-text');
             function typeLine() {
@@ -423,8 +471,6 @@
             const log = document.getElementById('sync-log');
 
             if (val.length < 5) { err.innerText = "ERROR: INVALID ID"; return; }
-
-            // SAVE ID
             localStorage.setItem('user_id', val);
 
             err.innerText = ""; btn.disabled = true; btn.style.background = "#333"; btn.innerText = "CONNECTING..."; log.style.display = "block";
@@ -443,47 +489,70 @@
         }
 
         // --- TRANS ---
-        const trans = {
-            en: { get_signal: "GET SIGNAL", exit: "EXIT", aviator: "AVIATOR", penalty: "PENALTY" },
-            ru: { get_signal: "ПОЛУЧИТЬ СИГНАЛ", exit: "МЕНЮ", aviator: "АВИАТОР", penalty: "ПЕНАЛЬТИ" },
-            es: { get_signal: "OBTENER SEÑAL", exit: "SALIR", aviator: "AVIATOR", penalty: "PENALTI" }
-        };
-        let curLang = 'en';
         function changeLang(l) {
             curLang = l;
+            document.body.className = "lang-" + l;
+            
+            const cont = document.getElementById('lang-cont');
+            if(l === 'ar') cont.classList.add('ar-pos'); else cont.classList.remove('ar-pos');
+
             document.querySelectorAll('[data-tr]').forEach(el => {
                 const k = el.getAttribute('data-tr');
                 if(trans[l][k]) el.innerText = trans[l][k];
             });
         }
 
+        // --- LIVE WINS LOGIC ---
+        function updateLiveWins() {
+            const ticker = document.getElementById('win-ticker');
+            const nList = namesData[curLang];
+            const name = nList[Math.floor(Math.random() * nList.length)];
+            const amt = Math.floor(Math.random() * 5000) + 500;
+            const games = ["Aviator", "Mines", "Penalty"];
+            const game = games[Math.floor(Math.random()*games.length)];
+            
+            // Build String
+            let txt = `<span class="win-name">${name}</span> just won <span class="win-amt">${amt}${currData[curLang]}</span> in ${game}`;
+            if(curLang === 'ar') txt = `<span class="win-name">${name}</span> فاز بـ <span class="win-amt">${amt}${currData[curLang]}</span> في ${game}`;
+            
+            ticker.innerHTML = txt;
+            
+            // Reset Animation trigger
+            ticker.style.animation = 'none';
+            ticker.offsetHeight; /* trigger reflow */
+            ticker.style.animation = 'slideLeft 10s linear infinite';
+        }
+
         // --- GAME LOGIC ---
         let activeGame = null;
         let minesSize = 3;
+        let minesCount = 3;
+        let minesMode = 'safe';
 
         function openGame(g) {
             activeGame = g;
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-game').classList.add('active');
-            
-            // Hide all views
             ['aviator', 'penalty', 'mines', 'chicken'].forEach(id => document.getElementById(id+'-view').style.display = 'none');
             
             document.getElementById('signal-btn').disabled = false;
-            document.getElementById('loader-text').innerText = "";
-            document.getElementById('risk-block').style.opacity = '0';
-
-            // Show selected view
+            document.getElementById('signal-btn').innerText = trans[curLang].get_signal;
             document.getElementById(g+'-view').style.display = 'flex';
 
-            // Reset States
+            // Reset
             if(g === 'aviator') { 
-                document.getElementById('coef-text').innerText="0.00x";
                 document.getElementById('coef-text').classList.remove('visible');
                 document.getElementById('aviator-plane').classList.remove('taking-off');
-                document.getElementById('aviator-graph').classList.remove('active');
             }
-            if(g === 'penalty') document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning'));
+            if(g === 'penalty') {
+                document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner'));
+                // Fill random history
+                const h = document.getElementById('pen-history'); h.innerHTML = "";
+                for(let i=0;i<5;i++) {
+                    const d = document.createElement('div'); d.className = Math.random()>0.3?'h-dot win':'h-dot lose';
+                    h.appendChild(d);
+                }
+            }
             if(g === 'mines') setMinesGrid(3);
             if(g === 'chicken') updateChickenGrid();
         }
@@ -493,43 +562,113 @@
             document.getElementById('screen-menu').classList.add('active');
         }
 
-        function getSignal() {
-            const btn = document.getElementById('signal-btn');
-            const loader = document.getElementById('loader-text');
-
-            if(activeGame === 'mines') {
-                const mInput = parseInt(document.getElementById('mines-input').value);
-                if(isNaN(mInput) || mInput < 1) { alert("ERROR: Enter at least 1 mine"); return; }
-            }
-
-            btn.disabled = true; loader.innerText = "ANALYZING...";
-            document.getElementById('risk-block').style.opacity = '0';
+        // --- MINES FUNCTIONS ---
+        function setMinesGrid(s) {
+            minesSize = s;
+            const b = document.getElementById('mines-board');
+            b.style.gridTemplateColumns = `repeat(${s}, 1fr)`; b.innerHTML = "";
+            document.getElementById('btn-3').classList.remove('active');
+            document.getElementById('btn-5').classList.remove('active');
+            document.getElementById(`btn-${s}`).classList.add('active');
             
-            // Reset visuals before signal
-            if(activeGame === 'aviator') {
-                 const plane = document.getElementById('aviator-plane');
-                 plane.classList.remove('taking-off');
-                 void plane.offsetWidth; // Trigger reflow
+            for(let i=0; i<s*s; i++) {
+                const d = document.createElement('div'); d.className='mine-tile'; d.id='mt-'+i; 
+                d.innerHTML='<img src="/img/mines_star.png">'; 
+                b.appendChild(d);
             }
-            if(activeGame === 'penalty') document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner'));
-            if(activeGame === 'mines') document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
-            if(activeGame === 'chicken') resetChicken();
-
-            // Run Animations
-            if(activeGame === 'aviator') runAviatorAnimation(loader, btn);
-            else if(activeGame === 'penalty') runPenaltyAnimation(loader, btn);
-            else setTimeout(() => {
-                if(activeGame === 'mines') runMines();
-                if(activeGame === 'chicken') runChicken();
-                finishSignal(loader, btn);
-            }, 1500);
+            minesCount = 3; document.getElementById('mines-val').innerText = minesCount;
+        }
+        function stepMines(d) {
+            const max = (minesSize * minesSize) - 1;
+            minesCount += d;
+            if(minesCount < 1) minesCount = 1;
+            if(minesCount > max) minesCount = max;
+            document.getElementById('mines-val').innerText = minesCount;
+        }
+        function setMinesMode(m) {
+            minesMode = m;
+            const el = document.getElementById('mines-mode');
+            const wrap = document.getElementById('mines-wrap');
+            el.setAttribute('data-mode', m);
+            document.querySelectorAll('.mode-opt').forEach(o => o.classList.remove('active'));
+            if(m==='safe') { el.children[1].classList.add('active'); wrap.classList.remove('risk-mode'); }
+            else { el.children[2].classList.add('active'); wrap.classList.add('risk-mode'); }
         }
 
-        function finishSignal(loader, btn) {
-            loader.innerText = "";
-            const acc = (Math.random()*(99-92)+92).toFixed(1);
-            document.getElementById('acc-val').innerText = acc + "%";
-            document.getElementById('risk-block').style.opacity = '1';
+        // --- SIGNAL LOGIC (SMART ANALYSIS) ---
+        function getSignal() {
+            const btn = document.getElementById('signal-btn');
+            btn.disabled = true;
+
+            // WARMING SEQUENCE
+            let steps = ["CONNECTING...", "ANALYZING ID...", "PREDICTING..."];
+            if(curLang === 'ar') steps = ["جار الاتصال...", "تحليل...", "تنبؤ..."];
+            
+            let stepI = 0;
+            btn.innerText = steps[0];
+            
+            const stepInt = setInterval(() => {
+                stepI++;
+                if(stepI < steps.length) {
+                    btn.innerText = steps[stepI];
+                } else {
+                    clearInterval(stepInt);
+                    showResult(btn);
+                }
+            }, 600);
+        }
+
+        function showResult(btn) {
+            if(activeGame === 'aviator') {
+                 const plane = document.getElementById('aviator-plane');
+                 plane.classList.remove('taking-off'); void plane.offsetWidth;
+                 plane.classList.add('taking-off');
+                 document.getElementById('aviator-graph').classList.add('active');
+                 const textEl = document.getElementById('coef-text');
+                 textEl.classList.add('visible');
+                 
+                 let val = 1.00;
+                 const int = setInterval(() => { val += 0.05; textEl.innerText = val.toFixed(2) + "x"; }, 50);
+                 setTimeout(() => { clearInterval(int); textEl.innerText = (Math.random()*(5.0-1.2)+1.2).toFixed(2) + "x"; cooldown(btn); }, 2500);
+            }
+            else if(activeGame === 'penalty') {
+                document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner'));
+                setTimeout(() => {
+                    const r = Math.floor(Math.random()*5)+1;
+                    document.getElementById('pz'+r).classList.add('winner');
+                    cooldown(btn);
+                }, 500);
+            }
+            else if(activeGame === 'mines') {
+                document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
+                const total = minesSize * minesSize;
+                let toReveal = 0;
+                
+                if(minesMode === 'safe') toReveal = Math.floor(Math.random()*2)+3; // 3-4
+                else toReveal = total - minesCount; // All safe cells
+
+                let set = new Set();
+                while(set.size < toReveal) { set.add(Math.floor(Math.random() * total)); }
+                let arr = Array.from(set); let i=0;
+                
+                let int = setInterval(() => { 
+                    if(i>=arr.length) { clearInterval(int); cooldown(btn); } 
+                    else { document.getElementById('mt-'+arr[i]).classList.add('reveal'); i++; } 
+                }, 100); // Faster reveal
+            }
+            else if(activeGame === 'chicken') {
+                document.querySelectorAll('.chicken-step').forEach(el => { el.classList.remove('safe'); el.style.transform = "scale(1)"; });
+                let limit = document.getElementById('chicken-diff').value === 'easy' ? 10 : 6;
+                let path = Math.floor(Math.random() * (limit - 2) + 2);
+                let i=1; 
+                let int = setInterval(() => { 
+                    if(i > path) { clearInterval(int); cooldown(btn); }
+                    else { document.getElementById('ch'+i).classList.add('safe'); i++; } 
+                }, 200);
+            }
+        }
+
+        function cooldown(btn) {
             let cd = 4;
             const t = setInterval(() => {
                 btn.innerText = `WAIT ${cd}s`; cd--;
@@ -537,97 +676,14 @@
             }, 1000);
         }
 
-        // --- ANIMATIONS ---
-        function runAviatorAnimation(loader, btn) {
-            document.getElementById('aviator-plane').classList.add('taking-off');
-            document.getElementById('aviator-graph').classList.add('active');
-            const textEl = document.getElementById('coef-text');
-            textEl.classList.add('visible');
-            
-            let val = 1.00;
-            const int = setInterval(() => {
-                val += 0.05;
-                textEl.innerText = val.toFixed(2) + "x";
-            }, 50);
-
-            setTimeout(() => {
-                clearInterval(int);
-                const finalVal = (Math.random()*(5.0-1.2)+1.2).toFixed(2);
-                textEl.innerText = finalVal + "x";
-                loader.innerText = "";
-                finishSignal(loader, btn);
-            }, 2500); 
-        }
-
-        function runPenaltyAnimation(loader, btn) {
-            const targets = document.querySelectorAll('.target-zone');
-            let steps = 0;
-            const int = setInterval(() => {
-                targets.forEach(el=>el.classList.remove('scanning')); 
-                targets[Math.floor(Math.random()*5)].classList.add('scanning');
-                steps++;
-                if(steps>15) {
-                    clearInterval(int); targets.forEach(el=>el.classList.remove('scanning'));
-                    document.getElementById('pz'+(Math.floor(Math.random()*5)+1)).classList.add('winner');
-                    finishSignal(loader, btn);
-                }
-            }, 150);
-        }
-
-        function setMinesGrid(s) {
-            minesSize = s; 
-            const b = document.getElementById('mines-board');
-            b.style.gridTemplateColumns = `repeat(${s}, 1fr)`; b.innerHTML = "";
-            [3,5,7,9].forEach(n => document.getElementById(`btn-${n}`).classList.remove('active'));
-            document.getElementById(`btn-${s}`).classList.add('active');
-            for(let i=0; i<s*s; i++) {
-                const d = document.createElement('div'); d.className='mine-tile'; d.id='mt-'+i; d.innerHTML='<img src="/img/mines_star.png">'; b.appendChild(d);
-            }
-        }
-
-        function runMines() {
-            const mInput = parseInt(document.getElementById('mines-input').value);
-            const total = minesSize * minesSize;
-            const safe = total - mInput;
-            let toReveal = Math.max(1, Math.min(safe, Math.floor(Math.random() * 4) + 2)); 
-            
-            let set = new Set();
-            while(set.size < toReveal) { set.add(Math.floor(Math.random() * total)); }
-            let arr = Array.from(set); let i=0;
-            let int = setInterval(() => { 
-                if(i>=arr.length) clearInterval(int); 
-                else { document.getElementById('mt-'+arr[i]).classList.add('reveal'); i++; } 
-            }, 400);
-        }
-
         function updateChickenGrid() {
             const val = document.getElementById('chicken-diff').value;
             const grid = document.getElementById('chicken-grid');
             grid.innerHTML = "";
-            let count = 15;
-            if(val === 'easy') count = 25; if(val === 'medium') count = 15; if(val === 'hard') count = 10;
-            
+            let count = 15; if(val === 'easy') count = 25; if(val === 'hard') count = 10;
             for(let i=1; i<=count; i++) {
                 const step = document.createElement('div'); step.className = 'chicken-step'; step.id = 'ch' + i; step.innerText = i; grid.appendChild(step);
             }
-        }
-        function resetChicken() { document.querySelectorAll('.chicken-step').forEach(el => { el.classList.remove('safe'); el.style.transform = "scale(1)"; }); }
-        function runChicken() {
-            const diff = document.getElementById('chicken-diff').value;
-            let limit = 5; 
-            if(diff === 'easy') limit = 10;
-            if(diff === 'medium') limit = 7;
-            
-            let pathLen = Math.floor(Math.random() * (limit - 2) + 2);
-            let i=1; 
-            let int = setInterval(() => { 
-                if(i > pathLen) clearInterval(int); 
-                else { 
-                    const el = document.getElementById('ch'+i); 
-                    if(el) el.classList.add('safe'); 
-                    i++; 
-                } 
-            }, 300);
         }
 
         window.Telegram.WebApp.ready();
