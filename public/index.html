@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v13.0</title>
+    <title>AI Signal Bot Ultimate v14.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     
@@ -190,7 +190,6 @@
         .aviator-plane-img {
             position: absolute; width: 60px; height: auto; z-index: 5; opacity: 0;
             filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
-            /* Path goes way off screen (X=800) */
             offset-path: path("M20,200 Q300,100 800,-100"); 
             offset-rotate: auto;
         }
@@ -206,7 +205,7 @@
         }
         .coef-text.visible { opacity: 1; }
 
-        /* --- PENALTY (UPDATED COORDINATES) --- */
+        /* --- PENALTY (FINAL FIX) --- */
         .penalty-container {
             position: relative; width: 300px; height: 190px; margin-bottom: 10px;
             background-image: url('img/penalty_bg.png'); background-size: cover; background-position: center;
@@ -215,14 +214,12 @@
         
         .target-zone { position: absolute; width: 45px; height: 45px; border-radius: 50%; transition: 0.1s; display: flex; justify-content: center; align-items: center; }
         
-        /* Top Row */
         .z1 { top: 20px; left: 20px; } 
         .z2 { top: 20px; right: 20px; } 
         .z3 { top: 20px; left: 50%; transform: translateX(-50%); } 
-        
-        /* Bottom Row - LOWER and WIDER */
-        .z4 { bottom: 22%; left: 10px; } 
-        .z5 { bottom: 22%; right: 10px; }
+        /* WIDER AND HIGHER */
+        .z4 { bottom: 25%; left: 5px; } 
+        .z5 { bottom: 25%; right: 5px; }
         
         .target-effect {
             width: 100%; height: 100%; border-radius: 50%;
@@ -237,64 +234,99 @@
 
         /* --- MINES (FIXED) --- */
         .mines-wrapper { width: 90%; max-width: 320px; margin-bottom: 20px; }
-        
-        .mines-mode-switch {
-            display: flex; background: #222; border-radius: 20px; padding: 4px; margin-bottom: 15px; border: 1px solid #444; position: relative;
-        }
+        .mines-mode-switch { display: flex; background: #222; border-radius: 20px; padding: 4px; margin-bottom: 15px; border: 1px solid #444; position: relative; }
         .mode-opt { flex: 1; text-align: center; padding: 8px; font-family: 'Orbitron'; font-size: 11px; z-index: 2; cursor: pointer; color: #888; transition: 0.3s; }
         .mode-opt.active { color: #000; font-weight: bold; text-shadow: none; }
-        .mode-bg { 
-            position: absolute; top: 4px; left: 4px; width: 50%; height: calc(100% - 8px); 
-            background: var(--brand-green);
-            border-radius: 16px; transition: 0.3s; z-index: 1; box-shadow: 0 0 10px var(--brand-green);
-        }
+        .mode-bg { position: absolute; top: 4px; left: 4px; width: 50%; height: calc(100% - 8px); background: var(--brand-green); border-radius: 16px; transition: 0.3s; z-index: 1; box-shadow: 0 0 10px var(--brand-green); }
         .mines-mode-switch[data-mode="risk"] .mode-bg { left: 50%; background: var(--brand-red); width: calc(50% - 4px); box-shadow: 0 0 10px var(--brand-red); }
-
         .mines-grid-select { display: flex; gap: 10px; margin-bottom: 15px; }
-        .mines-btn-grid { 
-            flex: 1; background: #333; border: 1px solid #555; color: #fff; padding: 12px 0; border-radius: 8px; 
-            font-family: 'Orbitron'; font-size: 12px; cursor: pointer; text-align: center; transition: 0.2s; 
-        }
+        .mines-btn-grid { flex: 1; background: #333; border: 1px solid #555; color: #fff; padding: 12px 0; border-radius: 8px; font-family: 'Orbitron'; font-size: 12px; cursor: pointer; text-align: center; transition: 0.2s; }
         .mines-btn-grid.active { background: var(--brand-green); color: #000; border-color: var(--brand-green); font-weight: 900; box-shadow: 0 0 15px rgba(0, 255, 65, 0.3); }
-
         .mines-stepper { display: flex; align-items: center; justify-content: space-between; background: #222; border-radius: 12px; border: 1px solid #444; padding: 5px; margin-bottom: 15px; }
-        .step-btn {
-            width: 45px; height: 45px; background: #333; border: none; border-radius: 8px; color: #fff; font-size: 20px; cursor: pointer; transition: 0.2s;
-        }
+        .step-btn { width: 45px; height: 45px; background: #333; border: none; border-radius: 8px; color: #fff; font-size: 20px; cursor: pointer; transition: 0.2s; }
         .step-btn:active { background: var(--brand-green); color: #000; }
         .mines-count-display { font-family: 'Orbitron'; font-size: 20px; font-weight: bold; color: #fff; }
         .mines-label-sm { font-size: 10px; color: #888; font-family: 'Poppins'; }
-
         .mines-board { background: var(--mines-bg); padding: 10px; border-radius: 10px; display: grid; gap: 6px; border: 2px solid #3d3d5c; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); transition: all 0.3s; }
         .mine-tile { background-color: var(--mines-tile); border-radius: 6px; aspect-ratio: 1; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 0 rgba(0,0,0,0.3); }
-        
-        .mine-tile img { 
-            width: 70%; height: 70%; object-fit: contain; 
-            display: none; 
-            position: relative; z-index: 20; 
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-        }
+        .mine-tile img { width: 70%; height: 70%; object-fit: contain; display: none; position: relative; z-index: 20; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
         .mine-tile.reveal { background-color: #004d13; box-shadow: inset 0 0 10px #00ff41; }
         .mines-wrapper.risk-mode .mine-tile.reveal { background-color: #4a1a25; box-shadow: inset 0 0 10px #ff334b; }
         .mine-tile.reveal img { display: block; }
         
-        /* --- CHICKEN --- */
-        .chicken-wrapper { width: 90%; max-width: 320px; margin-bottom: 20px; flex-direction: column; align-items: center; }
-        .chicken-road-grid { 
-            width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 15px; 
-            background: #2b2b2b; border-radius: 12px; border: 2px dashed #444; box-shadow: inset 0 0 20px #000; box-sizing: border-box;
+        /* --- CHICKEN ROAD (REDESIGN v14) --- */
+        .chicken-wrapper { width: 95%; max-width: 360px; margin-bottom: 20px; flex-direction: column; align-items: center; position: relative; }
+        
+        /* HORIZONTAL SCROLL CONTAINER */
+        .chicken-road-horizontal {
+            width: 100%;
+            height: 180px;
+            background: #2b2b2b;
+            border-radius: 12px;
+            border: 2px dashed #444;
+            box-shadow: inset 0 0 20px #000;
+            overflow-x: auto; /* ENABLE HORIZONTAL SCROLL */
+            overflow-y: hidden;
+            white-space: nowrap; /* KEEP ITEMS IN LINE */
+            padding: 20px 10px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            /* Hide scrollbar for cleaner look */
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
         }
-        .chicken-step { 
-            width: 100%; aspect-ratio: 1; background: #1a1a1a; border-radius: 50%; display: flex; justify-content: center; align-items: center; 
-            border: 2px solid #333; position: relative; transition: 0.3s; box-shadow: 0 4px 5px rgba(0,0,0,0.5); 
-            font-family: 'Orbitron'; font-size: 10px; color: #444; 
+        .chicken-road-horizontal::-webkit-scrollbar { display: none; } /* Chrome, Safari, Opera */
+
+        .road-step-wrapper {
+            display: inline-flex;
+            align-items: center;
+            position: relative;
         }
-        .chicken-step.safe { 
-            border-color: #00ff41; background: radial-gradient(circle, #004d13 0%, #002209 100%); 
-            box-shadow: 0 0 10px #00ff41; transform: scale(1.05); color: transparent; 
+
+        .road-step {
+            width: 60px; height: 60px;
+            background: #1a1a1a; border: 3px solid #333; border-radius: 50%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: relative; transition: 0.3s;
+            box-shadow: 0 4px 5px rgba(0,0,0,0.5);
+            flex-shrink: 0; /* Prevent shrinking */
         }
+
+        .step-coef { font-family: 'Orbitron'; font-size: 11px; color: #fff; font-weight: bold; }
+        .step-label { font-family: 'Poppins'; font-size: 8px; color: #666; }
+
+        /* SAFE STATE */
+        .road-step.safe {
+            border-color: var(--brand-green);
+            background: radial-gradient(circle, #004d13 0%, #002209 100%);
+            box-shadow: 0 0 15px var(--brand-green);
+            transform: scale(1.1); z-index: 2;
+        }
+        .road-step.safe .step-coef { text-shadow: 0 0 5px var(--brand-green); }
+
+        /* CONNECTOR LINE */
+        .road-connector {
+            width: 30px; height: 4px;
+            background: repeating-linear-gradient(90deg, #444, #444 5px, transparent 5px, transparent 10px);
+            flex-shrink: 0;
+        }
+        .road-step.safe + .road-connector {
+             background: repeating-linear-gradient(90deg, var(--brand-green), var(--brand-green) 5px, transparent 5px, transparent 10px);
+             box-shadow: 0 0 5px var(--brand-green);
+        }
+
+        /* CASHOUT LABEL */
+        .cashout-label {
+            position: absolute; top: -35px; left: 50%; transform: translateX(-50%);
+            background: var(--brand-green); color: #000; font-family: 'Orbitron'; font-weight: 900;
+            font-size: 12px; padding: 4px 10px; border-radius: 12px;
+            box-shadow: 0 0 15px var(--brand-green);
+            opacity: 0; transition: 0.3s; pointer-events: none;
+        }
+        .road-step.safe.final .cashout-label { opacity: 1; top: -45px; }
+
 
         /* --- LIVE WINS LIST --- */
         .live-wins-list {
@@ -312,10 +344,8 @@
         }
         .win-row.out { animation: fadeOut 0.5s forwards; }
         .win-row.big-win { border-left: 2px solid #ff9d00; background: rgba(255, 157, 0, 0.2); }
-        
         @keyframes slideUp { 100% { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOut { 100% { opacity: 0; transform: translateY(-10px); } }
-        
         .win-name { color: #fff; font-weight: bold; font-family: 'Orbitron'; letter-spacing: 1px; }
         .win-amt { color: var(--brand-green); text-shadow: 0 0 5px rgba(0,255,65,0.5); }
         .win-game { font-size: 9px; color: #888; margin-right: auto; margin-left: 10px; }
@@ -346,7 +376,7 @@
         <div id="screen-menu" class="screen">
             <div class="main-logo">
                 <div class="logo-title">AI PREDICTOR</div>
-                <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL v13.0</div>
+                <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL v14.0</div>
                 <div class="brand-sub">powered by Omar</div>
             </div>
             <div class="menu-grid">
@@ -441,14 +471,16 @@
                     <img src="img/menu_chicken.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
                 </div>
                 <div class="chicken-wrapper">
-                    <div style="width:100%; text-align:right; margin-bottom:5px;">
-                        <select id="chicken-diff" onchange="updateChickenGrid()">
+                    <div style="width:100%; text-align:right; margin-bottom:10px;">
+                        <select id="chicken-diff" onchange="renderChickenRoad()" style="padding: 8px 15px;">
                             <option value="easy">EASY</option>
                             <option value="medium" selected>MEDIUM</option>
                             <option value="hard">HARD</option>
+                            <option value="hardcore">HARDCORE</option>
                         </select>
                     </div>
-                    <div class="chicken-road-grid" id="chicken-grid"></div>
+                    <div class="chicken-road-horizontal" id="chicken-road-container">
+                        </div>
                 </div>
             </div>
 
@@ -477,6 +509,14 @@
         const currData = { en: "$", es: "€", ar: "EGP" };
         let curLang = 'en';
 
+        // --- CHICKEN ROAD DATA (PROVIDED) ---
+        const CHICKEN_DATA = {
+            easy: ["1.03x", "1.07x", "1.12x", "1.17x", "1.23x", "1.29x", "1.36x", "1.44x", "1.53x", "1.63x", "1.75x", "1.88x", "2.04x", "2.22x", "2.45x", "2.72x", "3.06x", "3.50x", "4.08x", "4.90x", "6.13x", "6.61x", "9.81x", "19.44x"],
+            medium: ["1.12x", "1.28x", "1.47x", "1.70x", "1.98x", "2.33x", "2.76x", "3.32x", "4.03x", "4.96x", "6.20x", "6.91x", "8.90x", "11.76x", "15.99x", "22.61x", "33.58x", "53.20x", "92.17x", "182.51x", "451.71x", "1778.80x"],
+            hard: ["1.23x", "1.55x", "1.98x", "2.56x", "3.36x", "4.49x", "5.49x", "7.53x", "10.56x", "15.21x", "22.59x", "34.79x", "55.97x", "94.99x", "172.42x", "341.40x", "760.46x", "2007.63x", "6956.47x", "41321.43x"],
+            hardcore: ["1.63x", "2.80x", "4.95x", "9.08x", "15.21x", "30.12x", "62.96x", "140.24x", "337.19x", "890.19x", "2643.89x", "9161.08x", "39301.05x", "233448.29x", "254112.51x"]
+        };
+
         // --- BOOT ---
         const termLines = ["INITIALIZING...", "CHECKING RESOURCES...", "ESTABLISHING SECURE TUNNEL...", "READY."];
         let lineIdx = 0;
@@ -485,15 +525,13 @@
             const savedId = localStorage.getItem('user_id');
             if(savedId) document.getElementById('user-id-input').value = savedId;
             
-            // Random User Count loop
             setInterval(() => {
                 let c = parseInt(document.getElementById('online-users').innerText);
                 c += Math.floor(Math.random() * 5) - 2;
                 document.getElementById('online-users').innerText = c;
             }, 3000);
 
-            // Live Wins Loop
-            addLiveWinItem(); // Start with one
+            addLiveWinItem(); 
             setInterval(addLiveWinItem, 3500);
 
             const term = document.getElementById('term-text');
@@ -552,20 +590,15 @@
             });
         }
 
-        // --- LIVE WINS LIST LOGIC (FIXED) ---
+        // --- LIVE WINS LIST LOGIC ---
         function addLiveWinItem() {
             const list = document.getElementById('live-list');
-            
-            // ID GENERATION
             const prefixes = ['155', '156', '157', '158', '159', '160'];
             const p = prefixes[Math.floor(Math.random()*prefixes.length)];
             const id = `${p}****${Math.floor(Math.random()*90)+10}`;
 
-            // AMOUNT GENERATION ($10 - $300 normally)
             let amt = Math.floor(Math.random() * 290) + 10;
             let isBigWin = false;
-
-            // 5% Chance for BIG WIN
             if(Math.random() > 0.95) {
                 amt = Math.floor(Math.random() * 2000) + 1000;
                 isBigWin = true;
@@ -579,12 +612,9 @@
             if(isBigWin) div.classList.add('big-win');
 
             div.innerHTML = `<div><span class="win-name">${id}</span> <span class="win-game">${game}</span></div> <div class="win-amt">+${amt}${currData[curLang]}</div>`;
-            
             list.prepend(div);
-            
             if(list.children.length > 5) {
-                const last = list.lastElementChild;
-                last.classList.add('out');
+                const last = list.lastElementChild; last.classList.add('out');
                 setTimeout(() => last.remove(), 500);
             }
         }
@@ -613,10 +643,9 @@
             }
             if(g === 'penalty') {
                 document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning'));
-                // History dots removed
             }
             if(g === 'mines') setMinesGrid(3);
-            if(g === 'chicken') updateChickenGrid();
+            if(g === 'chicken') renderChickenRoad();
         }
 
         function backMenu() {
@@ -632,11 +661,9 @@
             document.getElementById('btn-3').classList.remove('active');
             document.getElementById('btn-5').classList.remove('active');
             document.getElementById(`btn-${s}`).classList.add('active');
-            
             for(let i=0; i<s*s; i++) {
                 const d = document.createElement('div'); d.className='mine-tile'; d.id='mt-'+i; 
-                d.innerHTML='<img src="img/mines_star.png">'; 
-                b.appendChild(d);
+                d.innerHTML='<img src="img/mines_star.png">'; b.appendChild(d);
             }
             minesCount = 3; document.getElementById('mines-val').innerText = minesCount;
         }
@@ -657,6 +684,35 @@
             else { el.children[2].classList.add('active'); wrap.classList.add('risk-mode'); }
         }
 
+        // --- CHICKEN ROAD RENDERER ---
+        function renderChickenRoad() {
+            const diff = document.getElementById('chicken-diff').value;
+            const data = CHICKEN_DATA[diff];
+            const container = document.getElementById('chicken-road-container');
+            container.innerHTML = ""; // Clear
+            container.scrollLeft = 0; // Reset scroll
+
+            data.forEach((coef, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'road-step-wrapper';
+                
+                const step = document.createElement('div');
+                step.className = 'road-step';
+                step.id = 'road-step-' + index;
+                step.innerHTML = `<span class="step-coef">${coef}</span><span class="step-label">STEP ${index+1}</span><div class="cashout-label">CASHOUT</div>`;
+                
+                wrapper.appendChild(step);
+
+                // Add connector if not last
+                if(index < data.length - 1) {
+                    const connector = document.createElement('div');
+                    connector.className = 'road-connector';
+                    wrapper.appendChild(connector);
+                }
+                container.appendChild(wrapper);
+            });
+        }
+
         // --- SIGNAL LOGIC ---
         function getSignal() {
             const btn = document.getElementById('signal-btn');
@@ -666,13 +722,9 @@
             if(activeGame === 'aviator') {
                  const plane = document.getElementById('aviator-plane');
                  const graph = document.getElementById('aviator-graph');
-                 
-                 // Remove classes to reset
                  plane.classList.remove('taking-off');
                  graph.classList.remove('active');
                  document.getElementById('coef-text').classList.remove('visible');
-                 
-                 // FORCE REFLOW (Magic trigger)
                  void plane.offsetWidth; 
             }
             if(activeGame === 'penalty') {
@@ -682,7 +734,8 @@
                  document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
             }
             if(activeGame === 'chicken') {
-                 document.querySelectorAll('.chicken-step').forEach(el => { el.classList.remove('safe'); el.style.transform = "scale(1)"; });
+                document.querySelectorAll('.road-step').forEach(el => el.classList.remove('safe', 'final'));
+                document.getElementById('chicken-road-container').scrollLeft = 0;
             }
 
             // 2. WARMING SEQUENCE
@@ -749,27 +802,41 @@
             else if(activeGame === 'mines') {
                 const total = minesSize * minesSize;
                 let toReveal = 0;
-                
                 if(minesMode === 'safe') toReveal = Math.floor(Math.random()*2)+3; // 3-4
                 else toReveal = total - minesCount; // All safe cells
-
                 let set = new Set();
                 while(set.size < toReveal) { set.add(Math.floor(Math.random() * total)); }
                 let arr = Array.from(set); let i=0;
-                
                 let int = setInterval(() => { 
                     if(i>=arr.length) { clearInterval(int); cooldown(btn); } 
                     else { document.getElementById('mt-'+arr[i]).classList.add('reveal'); i++; } 
                 }, 100);
             }
             else if(activeGame === 'chicken') {
-                let limit = document.getElementById('chicken-diff').value === 'easy' ? 10 : 6;
-                let path = Math.floor(Math.random() * (limit - 2) + 2);
-                let i=1; 
-                let int = setInterval(() => { 
-                    if(i > path) { clearInterval(int); cooldown(btn); }
-                    else { document.getElementById('ch'+i).classList.add('safe'); i++; } 
-                }, 200);
+                const diff = document.getElementById('chicken-diff').value;
+                const totalSteps = CHICKEN_DATA[diff].length;
+                const container = document.getElementById('chicken-road-container');
+
+                // Smart path logic
+                let safeSteps = Math.floor(Math.random() * 4) + 3; // Default 3-6
+                if(Math.random() > 0.8) safeSteps = Math.floor(Math.random() * 5) + 8; // Lucky 8-12
+                if(safeSteps > totalSteps) safeSteps = totalSteps;
+
+                let i = 0;
+                const int = setInterval(() => {
+                    if(i >= safeSteps) {
+                        clearInterval(int);
+                        if(i > 0) document.getElementById('road-step-' + (i-1)).classList.add('final'); // Mark last as cashout
+                        cooldown(btn);
+                    } else {
+                        const stepEl = document.getElementById('road-step-' + i);
+                        stepEl.classList.add('safe');
+                        // Auto-scroll to center the active step
+                        const scrollPos = stepEl.offsetLeft - container.clientWidth / 2 + stepEl.clientWidth / 2;
+                        container.scrollTo({ left: scrollPos, behavior: 'smooth' });
+                        i++;
+                    }
+                }, 600);
             }
         }
 
@@ -779,16 +846,6 @@
                 btn.innerText = `WAIT ${cd}s`; cd--;
                 if(cd < 0) { clearInterval(t); btn.innerText = trans[curLang].get_signal; btn.disabled = false; }
             }, 1000);
-        }
-
-        function updateChickenGrid() {
-            const val = document.getElementById('chicken-diff').value;
-            const grid = document.getElementById('chicken-grid');
-            grid.innerHTML = "";
-            let count = 15; if(val === 'easy') count = 25; if(val === 'hard') count = 10;
-            for(let i=1; i<=count; i++) {
-                const step = document.createElement('div'); step.className = 'chicken-step'; step.id = 'ch' + i; step.innerText = i; grid.appendChild(step);
-            }
         }
 
         window.Telegram.WebApp.ready();
