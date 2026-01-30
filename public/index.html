@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v9.0</title>
+    <title>AI Signal Bot Ultimate v10.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     
@@ -14,11 +14,10 @@
             --text-color: #ffffff;
             --brand-green: #00ff41;
             --brand-red: #ff334b;
-            --brand-orange: #ff9d00;
-            --glass-panel: rgba(20, 20, 30, 0.6);
+            --glass-panel: rgba(20, 20, 30, 0.7);
             --mines-bg: #272749;
             --mines-tile: #2b2e55;
-            --mines-active: #094e67;
+            --mines-active: #004d13; /* Greenish base for reveal */
         }
 
         body {
@@ -26,15 +25,29 @@
             color: var(--text-color);
             font-family: 'Poppins', sans-serif;
             margin: 0; padding: 0; overflow: hidden; user-select: none; height: 100vh;
+            /* Center on PC */
+            display: flex; justify-content: center; align-items: flex-start;
+        }
+
+        /* --- MOBILE WRAPPER FOR PC --- */
+        #app-wrapper {
+            width: 100%;
+            max-width: 450px; /* Limits width on PC */
+            height: 100%;
+            position: relative;
+            background: transparent;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
 
         /* ARABIC FONT SUPPORT */
         body.lang-ar { font-family: 'Cairo', sans-serif; direction: rtl; }
-        body.lang-ar .hud-bar { direction: ltr; } /* Keep HUD LTR for aesthetics */
+        body.lang-ar .hud-bar { direction: ltr; }
 
         /* --- PRELOADER --- */
         #preloader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
@@ -45,14 +58,14 @@
 
         /* --- BACKGROUND --- */
         .cyber-wrapper {
-            position: absolute; width: 100%; height: 100%; overflow: hidden;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(to bottom, #020005 0%, #10002b 100%);
             z-index: -2;
         }
 
         /* --- HUD --- */
         .hud-bar {
-            position: absolute; top: 0; left: 0; width: 100%; height: 60px; padding: 0 20px; box-sizing: border-box;
+            position: absolute; top: 0; left: 0; width: 100%; height: 50px; padding: 0 20px; box-sizing: border-box;
             display: flex; align-items: center; justify-content: space-between;
             font-family: 'Orbitron', sans-serif; font-size: 10px; color: rgba(255, 255, 255, 0.5); z-index: 50; pointer-events: none;
         }
@@ -61,12 +74,12 @@
 
         /* --- ID MODAL --- */
         .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; flex-direction: column;
             backdrop-filter: blur(10px);
         }
         .id-box {
-            background: #111; border: 1px solid var(--accent-cyan); padding: 30px 20px; border-radius: 16px; width: 85%; max-width: 320px; text-align: center;
+            background: #111; border: 1px solid var(--accent-cyan); padding: 30px 20px; border-radius: 16px; width: 85%; max-width: 300px; text-align: center;
             box-shadow: 0 0 40px rgba(0, 242, 234, 0.15);
         }
         .id-input {
@@ -84,7 +97,7 @@
 
         /* --- LANG --- */
         .lang-container { position: absolute; top: 50px; right: 20px; z-index: 60; }
-        .lang-container.ar-pos { right: auto; left: 20px; } /* Flip for AR */
+        .lang-container.ar-pos { right: auto; left: 20px; }
         select {
             background: rgba(0, 0, 0, 0.6); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 5px 10px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 12px; outline: none;
@@ -94,8 +107,9 @@
         /* --- SCREENS --- */
         .screen { 
             display: none; flex-direction: column; align-items: center; justify-content: center; 
-            height: 100vh; width: 100%; position: relative; z-index: 10; 
-            padding-bottom: 60px; box-sizing: border-box;
+            height: 100%; width: 100%; position: relative; z-index: 10; 
+            padding-bottom: 120px; /* Space for Live Wins + Buttons */
+            box-sizing: border-box;
         }
         .screen.active { display: flex; }
 
@@ -105,7 +119,7 @@
             font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 26px; color: #fff;
             text-shadow: 0 0 20px rgba(58, 134, 255, 0.6); letter-spacing: 1px;
         }
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 90%; max-width: 380px; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 90%; max-width: 360px; }
         .game-card {
             background: var(--glass-panel); backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 15px;
@@ -119,8 +133,8 @@
         .game-img { width: 60px; height: 60px; margin-bottom: 8px; border-radius: 12px; object-fit: cover; }
         .game-title { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 12px; color: #fff; }
 
-        /* --- GAME UI COMMON --- */
-        .game-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; width: 100%; }
+        /* --- GAME UI --- */
+        .game-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; width: 100%; }
         .telegram-link {
             text-decoration: none; font-family: 'Orbitron', sans-serif; color: var(--accent-cyan);
             border: 1px solid rgba(0, 242, 234, 0.3); padding: 8px 16px; border-radius: 20px;
@@ -128,7 +142,7 @@
             backdrop-filter: blur(5px); margin-bottom: 10px; display: inline-block;
         }
         .game-logo-hero {
-            width: 100px; height: auto; display: block; 
+            width: 80px; height: auto; display: block; 
             filter: drop-shadow(0 0 15px rgba(255,255,255,0.1));
             animation: floatLogo 4s infinite ease-in-out; margin-bottom: 10px;
         }
@@ -136,21 +150,22 @@
 
         .btn-signal {
             background: linear-gradient(90deg, #d6002a 0%, #8a001a 100%);
-            border: none; width: 85%; max-width: 320px; padding: 18px; border-radius: 14px;
+            border: none; width: 85%; max-width: 320px; padding: 16px; border-radius: 14px;
             color: white; font-family: 'Orbitron', sans-serif; font-size: 16px; letter-spacing: 1px;
             cursor: pointer; box-shadow: 0 5px 20px rgba(214, 0, 42, 0.25);
             text-transform: uppercase; margin-top: 10px; border: 1px solid rgba(255,255,255,0.1);
             position: relative; overflow: hidden; transition: 0.3s;
+            z-index: 100;
         }
         .btn-signal:active { transform: scale(0.98); }
         .btn-signal:disabled { opacity: 0.8; cursor: not-allowed; background: #333; color: #888; box-shadow: none; }
         
-        .btn-back { margin-top: 15px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 25px; border-radius: 20px; font-size: 10px; font-family: 'Orbitron'; cursor: pointer; }
+        .btn-back { margin-top: 15px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 25px; border-radius: 20px; font-size: 10px; font-family: 'Orbitron'; cursor: pointer; z-index: 100; }
 
-        /* --- AVIATOR SEAMLESS --- */
+        /* --- AVIATOR FIXED --- */
         .aviator-wrapper {
-            position: relative; width: 100%; height: 220px; margin-bottom: 10px;
-            overflow: hidden; /* Only hide vertical overflow if needed, but we want seamless horizontal */
+            position: relative; width: 100%; height: 200px; margin-bottom: 10px;
+            overflow: hidden; /* Seamless effect handled by masking */
         }
         .aviator-graph-svg {
             position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; z-index: 2; opacity: 0; transition: opacity 0.5s;
@@ -161,21 +176,22 @@
         .aviator-plane-img {
             position: absolute; width: 60px; height: auto; z-index: 5; opacity: 0;
             filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
-            offset-path: path("M20,200 Q150,150 350,20"); /* Path goes off screen */
+            /* Flatter curve to fix nose up issue */
+            offset-path: path("M20,200 Q200,180 450,40"); 
             offset-rotate: auto;
         }
-        .aviator-plane-img.taking-off { opacity: 1; animation: flySeamless 2.5s forwards cubic-bezier(0.2, 0.8, 0.2, 1); }
-        @keyframes flySeamless { 0% { offset-distance: 0%; transform: scale(0.8); } 100% { offset-distance: 100%; transform: scale(1.2); } }
+        .aviator-plane-img.taking-off { opacity: 1; animation: flySeamless 3s forwards cubic-bezier(0.2, 0.8, 0.2, 1); }
+        @keyframes flySeamless { 0% { offset-distance: 0%; transform: scale(0.6); } 100% { offset-distance: 100%; transform: scale(1.1); } }
         .coef-text { 
             position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
-            font-family: 'Orbitron'; font-size: 52px; font-weight: 900; color: #fff; z-index: 10; 
+            font-family: 'Orbitron'; font-size: 48px; font-weight: 900; color: #fff; z-index: 10; 
             text-shadow: 0 0 20px rgba(0,0,0,1); opacity: 0; transition: opacity 0.3s;
         }
         .coef-text.visible { opacity: 1; }
 
-        /* --- PENALTY PRO --- */
+        /* --- PENALTY PRO (ANIMATED) --- */
         .penalty-container {
-            position: relative; width: 320px; height: 210px; margin-bottom: 10px;
+            position: relative; width: 300px; height: 190px; margin-bottom: 10px;
             background-image: url('/img/penalty_bg.png'); background-size: cover; background-position: center;
             border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
@@ -186,63 +202,62 @@
         .h-dot.win { background: #00ff41; box-shadow: 0 0 5px #00ff41; }
         .h-dot.lose { background: #ff334b; }
 
-        .target-zone { position: absolute; width: 45px; height: 45px; border-radius: 50%; transition: 0.2s; display: flex; justify-content: center; align-items: center; }
-        .z1 { top: 25px; left: 25px; } .z2 { top: 25px; right: 25px; } 
-        .z3 { top: 25px; left: 50%; transform: translateX(-50%); } 
-        .z4 { bottom: 25px; left: 25px; } .z5 { bottom: 25px; right: 25px; }
+        .target-zone { position: absolute; width: 45px; height: 45px; border-radius: 50%; transition: 0.1s; display: flex; justify-content: center; align-items: center; }
+        .z1 { top: 20px; left: 20px; } .z2 { top: 20px; right: 20px; } 
+        .z3 { top: 20px; left: 50%; transform: translateX(-50%); } 
+        .z4 { bottom: 20px; left: 20px; } .z5 { bottom: 20px; right: 20px; }
         
         .target-effect {
             width: 100%; height: 100%; border-radius: 50%;
-            border: 2px solid var(--accent-cyan);
+            border: 3px solid var(--accent-cyan);
             background: radial-gradient(circle, rgba(0,242,234,0.6) 0%, transparent 70%);
-            box-shadow: 0 0 15px var(--accent-cyan);
-            transform: scale(0); opacity: 0; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 20px var(--accent-cyan);
+            transform: scale(0); opacity: 0; transition: 0.3s;
         }
-        .target-zone.winner .target-effect { transform: scale(1.2); opacity: 1; }
+        .target-zone.scanning { border: 2px dashed rgba(255, 255, 255, 0.6); background: rgba(255,255,255,0.1); }
+        .target-zone.winner .target-effect { transform: scale(1.1); opacity: 1; animation: pulseTarget 1s infinite; }
+        @keyframes pulseTarget { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
-        /* --- MINES 2.0 --- */
-        .mines-wrapper { width: 90%; max-width: 340px; margin-bottom: 20px; }
+        /* --- MINES GREEN THEME --- */
+        .mines-wrapper { width: 90%; max-width: 320px; margin-bottom: 20px; }
         
-        /* New Mode Switch */
         .mines-mode-switch {
             display: flex; background: #222; border-radius: 20px; padding: 4px; margin-bottom: 15px; border: 1px solid #444; position: relative;
         }
         .mode-opt { flex: 1; text-align: center; padding: 8px; font-family: 'Orbitron'; font-size: 11px; z-index: 2; cursor: pointer; color: #888; transition: 0.3s; }
-        .mode-opt.active { color: #fff; text-shadow: 0 0 5px rgba(255,255,255,0.5); }
+        .mode-opt.active { color: #000; font-weight: bold; text-shadow: none; }
         .mode-bg { 
             position: absolute; top: 4px; left: 4px; width: 50%; height: calc(100% - 8px); 
-            background: var(--brand-green); border-radius: 16px; transition: 0.3s; z-index: 1; opacity: 0.8;
+            background: var(--brand-green); /* GREEN BY DEFAULT */
+            border-radius: 16px; transition: 0.3s; z-index: 1; box-shadow: 0 0 10px var(--brand-green);
         }
-        .mines-mode-switch[data-mode="risk"] .mode-bg { left: 50%; background: var(--brand-red); width: calc(50% - 4px); }
+        /* Risk Mode RED */
+        .mines-mode-switch[data-mode="risk"] .mode-bg { left: 50%; background: var(--brand-red); width: calc(50% - 4px); box-shadow: 0 0 10px var(--brand-red); }
 
-        /* Grid Select */
         .mines-grid-select { display: flex; gap: 10px; margin-bottom: 15px; }
         .mines-btn-grid { 
             flex: 1; background: #333; border: 1px solid #555; color: #fff; padding: 12px 0; border-radius: 8px; 
             font-family: 'Orbitron'; font-size: 12px; cursor: pointer; text-align: center; transition: 0.2s; 
         }
-        .mines-btn-grid.active { background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan); font-weight: 900; box-shadow: 0 0 10px rgba(0,242,234,0.2); }
+        /* Green Active State */
+        .mines-btn-grid.active { background: var(--brand-green); color: #000; border-color: var(--brand-green); font-weight: 900; box-shadow: 0 0 15px rgba(0, 255, 65, 0.3); }
 
-        /* Custom Stepper */
         .mines-stepper { display: flex; align-items: center; justify-content: space-between; background: #222; border-radius: 12px; border: 1px solid #444; padding: 5px; margin-bottom: 15px; }
         .step-btn {
             width: 45px; height: 45px; background: #333; border: none; border-radius: 8px; color: #fff; font-size: 20px; cursor: pointer; transition: 0.2s;
         }
-        .step-btn:active { background: var(--accent-cyan); color: #000; }
+        .step-btn:active { background: var(--brand-green); color: #000; }
         .mines-count-display { font-family: 'Orbitron'; font-size: 20px; font-weight: bold; color: #fff; }
         .mines-label-sm { font-size: 10px; color: #888; font-family: 'Poppins'; }
 
         .mines-board { background: var(--mines-bg); padding: 10px; border-radius: 10px; display: grid; gap: 6px; border: 2px solid #3d3d5c; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); transition: all 0.3s; }
         .mine-tile { background-color: var(--mines-tile); border-radius: 6px; aspect-ratio: 1; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 0 rgba(0,0,0,0.3); }
         .mine-tile img { width: 70%; height: 70%; object-fit: contain; display: none; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .mine-tile.reveal { background-color: var(--mines-active); }
-        .mine-tile.reveal img { display: block; }
-        /* Risk Mode Color */
-        .mines-wrapper.risk-mode .mine-tile.reveal { background-color: #4a1a25; } 
+        .mine-tile.reveal { background-color: #004d13; box-shadow: inset 0 0 10px #00ff41; } /* GREEN REVEAL BASE */
+        .mines-wrapper.risk-mode .mine-tile.reveal { background-color: #4a1a25; box-shadow: inset 0 0 10px #ff334b; } /* RED REVEAL BASE */
         
-        /* --- CHICKEN (FIXED) --- */
-        .chicken-wrapper { width: 90%; max-width: 340px; margin-bottom: 20px; flex-direction: column; align-items: center; }
+        /* --- CHICKEN --- */
+        .chicken-wrapper { width: 90%; max-width: 320px; margin-bottom: 20px; flex-direction: column; align-items: center; }
         .chicken-road-grid { 
             width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 15px; 
             background: #2b2b2b; border-radius: 12px; border: 2px dashed #444; box-shadow: inset 0 0 20px #000; box-sizing: border-box;
@@ -257,154 +272,160 @@
             box-shadow: 0 0 10px #00ff41; transform: scale(1.05); color: transparent; 
         }
 
-        /* --- LIVE WINS --- */
-        .live-wins-bar {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background: rgba(0,0,0,0.9); border-top: 1px solid #333;
-            display: flex; align-items: center; overflow: hidden; white-space: nowrap; padding-left: 10px; z-index: 100;
+        /* --- NEW LIVE WINS LIST --- */
+        .live-wins-list {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 160px;
+            background: linear-gradient(to top, #000 20%, transparent 100%);
+            display: flex; flex-direction: column; justify-content: flex-end; padding: 10px 20px; box-sizing: border-box;
+            z-index: 50; overflow: hidden; pointer-events: none;
         }
-        .win-item {
-            display: inline-flex; align-items: center; font-family: 'Orbitron'; font-size: 10px; color: #aaa; margin-right: 20px; opacity: 0.8;
-            animation: slideLeft 10s linear infinite;
+        .win-row {
+            display: flex; justify-content: space-between; align-items: center;
+            font-family: 'Orbitron'; font-size: 11px; color: #ccc;
+            margin-bottom: 6px; opacity: 0; transform: translateY(20px);
+            animation: slideUp 0.5s forwards;
+            background: rgba(0, 0, 0, 0.5); padding: 4px 8px; border-radius: 4px; border-left: 2px solid var(--brand-green);
         }
-        @keyframes slideLeft { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
-        .win-name { color: #fff; font-weight: bold; margin-right: 5px; }
-        .win-amt { color: var(--brand-green); margin-left: 5px; }
+        .win-row.out { animation: fadeOut 0.5s forwards; }
+        @keyframes slideUp { 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { 100% { opacity: 0; transform: translateY(-10px); } }
+        
+        .win-name { color: #fff; font-weight: bold; }
+        .win-amt { color: var(--brand-green); text-shadow: 0 0 5px rgba(0,255,65,0.5); }
+        .win-game { font-size: 9px; color: #888; margin-right: auto; margin-left: 10px; }
 
-        @media (min-width: 768px) { .penalty-container { transform: scale(1.2); margin-bottom: 40px; } }
     </style>
 </head>
 <body class="lang-en">
 
-    <div id="preloader"><div class="terminal-text" id="term-text"></div></div>
-    <div class="cyber-wrapper"></div>
-    <div class="hud-bar">
-        <div><span class="status-dot"></span>ONLINE <span id="online-users" class="online-count">1420</span></div>
-        <div id="session-id">SID: ...</div>
-    </div>
-    
-    <div class="lang-container" id="lang-cont">
-        <select onchange="changeLang(this.value)" id="lang-select">
-            <option value="en">🇬🇧 EN</option>
-            <option value="es">🇪🇸 ES</option>
-            <option value="ar">🇦🇪 AR</option>
-        </select>
-    </div>
+    <div class="cyber-wrapper"></div> <div id="app-wrapper"> <div id="preloader"><div class="terminal-text" id="term-text"></div></div>
 
-    <div id="screen-menu" class="screen">
-        <div class="main-logo">
-            <div class="logo-title">AI PREDICTOR</div>
-            <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL v9.0</div>
+        <div class="hud-bar">
+            <div><span class="status-dot"></span>ONLINE <span id="online-users" class="online-count">1420</span></div>
+            <div id="session-id">SID: ...</div>
         </div>
-        <div class="menu-grid">
-            <div class="game-card" onclick="openGame('aviator')"><img src="/img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
-            <div class="game-card" onclick="openGame('penalty')"><img src="/img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div>
-            <div class="game-card" onclick="openGame('mines')"><img src="/img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div>
-            <div class="game-card" onclick="openGame('chicken')"><img src="/img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div>
-        </div>
-    </div>
-
-    <div id="id-modal" class="modal-overlay">
-        <div class="id-box">
-            <h3 style="color:#00f2ea; font-family:'Orbitron'; margin-bottom:5px;">AUTHORIZATION</h3>
-            <p style="font-size:11px; color:#aaa; margin-bottom:20px;">Secure connection to Server</p>
-            <input type="tel" id="user-id-input" class="id-input" placeholder="Account ID" maxlength="12">
-            <button id="btn-connect" class="id-btn" onclick="validateAndConnect()">CONNECT ACCOUNT</button>
-            <div id="id-error" style="color:#ff334b; font-size:10px; margin-top:10px; min-height:15px; font-weight:bold;"></div>
-            <div id="sync-log" class="sync-log"></div>
-        </div>
-    </div>
-
-    <div id="screen-game" class="screen">
         
-        <div id="aviator-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
-            <div class="game-header">
-                <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
-                <img src="/img/aviator_logo.png" class="game-logo-hero">
+        <div class="lang-container" id="lang-cont">
+            <select onchange="changeLang(this.value)" id="lang-select">
+                <option value="en">🇬🇧 EN</option>
+                <option value="es">🇪🇸 ES</option>
+                <option value="ar">🇦🇪 AR</option>
+            </select>
+        </div>
+
+        <div id="screen-menu" class="screen">
+            <div class="main-logo">
+                <div class="logo-title">AI PREDICTOR</div>
+                <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL v10.0</div>
             </div>
-            <div class="aviator-wrapper">
-                <svg class="aviator-graph-svg" id="aviator-graph" viewBox="0 0 350 200" preserveAspectRatio="none">
-                    <path d="M0,200 Q150,150 350,20 L350,200 Z" fill="rgba(255, 51, 75, 0.2)" />
-                    <path d="M0,200 Q150,150 350,20" fill="none" stroke="#ff334b" stroke-width="4" />
-                </svg>
-                <img src="/img/plane.png" id="aviator-plane" class="aviator-plane-img">
-                <div class="coef-text" id="coef-text">0.00x</div>
+            <div class="menu-grid">
+                <div class="game-card" onclick="openGame('aviator')"><img src="/img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
+                <div class="game-card" onclick="openGame('penalty')"><img src="/img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div>
+                <div class="game-card" onclick="openGame('mines')"><img src="/img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div>
+                <div class="game-card" onclick="openGame('chicken')"><img src="/img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div>
             </div>
         </div>
 
-        <div id="penalty-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
-            <div class="game-header">
-                <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
-                <img src="/img/menu_penalty.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
-            </div>
-            <div class="history-dots" id="pen-history"></div>
-            <div class="penalty-container">
-                <div class="target-zone z1" id="pz1"><div class="target-effect"></div></div>
-                <div class="target-zone z2" id="pz2"><div class="target-effect"></div></div>
-                <div class="target-zone z3" id="pz3"><div class="target-effect"></div></div>
-                <div class="target-zone z4" id="pz4"><div class="target-effect"></div></div>
-                <div class="target-zone z5" id="pz5"><div class="target-effect"></div></div>
+        <div id="id-modal" class="modal-overlay">
+            <div class="id-box">
+                <h3 style="color:#00f2ea; font-family:'Orbitron'; margin-bottom:5px;">AUTHORIZATION</h3>
+                <p style="font-size:11px; color:#aaa; margin-bottom:20px;">Secure connection to Server</p>
+                <input type="tel" id="user-id-input" class="id-input" placeholder="Account ID" maxlength="12">
+                <button id="btn-connect" class="id-btn" onclick="validateAndConnect()">CONNECT ACCOUNT</button>
+                <div id="id-error" style="color:#ff334b; font-size:10px; margin-top:10px; min-height:15px; font-weight:bold;"></div>
+                <div id="sync-log" class="sync-log"></div>
             </div>
         </div>
 
-        <div id="mines-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
-            <div class="game-header">
-                <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
-                <img src="/img/menu_mines.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
+        <div id="screen-game" class="screen">
+            
+            <div id="aviator-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
+                <div class="game-header">
+                    <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
+                    <img src="/img/aviator_logo.png" class="game-logo-hero">
+                </div>
+                <div class="aviator-wrapper">
+                    <svg class="aviator-graph-svg" id="aviator-graph" viewBox="0 0 350 200" preserveAspectRatio="none">
+                        <path d="M0,200 Q150,150 350,20 L350,200 Z" fill="rgba(255, 51, 75, 0.2)" />
+                        <path d="M0,200 Q150,150 350,20" fill="none" stroke="#ff334b" stroke-width="4" />
+                    </svg>
+                    <img src="/img/plane.png" id="aviator-plane" class="aviator-plane-img">
+                    <div class="coef-text" id="coef-text">0.00x</div>
+                </div>
             </div>
-            <div class="mines-wrapper" id="mines-wrap">
-                <div class="mines-mode-switch" id="mines-mode" data-mode="safe">
-                    <div class="mode-bg"></div>
-                    <div class="mode-opt active" onclick="setMinesMode('safe')">SAFE</div>
-                    <div class="mode-opt" onclick="setMinesMode('risk')">HIGH RISK</div>
-                </div>
 
-                <div class="mines-grid-select">
-                    <div class="mines-btn-grid active" id="btn-3" onclick="setMinesGrid(3)">3x3</div>
-                    <div class="mines-btn-grid" id="btn-5" onclick="setMinesGrid(5)">5x5</div>
+            <div id="penalty-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
+                <div class="game-header">
+                    <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
+                    <img src="/img/menu_penalty.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
                 </div>
+                <div class="history-dots" id="pen-history"></div>
+                <div class="penalty-container">
+                    <div class="target-zone z1" id="pz1"><div class="target-effect"></div></div>
+                    <div class="target-zone z2" id="pz2"><div class="target-effect"></div></div>
+                    <div class="target-zone z3" id="pz3"><div class="target-effect"></div></div>
+                    <div class="target-zone z4" id="pz4"><div class="target-effect"></div></div>
+                    <div class="target-zone z5" id="pz5"><div class="target-effect"></div></div>
+                </div>
+            </div>
 
-                <div class="mines-stepper">
-                    <div style="display:flex; flex-direction:column; padding-left:5px;">
-                        <span class="mines-count-display" id="mines-val">3</span>
-                        <span class="mines-label-sm">TRAPS</span>
+            <div id="mines-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
+                <div class="game-header">
+                    <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
+                    <img src="/img/menu_mines.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
+                </div>
+                <div class="mines-wrapper" id="mines-wrap">
+                    <div class="mines-mode-switch" id="mines-mode" data-mode="safe">
+                        <div class="mode-bg"></div>
+                        <div class="mode-opt active" onclick="setMinesMode('safe')">SAFE</div>
+                        <div class="mode-opt" onclick="setMinesMode('risk')">HIGH RISK</div>
                     </div>
-                    <div style="display:flex; gap:5px;">
-                        <button class="step-btn" onclick="stepMines(-1)">−</button>
-                        <button class="step-btn" onclick="stepMines(1)">+</button>
+
+                    <div class="mines-grid-select">
+                        <div class="mines-btn-grid active" id="btn-3" onclick="setMinesGrid(3)">3x3</div>
+                        <div class="mines-btn-grid" id="btn-5" onclick="setMinesGrid(5)">5x5</div>
                     </div>
+
+                    <div class="mines-stepper">
+                        <div style="display:flex; flex-direction:column; padding-left:5px;">
+                            <span class="mines-count-display" id="mines-val">3</span>
+                            <span class="mines-label-sm">TRAPS</span>
+                        </div>
+                        <div style="display:flex; gap:5px;">
+                            <button class="step-btn" onclick="stepMines(-1)">−</button>
+                            <button class="step-btn" onclick="stepMines(1)">+</button>
+                        </div>
+                    </div>
+                    
+                    <div id="mines-board" class="mines-board"></div>
                 </div>
-                
-                <div id="mines-board" class="mines-board"></div>
             </div>
+
+            <div id="chicken-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
+                <div class="game-header">
+                    <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
+                    <img src="/img/menu_chicken.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
+                </div>
+                <div class="chicken-wrapper">
+                    <div style="width:100%; text-align:right; margin-bottom:5px;">
+                        <select id="chicken-diff" onchange="updateChickenGrid()">
+                            <option value="easy">EASY</option>
+                            <option value="medium" selected>MEDIUM</option>
+                            <option value="hard">HARD</option>
+                        </select>
+                    </div>
+                    <div class="chicken-road-grid" id="chicken-grid"></div>
+                </div>
+            </div>
+
+            <button id="signal-btn" class="btn-signal" onclick="getSignal()" data-tr="get_signal">GET SIGNAL</button>
+            <button class="btn-back" onclick="backMenu()" data-tr="exit">EXIT</button>
         </div>
 
-        <div id="chicken-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
-            <div class="game-header">
-                <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
-                <img src="/img/menu_chicken.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
+        <div id="live-list" class="live-wins-list">
             </div>
-            <div class="chicken-wrapper">
-                <div style="width:100%; text-align:right; margin-bottom:5px;">
-                    <select id="chicken-diff" onchange="updateChickenGrid()">
-                        <option value="easy">EASY</option>
-                        <option value="medium" selected>MEDIUM</option>
-                        <option value="hard">HARD</option>
-                    </select>
-                </div>
-                <div class="chicken-road-grid" id="chicken-grid"></div>
-            </div>
-        </div>
 
-        <button id="signal-btn" class="btn-signal" onclick="getSignal()" data-tr="get_signal">GET SIGNAL</button>
-        <button class="btn-back" onclick="backMenu()" data-tr="exit">EXIT</button>
-    </div>
-
-    <div class="live-wins-bar">
-        <div class="win-item" id="win-ticker">
-            </div>
-    </div>
-
-    <div style="display:none;">
+    </div> <div style="display:none;">
         <img src="/img/menu_aviator.png"><img src="/img/menu_penalty.png">
         <img src="/img/menu_mines.png"><img src="/img/menu_chicken.png">
         <img src="/img/plane.png"><img src="/img/penalty_bg.png">
@@ -442,8 +463,8 @@
             }, 3000);
 
             // Live Wins Loop
-            updateLiveWins();
-            setInterval(updateLiveWins, 4000);
+            addLiveWinItem(); // Start with one
+            setInterval(addLiveWinItem, 3500);
 
             const term = document.getElementById('term-text');
             function typeLine() {
@@ -492,7 +513,6 @@
         function changeLang(l) {
             curLang = l;
             document.body.className = "lang-" + l;
-            
             const cont = document.getElementById('lang-cont');
             if(l === 'ar') cont.classList.add('ar-pos'); else cont.classList.remove('ar-pos');
 
@@ -502,25 +522,27 @@
             });
         }
 
-        // --- LIVE WINS LOGIC ---
-        function updateLiveWins() {
-            const ticker = document.getElementById('win-ticker');
+        // --- LIVE WINS LIST LOGIC ---
+        function addLiveWinItem() {
+            const list = document.getElementById('live-list');
             const nList = namesData[curLang];
             const name = nList[Math.floor(Math.random() * nList.length)];
             const amt = Math.floor(Math.random() * 5000) + 500;
             const games = ["Aviator", "Mines", "Penalty"];
             const game = games[Math.floor(Math.random()*games.length)];
             
-            // Build String
-            let txt = `<span class="win-name">${name}</span> just won <span class="win-amt">${amt}${currData[curLang]}</span> in ${game}`;
-            if(curLang === 'ar') txt = `<span class="win-name">${name}</span> فاز بـ <span class="win-amt">${amt}${currData[curLang]}</span> في ${game}`;
+            const div = document.createElement('div');
+            div.className = 'win-row';
+            div.innerHTML = `<div><span class="win-name">${name}</span> <span class="win-game">${game}</span></div> <div class="win-amt">+${amt}${currData[curLang]}</div>`;
             
-            ticker.innerHTML = txt;
+            list.prepend(div);
             
-            // Reset Animation trigger
-            ticker.style.animation = 'none';
-            ticker.offsetHeight; /* trigger reflow */
-            ticker.style.animation = 'slideLeft 10s linear infinite';
+            // Keep max 5 items
+            if(list.children.length > 5) {
+                const last = list.lastElementChild;
+                last.classList.add('out');
+                setTimeout(() => last.remove(), 500);
+            }
         }
 
         // --- GAME LOGIC ---
@@ -539,22 +561,25 @@
             document.getElementById('signal-btn').innerText = trans[curLang].get_signal;
             document.getElementById(g+'-view').style.display = 'flex';
 
-            // Reset
+            // Reset States
             if(g === 'aviator') { 
+                const plane = document.getElementById('aviator-plane');
+                plane.classList.remove('taking-off');
                 document.getElementById('coef-text').classList.remove('visible');
-                document.getElementById('aviator-plane').classList.remove('taking-off');
             }
             if(g === 'penalty') {
-                document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner'));
-                // Fill random history
+                document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning'));
                 const h = document.getElementById('pen-history'); h.innerHTML = "";
-                for(let i=0;i<5;i++) {
-                    const d = document.createElement('div'); d.className = Math.random()>0.3?'h-dot win':'h-dot lose';
-                    h.appendChild(d);
-                }
+                for(let i=0;i<5;i++) h.appendChild(createDot());
             }
             if(g === 'mines') setMinesGrid(3);
             if(g === 'chicken') updateChickenGrid();
+        }
+
+        function createDot() {
+            const d = document.createElement('div'); 
+            d.className = Math.random()>0.3?'h-dot win':'h-dot lose';
+            return d;
         }
 
         function backMenu() {
@@ -595,12 +620,31 @@
             else { el.children[2].classList.add('active'); wrap.classList.add('risk-mode'); }
         }
 
-        // --- SIGNAL LOGIC (SMART ANALYSIS) ---
+        // --- SIGNAL LOGIC ---
         function getSignal() {
             const btn = document.getElementById('signal-btn');
             btn.disabled = true;
 
-            // WARMING SEQUENCE
+            // 1. HARD RESET VISUALS
+            if(activeGame === 'aviator') {
+                 const plane = document.getElementById('aviator-plane');
+                 const graph = document.getElementById('aviator-graph');
+                 plane.classList.remove('taking-off');
+                 graph.classList.remove('active');
+                 document.getElementById('coef-text').classList.remove('visible');
+                 void plane.offsetWidth; // Force Reflow
+            }
+            if(activeGame === 'penalty') {
+                 document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner', 'scanning'));
+            }
+            if(activeGame === 'mines') {
+                 document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
+            }
+            if(activeGame === 'chicken') {
+                 document.querySelectorAll('.chicken-step').forEach(el => { el.classList.remove('safe'); el.style.transform = "scale(1)"; });
+            }
+
+            // 2. WARMING SEQUENCE
             let steps = ["CONNECTING...", "ANALYZING ID...", "PREDICTING..."];
             if(curLang === 'ar') steps = ["جار الاتصال...", "تحليل...", "تنبؤ..."];
             
@@ -621,26 +665,33 @@
         function showResult(btn) {
             if(activeGame === 'aviator') {
                  const plane = document.getElementById('aviator-plane');
-                 plane.classList.remove('taking-off'); void plane.offsetWidth;
-                 plane.classList.add('taking-off');
+                 plane.classList.add('taking-off'); // RESTART ANIMATION
                  document.getElementById('aviator-graph').classList.add('active');
                  const textEl = document.getElementById('coef-text');
                  textEl.classList.add('visible');
                  
                  let val = 1.00;
                  const int = setInterval(() => { val += 0.05; textEl.innerText = val.toFixed(2) + "x"; }, 50);
-                 setTimeout(() => { clearInterval(int); textEl.innerText = (Math.random()*(5.0-1.2)+1.2).toFixed(2) + "x"; cooldown(btn); }, 2500);
+                 setTimeout(() => { clearInterval(int); textEl.innerText = (Math.random()*(5.0-1.2)+1.2).toFixed(2) + "x"; cooldown(btn); }, 3000);
             }
             else if(activeGame === 'penalty') {
-                document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner'));
-                setTimeout(() => {
-                    const r = Math.floor(Math.random()*5)+1;
-                    document.getElementById('pz'+r).classList.add('winner');
-                    cooldown(btn);
-                }, 500);
+                // SCANNING ANIMATION RESTORED
+                const targets = document.querySelectorAll('.target-zone');
+                let scanSteps = 0;
+                const scanInt = setInterval(() => {
+                    targets.forEach(el => el.classList.remove('scanning'));
+                    targets[Math.floor(Math.random()*5)].classList.add('scanning');
+                    scanSteps++;
+                    if(scanSteps > 10) {
+                        clearInterval(scanInt);
+                        targets.forEach(el => el.classList.remove('scanning'));
+                        const r = Math.floor(Math.random()*5)+1;
+                        document.getElementById('pz'+r).classList.add('winner');
+                        cooldown(btn);
+                    }
+                }, 100);
             }
             else if(activeGame === 'mines') {
-                document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
                 const total = minesSize * minesSize;
                 let toReveal = 0;
                 
@@ -654,10 +705,9 @@
                 let int = setInterval(() => { 
                     if(i>=arr.length) { clearInterval(int); cooldown(btn); } 
                     else { document.getElementById('mt-'+arr[i]).classList.add('reveal'); i++; } 
-                }, 100); // Faster reveal
+                }, 100);
             }
             else if(activeGame === 'chicken') {
-                document.querySelectorAll('.chicken-step').forEach(el => { el.classList.remove('safe'); el.style.transform = "scale(1)"; });
                 let limit = document.getElementById('chicken-diff').value === 'easy' ? 10 : 6;
                 let path = Math.floor(Math.random() * (limit - 2) + 2);
                 let i=1; 
