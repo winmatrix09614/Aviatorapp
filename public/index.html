@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v10.0</title>
+    <title>AI Signal Bot Ultimate v11.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     
@@ -17,7 +17,6 @@
             --glass-panel: rgba(20, 20, 30, 0.7);
             --mines-bg: #272749;
             --mines-tile: #2b2e55;
-            --mines-active: #004d13; /* Greenish base for reveal */
         }
 
         body {
@@ -119,6 +118,8 @@
             font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 26px; color: #fff;
             text-shadow: 0 0 20px rgba(58, 134, 255, 0.6); letter-spacing: 1px;
         }
+        .brand-sub { font-size: 10px; color: #888; letter-spacing: 1px; margin-top: 5px; font-family: 'Poppins'; }
+
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 90%; max-width: 360px; }
         .game-card {
             background: var(--glass-panel); backdrop-filter: blur(10px);
@@ -162,26 +163,29 @@
         
         .btn-back { margin-top: 15px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 25px; border-radius: 20px; font-size: 10px; font-family: 'Orbitron'; cursor: pointer; z-index: 100; }
 
-        /* --- AVIATOR FIXED --- */
+        /* --- AVIATOR FIXED v2 --- */
         .aviator-wrapper {
             position: relative; width: 100%; height: 200px; margin-bottom: 10px;
-            overflow: hidden; /* Seamless effect handled by masking */
+            overflow: hidden;
         }
         .aviator-graph-svg {
             position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; z-index: 2; opacity: 0; transition: opacity 0.5s;
-            mask-image: linear-gradient(to right, black 80%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+            mask-image: linear-gradient(to right, black 70%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%);
         }
         .aviator-graph-svg.active { opacity: 1; }
         .aviator-plane-img {
             position: absolute; width: 60px; height: auto; z-index: 5; opacity: 0;
             filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
-            /* Flatter curve to fix nose up issue */
-            offset-path: path("M20,200 Q200,180 450,40"); 
+            /* ADJUSTED PATH TO STAY ON SCREEN LONGER */
+            offset-path: path("M20,200 Q150,150 320,50"); 
             offset-rotate: auto;
         }
-        .aviator-plane-img.taking-off { opacity: 1; animation: flySeamless 3s forwards cubic-bezier(0.2, 0.8, 0.2, 1); }
-        @keyframes flySeamless { 0% { offset-distance: 0%; transform: scale(0.6); } 100% { offset-distance: 100%; transform: scale(1.1); } }
+        .aviator-plane-img.taking-off { opacity: 1; animation: flySeamless 3s forwards ease-out; }
+        @keyframes flySeamless { 
+            0% { offset-distance: 0%; transform: scale(0.6); } 
+            100% { offset-distance: 100%; transform: scale(1.1); } 
+        }
         .coef-text { 
             position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
             font-family: 'Orbitron'; font-size: 48px; font-weight: 900; color: #fff; z-index: 10; 
@@ -218,7 +222,7 @@
         .target-zone.winner .target-effect { transform: scale(1.1); opacity: 1; animation: pulseTarget 1s infinite; }
         @keyframes pulseTarget { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
-        /* --- MINES GREEN THEME --- */
+        /* --- MINES (FIXED IMAGES) --- */
         .mines-wrapper { width: 90%; max-width: 320px; margin-bottom: 20px; }
         
         .mines-mode-switch {
@@ -228,10 +232,9 @@
         .mode-opt.active { color: #000; font-weight: bold; text-shadow: none; }
         .mode-bg { 
             position: absolute; top: 4px; left: 4px; width: 50%; height: calc(100% - 8px); 
-            background: var(--brand-green); /* GREEN BY DEFAULT */
+            background: var(--brand-green);
             border-radius: 16px; transition: 0.3s; z-index: 1; box-shadow: 0 0 10px var(--brand-green);
         }
-        /* Risk Mode RED */
         .mines-mode-switch[data-mode="risk"] .mode-bg { left: 50%; background: var(--brand-red); width: calc(50% - 4px); box-shadow: 0 0 10px var(--brand-red); }
 
         .mines-grid-select { display: flex; gap: 10px; margin-bottom: 15px; }
@@ -239,7 +242,6 @@
             flex: 1; background: #333; border: 1px solid #555; color: #fff; padding: 12px 0; border-radius: 8px; 
             font-family: 'Orbitron'; font-size: 12px; cursor: pointer; text-align: center; transition: 0.2s; 
         }
-        /* Green Active State */
         .mines-btn-grid.active { background: var(--brand-green); color: #000; border-color: var(--brand-green); font-weight: 900; box-shadow: 0 0 15px rgba(0, 255, 65, 0.3); }
 
         .mines-stepper { display: flex; align-items: center; justify-content: space-between; background: #222; border-radius: 12px; border: 1px solid #444; padding: 5px; margin-bottom: 15px; }
@@ -252,9 +254,19 @@
 
         .mines-board { background: var(--mines-bg); padding: 10px; border-radius: 10px; display: grid; gap: 6px; border: 2px solid #3d3d5c; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); transition: all 0.3s; }
         .mine-tile { background-color: var(--mines-tile); border-radius: 6px; aspect-ratio: 1; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 0 rgba(0,0,0,0.3); }
-        .mine-tile img { width: 70%; height: 70%; object-fit: contain; display: none; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .mine-tile.reveal { background-color: #004d13; box-shadow: inset 0 0 10px #00ff41; } /* GREEN REVEAL BASE */
-        .mines-wrapper.risk-mode .mine-tile.reveal { background-color: #4a1a25; box-shadow: inset 0 0 10px #ff334b; } /* RED REVEAL BASE */
+        
+        /* FIXED IMAGE STYLES */
+        .mine-tile img { 
+            width: 70%; height: 70%; object-fit: contain; 
+            display: none; 
+            position: relative; z-index: 10; /* Ensure image is ON TOP */
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        .mine-tile.reveal { background-color: #004d13; box-shadow: inset 0 0 10px #00ff41; }
+        .mines-wrapper.risk-mode .mine-tile.reveal { background-color: #4a1a25; box-shadow: inset 0 0 10px #ff334b; }
+        .mine-tile.reveal img { display: block; }
         
         /* --- CHICKEN --- */
         .chicken-wrapper { width: 90%; max-width: 320px; margin-bottom: 20px; flex-direction: column; align-items: center; }
@@ -287,10 +299,12 @@
             background: rgba(0, 0, 0, 0.5); padding: 4px 8px; border-radius: 4px; border-left: 2px solid var(--brand-green);
         }
         .win-row.out { animation: fadeOut 0.5s forwards; }
+        .win-row.big-win { border-left: 2px solid #ff9d00; background: rgba(255, 157, 0, 0.2); }
+        
         @keyframes slideUp { 100% { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOut { 100% { opacity: 0; transform: translateY(-10px); } }
         
-        .win-name { color: #fff; font-weight: bold; }
+        .win-name { color: #fff; font-weight: bold; font-family: 'Orbitron'; letter-spacing: 1px; }
         .win-amt { color: var(--brand-green); text-shadow: 0 0 5px rgba(0,255,65,0.5); }
         .win-game { font-size: 9px; color: #888; margin-right: auto; margin-left: 10px; }
 
@@ -298,7 +312,11 @@
 </head>
 <body class="lang-en">
 
-    <div class="cyber-wrapper"></div> <div id="app-wrapper"> <div id="preloader"><div class="terminal-text" id="term-text"></div></div>
+    <div class="cyber-wrapper"></div>
+    
+    <div id="app-wrapper">
+        
+        <div id="preloader"><div class="terminal-text" id="term-text"></div></div>
 
         <div class="hud-bar">
             <div><span class="status-dot"></span>ONLINE <span id="online-users" class="online-count">1420</span></div>
@@ -316,7 +334,8 @@
         <div id="screen-menu" class="screen">
             <div class="main-logo">
                 <div class="logo-title">AI PREDICTOR</div>
-                <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL v10.0</div>
+                <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL v11.0</div>
+                <div class="brand-sub">powered by Omar</div>
             </div>
             <div class="menu-grid">
                 <div class="game-card" onclick="openGame('aviator')"><img src="/img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
@@ -380,12 +399,10 @@
                         <div class="mode-opt active" onclick="setMinesMode('safe')">SAFE</div>
                         <div class="mode-opt" onclick="setMinesMode('risk')">HIGH RISK</div>
                     </div>
-
                     <div class="mines-grid-select">
                         <div class="mines-btn-grid active" id="btn-3" onclick="setMinesGrid(3)">3x3</div>
                         <div class="mines-btn-grid" id="btn-5" onclick="setMinesGrid(5)">5x5</div>
                     </div>
-
                     <div class="mines-stepper">
                         <div style="display:flex; flex-direction:column; padding-left:5px;">
                             <span class="mines-count-display" id="mines-val">3</span>
@@ -396,7 +413,6 @@
                             <button class="step-btn" onclick="stepMines(1)">+</button>
                         </div>
                     </div>
-                    
                     <div id="mines-board" class="mines-board"></div>
                 </div>
             </div>
@@ -422,10 +438,11 @@
             <button class="btn-back" onclick="backMenu()" data-tr="exit">EXIT</button>
         </div>
 
-        <div id="live-list" class="live-wins-list">
-            </div>
+        <div id="live-list" class="live-wins-list"></div>
 
-    </div> <div style="display:none;">
+    </div>
+
+    <div style="display:none;">
         <img src="/img/menu_aviator.png"><img src="/img/menu_penalty.png">
         <img src="/img/menu_mines.png"><img src="/img/menu_chicken.png">
         <img src="/img/plane.png"><img src="/img/penalty_bg.png">
@@ -438,11 +455,6 @@
             en: { get_signal: "GET SIGNAL", exit: "EXIT", aviator: "AVIATOR", penalty: "PENALTY" },
             es: { get_signal: "OBTENER SEÑAL", exit: "SALIR", aviator: "AVIATOR", penalty: "PENALTI" },
             ar: { get_signal: "احصل على إشارة", exit: "خروج", aviator: "طيار", penalty: "ضربة جزاء" }
-        };
-        const namesData = {
-            en: ["John", "Mike", "Alex", "David", "Chris", "Sarah", "James"],
-            es: ["Carlos", "Juan", "Pedro", "Luis", "Miguel", "Maria", "Jose"],
-            ar: ["Ahmed", "Ali", "Mohamed", "Omar", "Youssef", "Ibrahim", "Hassan"]
         };
         const currData = { en: "$", es: "€", ar: "EGP" };
         let curLang = 'en';
@@ -522,22 +534,36 @@
             });
         }
 
-        // --- LIVE WINS LIST LOGIC ---
+        // --- LIVE WINS LIST LOGIC (FIXED) ---
         function addLiveWinItem() {
             const list = document.getElementById('live-list');
-            const nList = namesData[curLang];
-            const name = nList[Math.floor(Math.random() * nList.length)];
-            const amt = Math.floor(Math.random() * 5000) + 500;
+            
+            // ID GENERATION
+            const prefixes = ['155', '156', '157', '158', '159', '160'];
+            const p = prefixes[Math.floor(Math.random()*prefixes.length)];
+            const id = `${p}****${Math.floor(Math.random()*90)+10}`;
+
+            // AMOUNT GENERATION ($10 - $300 normally)
+            let amt = Math.floor(Math.random() * 290) + 10;
+            let isBigWin = false;
+
+            // 5% Chance for BIG WIN
+            if(Math.random() > 0.95) {
+                amt = Math.floor(Math.random() * 2000) + 1000;
+                isBigWin = true;
+            }
+
             const games = ["Aviator", "Mines", "Penalty"];
             const game = games[Math.floor(Math.random()*games.length)];
             
             const div = document.createElement('div');
             div.className = 'win-row';
-            div.innerHTML = `<div><span class="win-name">${name}</span> <span class="win-game">${game}</span></div> <div class="win-amt">+${amt}${currData[curLang]}</div>`;
+            if(isBigWin) div.classList.add('big-win');
+
+            div.innerHTML = `<div><span class="win-name">${id}</span> <span class="win-game">${game}</span></div> <div class="win-amt">+${amt}${currData[curLang]}</div>`;
             
             list.prepend(div);
             
-            // Keep max 5 items
             if(list.children.length > 5) {
                 const last = list.lastElementChild;
                 last.classList.add('out');
@@ -664,18 +690,32 @@
 
         function showResult(btn) {
             if(activeGame === 'aviator') {
+                 // FIXED: Generate FINAL value first
+                 const finalVal = (Math.random() * (5.0 - 1.2) + 1.2).toFixed(2);
+                 const duration = 3000; // Animation time ms
+                 const steps = duration / 50;
+                 const increment = (finalVal - 1.00) / steps;
+                 
                  const plane = document.getElementById('aviator-plane');
-                 plane.classList.add('taking-off'); // RESTART ANIMATION
+                 plane.classList.add('taking-off'); 
                  document.getElementById('aviator-graph').classList.add('active');
                  const textEl = document.getElementById('coef-text');
                  textEl.classList.add('visible');
                  
-                 let val = 1.00;
-                 const int = setInterval(() => { val += 0.05; textEl.innerText = val.toFixed(2) + "x"; }, 50);
-                 setTimeout(() => { clearInterval(int); textEl.innerText = (Math.random()*(5.0-1.2)+1.2).toFixed(2) + "x"; cooldown(btn); }, 3000);
+                 let currentVal = 1.00;
+                 const int = setInterval(() => {
+                    currentVal += increment;
+                    if(currentVal >= finalVal) {
+                        currentVal = finalVal;
+                        clearInterval(int);
+                        textEl.innerText = finalVal + "x";
+                        cooldown(btn);
+                    } else {
+                        textEl.innerText = currentVal.toFixed(2) + "x";
+                    }
+                 }, 50);
             }
             else if(activeGame === 'penalty') {
-                // SCANNING ANIMATION RESTORED
                 const targets = document.querySelectorAll('.target-zone');
                 let scanSteps = 0;
                 const scanInt = setInterval(() => {
