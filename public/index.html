@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v17.0</title>
+    <title>AI Signal Bot Ultimate v18.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     
@@ -82,22 +82,20 @@
         .coef-text { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-family: 'Orbitron'; font-size: 48px; font-weight: 900; color: #fff; z-index: 10; text-shadow: 0 0 20px rgba(0,0,0,1); opacity: 0; transition: opacity 0.3s; }
         .coef-text.visible { opacity: 1; }
 
-        /* PENALTY */
+        /* PENALTY (FINAL POSITIONS) */
         .penalty-container { position: relative; width: 300px; height: 190px; margin-bottom: 10px; background-image: url('img/penalty_bg.png'); background-size: cover; background-position: center; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(0,0,0,0.5); }
         .target-zone { position: absolute; width: 45px; height: 45px; border-radius: 50%; transition: 0.1s; display: flex; justify-content: center; align-items: center; }
+        /* APPLIED CALIBRATION */
+        .z1 { top: 20px; left: 21px; } 
+        .z2 { top: 20px; right: 18px; } 
+        .z3 { top: 18px; left: 50%; transform: translateX(-50%); } 
+        .z4 { bottom: 28%; left: 16px; } 
+        .z5 { bottom: 28%; right: 13px; }
+        
         .target-effect { width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--accent-cyan); background: radial-gradient(circle, rgba(0,242,234,0.6) 0%, transparent 70%); box-shadow: 0 0 20px var(--accent-cyan); transform: scale(0); opacity: 0; transition: 0.3s; }
         .target-zone.scanning { border: 2px dashed rgba(255, 255, 255, 0.6); background: rgba(255,255,255,0.1); }
         .target-zone.winner .target-effect { transform: scale(1.1); opacity: 1; animation: pulseTarget 1s infinite; }
         @keyframes pulseTarget { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
-        
-        /* CALIBRATION UI */
-        .calib-controls { display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 10px; background: rgba(0,0,0,0.8); padding: 8px; border-radius: 8px; border: 1px solid #444; width: 90%; }
-        .calib-row { display: flex; gap: 15px; align-items: center; justify-content: center; width: 100%; }
-        .calib-btn { background: #333; color: #fff; border: 1px solid #555; padding: 8px 12px; border-radius: 6px; font-family: 'Orbitron'; font-size: 14px; cursor: pointer; min-width: 40px; }
-        .calib-btn:active { background: var(--accent-cyan); color: #000; }
-        .calib-display { font-family: 'Orbitron'; color: var(--brand-green); font-size: 11px; text-align: center; width: 100%; letter-spacing: 1px; margin-bottom: 5px; }
-        .calib-select-btn { background: var(--accent-cyan); color: #000; font-weight: bold; border: none; }
-
         .penalty-strategy { display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: 5px; height: 25px; }
         .strat-dot { width: 12px; height: 12px; border-radius: 50%; background: #333; transition: 0.3s; box-shadow: 0 0 5px #000; }
         .strat-dot.win { background: #00ff41; box-shadow: 0 0 8px #00ff41; }
@@ -165,7 +163,7 @@
         <div class="lang-container" id="lang-cont"><select onchange="changeLang(this.value)" id="lang-select"><option value="en">🇬🇧 EN</option><option value="es">🇪🇸 ES</option><option value="ar">🇦🇪 AR</option></select></div>
 
         <div id="screen-menu" class="screen">
-            <div class="main-logo"><div class="logo-title">AI PREDICTOR</div><div style="font-size:9px;color:#00f2ea;letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v17.0</div><div class="brand-sub">powered by Omar</div></div>
+            <div class="main-logo"><div class="logo-title">AI PREDICTOR</div><div style="font-size:9px;color:#00f2ea;letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v18.0</div><div class="brand-sub">powered by Omar</div></div>
             <div class="menu-grid">
                 <div class="game-card" onclick="openGame('aviator')"><img src="img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
                 <div class="game-card" onclick="openGame('penalty')"><img src="img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div>
@@ -188,20 +186,6 @@
 
             <div id="penalty-view" style="display:none;width:100%;display:flex;flex-direction:column;align-items:center;">
                 <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/menu_penalty.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
-                
-                <div class="calib-controls">
-                    <div class="calib-display" id="calib-debug">Z1 | T:20px L:20px</div>
-                    <div class="calib-row">
-                        <button class="calib-btn" onclick="calibMove('y', -1)">⬆</button>
-                        <button class="calib-btn" onclick="calibMove('y', 1)">⬇</button>
-                    </div>
-                    <div class="calib-row">
-                        <button class="calib-btn" onclick="calibMove('x', -1)">⬅</button>
-                        <button class="calib-btn calib-select-btn" onclick="calibToggle()">SELECT Z1</button>
-                        <button class="calib-btn" onclick="calibMove('x', 1)">➡</button>
-                    </div>
-                </div>
-
                 <div class="penalty-strategy" id="pen-strat"></div>
                 <div class="penalty-container">
                     <div class="target-zone z1" id="pz1"><div class="target-effect"></div></div>
@@ -245,21 +229,10 @@
         const CHICKEN_DATA={easy:["1.03x","1.07x","1.12x","1.17x","1.23x","1.29x","1.36x","1.44x","1.53x","1.63x","1.75x","1.88x","2.04x","2.22x","2.45x","2.72x","3.06x","3.50x","4.08x","4.90x","6.13x","6.61x","9.81x","19.44x"],medium:["1.12x","1.28x","1.47x","1.70x","1.98x","2.33x","2.76x","3.32x","4.03x","4.96x","6.20x","6.91x","8.90x","11.76x","15.99x","22.61x","33.58x","53.20x","92.17x","182.51x","451.71x","1778.80x"],hard:["1.23x","1.55x","1.98x","2.56x","3.36x","4.49x","5.49x","7.53x","10.56x","15.21x","22.59x","34.79x","55.97x","94.99x","172.42x","341.40x","760.46x","2007.63x","6956.47x","41321.43x"],hardcore:["1.63x","2.80x","4.95x","9.08x","15.21x","30.12x","62.96x","140.24x","337.19x","890.19x","2643.89x","9161.08x","39301.05x","233448.29x","254112.51x"]};
         let curLang='en';
 
-        // --- PENALTY CALIB DATA ---
-        // Z1:TopLeft, Z2:TopRight, Z3:TopCenter, Z4:BotLeft, Z5:BotRight
-        let zones = [
-            { id:1, yProp:'top', xProp:'left', yVal:20, xVal:20 },
-            { id:2, yProp:'top', xProp:'right', yVal:20, xVal:20 },
-            { id:3, yProp:'top', xProp:'marginLeft', yVal:20, xVal:0 }, // Z3 uses margin-left to offset from center
-            { id:4, yProp:'bottom', xProp:'left', yVal:25, xVal:10 },   // % for bottom
-            { id:5, yProp:'bottom', xProp:'right', yVal:25, xVal:10 }   // % for bottom
-        ];
-        let activeZ = 0; // Index in array
-
         window.onload = function() {
             const savedId=localStorage.getItem('user_id'); if(savedId)document.getElementById('user-id-input').value=savedId;
             setInterval(()=>{ let c=parseInt(document.getElementById('online-users').innerText);c+=Math.floor(Math.random()*5)-2;document.getElementById('online-users').innerText=c;},3000);
-            for(let i=0;i<15;i++) addLiveWinItem(); setInterval(addLiveWinItem,3000); initDragScroll(); updateCalibUI(); applyZones();
+            for(let i=0;i<15;i++) addLiveWinItem(); setInterval(addLiveWinItem,3000); initDragScroll();
             const term=document.getElementById('term-text'); const termLines=["INITIALIZING...","CHECKING RESOURCES...","ESTABLISHING SECURE TUNNEL...","READY."]; let lineIdx=0;
             function typeLine(){ if(lineIdx<termLines.length){term.innerText=termLines[lineIdx++];setTimeout(typeLine,300);}else{setTimeout(()=>{document.getElementById('preloader').style.display='none';document.getElementById('id-modal').style.display='flex';},500);} } typeLine();
         };
@@ -287,33 +260,6 @@
             slider.addEventListener('mousedown',(e)=>{isDown=true;slider.classList.add('active');startX=e.pageX-slider.offsetLeft;scrollLeft=slider.scrollLeft;});
             slider.addEventListener('mouseleave',()=>{isDown=false;slider.classList.remove('active');}); slider.addEventListener('mouseup',()=>{isDown=false;slider.classList.remove('active');});
             slider.addEventListener('mousemove',(e)=>{if(!isDown)return;e.preventDefault();const x=e.pageX-slider.offsetLeft;const walk=(x-startX)*2;slider.scrollLeft=scrollLeft-walk;});
-        }
-
-        // --- PENALTY CALIBRATION LOGIC ---
-        function calibToggle() {
-            activeZ++; if(activeZ >= zones.length) activeZ = 0;
-            updateCalibUI();
-        }
-        function calibMove(axis, val) {
-            let z = zones[activeZ];
-            if (axis === 'y') z.yVal += val;
-            else z.xVal += val;
-            applyZones(); updateCalibUI();
-        }
-        function applyZones() {
-            zones.forEach(z => {
-                const el = document.querySelector('.z' + z.id);
-                // Handle Units: Bottom uses %, others px
-                let yUnit = (z.yProp === 'bottom') ? '%' : 'px';
-                el.style[z.yProp] = z.yVal + yUnit;
-                el.style[z.xProp] = z.xVal + 'px';
-            });
-        }
-        function updateCalibUI() {
-            let z = zones[activeZ];
-            let yUnit = (z.yProp === 'bottom') ? '%' : 'px';
-            document.querySelector('.calib-select-btn').innerText = `SELECT Z${z.id}`;
-            document.getElementById('calib-debug').innerText = `Z${z.id} | ${z.yProp[0].toUpperCase()}:${z.yVal}${yUnit} ${z.xProp[0].toUpperCase()}:${z.xVal}px`;
         }
 
         let activeGame=null; let minesSize=3; let minesCount=3; let minesMode='safe';
