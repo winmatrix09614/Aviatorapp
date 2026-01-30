@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v15.0</title>
+    <title>AI Signal Bot Ultimate v16.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     
@@ -105,7 +105,7 @@
         .screen { 
             display: none; flex-direction: column; align-items: center; justify-content: center; 
             height: 100%; width: 100%; position: relative; z-index: 10; 
-            padding-bottom: 80px; /* Adjusted padding */
+            padding-bottom: 80px; 
             box-sizing: border-box;
         }
         .screen.active { display: flex; }
@@ -165,23 +165,27 @@
         
         .btn-back { margin-top: 15px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 25px; border-radius: 20px; font-size: 10px; font-family: 'Orbitron'; cursor: pointer; z-index: 100; }
 
-        /* --- AVIATOR --- */
+        /* --- AVIATOR GRAPH FIX --- */
         .aviator-wrapper {
             position: relative; width: 100%; height: 200px; margin-bottom: 10px;
-            overflow: hidden;
+            overflow: hidden; /* Only hide outside of container */
         }
         .aviator-graph-svg {
             position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; z-index: 2; opacity: 0; transition: opacity 0.5s;
-            mask-image: linear-gradient(to right, black 70%, transparent 100%); -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%);
+            /* Removed aggressive mask to show line */
         }
         .aviator-graph-svg.active { opacity: 1; }
         .aviator-plane-img {
             position: absolute; width: 60px; height: auto; z-index: 5; opacity: 0;
             filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
-            offset-path: path("M20,200 Q300,100 800,-100"); offset-rotate: auto;
+            offset-path: path("M20,200 Q200,150 400,20"); /* Adjusted path to stay visible longer */
+            offset-rotate: auto;
         }
-        .aviator-plane-img.taking-off { opacity: 1; animation: flyOffScreen 3s forwards ease-in; }
-        @keyframes flyOffScreen { 0% { offset-distance: 0%; transform: scale(0.6); } 100% { offset-distance: 100%; transform: scale(1.2); } }
+        .aviator-plane-img.taking-off { opacity: 1; animation: flyPath 3s forwards ease-in; }
+        @keyframes flyPath { 
+            0% { offset-distance: 0%; transform: scale(0.6); } 
+            100% { offset-distance: 100%; transform: scale(1.2); } 
+        }
         .coef-text { 
             position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
             font-family: 'Orbitron'; font-size: 48px; font-weight: 900; color: #fff; z-index: 10; 
@@ -189,7 +193,7 @@
         }
         .coef-text.visible { opacity: 1; }
 
-        /* --- PENALTY (ADJUSTED ZONES & STRATEGY) --- */
+        /* --- PENALTY (CALIBRATION MODE) --- */
         .penalty-container {
             position: relative; width: 300px; height: 190px; margin-bottom: 10px;
             background-image: url('img/penalty_bg.png'); background-size: cover; background-position: center;
@@ -197,9 +201,9 @@
         }
         .target-zone { position: absolute; width: 45px; height: 45px; border-radius: 50%; transition: 0.1s; display: flex; justify-content: center; align-items: center; }
         .z1 { top: 20px; left: 20px; } .z2 { top: 20px; right: 20px; } .z3 { top: 20px; left: 50%; transform: translateX(-50%); } 
-        /* UPDATED BOTTOM ZONES */
-        .z4 { bottom: 30px; left: 15px; } 
-        .z5 { bottom: 30px; right: 15px; }
+        /* DEFAULT VALUES (User will calibrate) */
+        .z4 { bottom: 25%; left: 10px; } 
+        .z5 { bottom: 25%; right: 10px; }
         
         .target-effect {
             width: 100%; height: 100%; border-radius: 50%;
@@ -212,19 +216,32 @@
         .target-zone.winner .target-effect { transform: scale(1.1); opacity: 1; animation: pulseTarget 1s infinite; }
         @keyframes pulseTarget { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
+        /* PENALTY CALIBRATION UI */
+        .calib-controls {
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            margin-bottom: 10px; background: rgba(0,0,0,0.8); padding: 5px; border-radius: 8px; border: 1px solid #444;
+        }
+        .calib-row { display: flex; gap: 10px; }
+        .calib-btn { background: #333; color: #fff; border: 1px solid #555; padding: 5px 10px; border-radius: 4px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; }
+        .calib-btn:active { background: var(--accent-cyan); color: #000; }
+        .calib-display { font-family: 'Orbitron'; color: var(--brand-green); font-size: 10px; min-width: 120px; text-align: center; }
+
         /* PENALTY STRATEGY BAR */
-        .penalty-strategy { display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: 10px; height: 25px; }
+        .penalty-strategy { display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: 5px; height: 25px; }
         .strat-dot { width: 12px; height: 12px; border-radius: 50%; background: #333; transition: 0.3s; box-shadow: 0 0 5px #000; }
         .strat-dot.win { background: #00ff41; box-shadow: 0 0 8px #00ff41; }
         .strat-dot.cashout { width: auto; height: auto; border-radius: 4px; padding: 2px 6px; background: #ff334b; color: #fff; font-size: 9px; font-family: 'Orbitron'; font-weight: bold; box-shadow: 0 0 8px #ff334b; }
 
-        /* --- MINES --- */
+        /* --- MINES (COLOR FIX) --- */
         .mines-wrapper { width: 90%; max-width: 320px; margin-bottom: 20px; }
         .mines-mode-switch { display: flex; background: #222; border-radius: 20px; padding: 4px; margin-bottom: 15px; border: 1px solid #444; position: relative; }
         .mode-opt { flex: 1; text-align: center; padding: 8px; font-family: 'Orbitron'; font-size: 11px; z-index: 2; cursor: pointer; color: #888; transition: 0.3s; }
-        .mode-opt.active { color: #000; font-weight: bold; text-shadow: none; }
+        .mode-opt.active { color: #fff; font-weight: bold; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        
         .mode-bg { position: absolute; top: 4px; left: 4px; width: 50%; height: calc(100% - 8px); background: var(--brand-green); border-radius: 16px; transition: 0.3s; z-index: 1; box-shadow: 0 0 10px var(--brand-green); }
+        /* RED FOR HIGH RISK */
         .mines-mode-switch[data-mode="risk"] .mode-bg { left: 50%; background: var(--brand-red); width: calc(50% - 4px); box-shadow: 0 0 10px var(--brand-red); }
+
         .mines-grid-select { display: flex; gap: 10px; margin-bottom: 15px; }
         .mines-btn-grid { flex: 1; background: #333; border: 1px solid #555; color: #fff; padding: 12px 0; border-radius: 8px; font-family: 'Orbitron'; font-size: 12px; cursor: pointer; text-align: center; transition: 0.2s; }
         .mines-btn-grid.active { background: var(--brand-green); color: #000; border-color: var(--brand-green); font-weight: 900; box-shadow: 0 0 15px rgba(0, 255, 65, 0.3); }
@@ -246,12 +263,10 @@
         .chicken-road-horizontal {
             width: 100%; height: 180px; background: #2b2b2b; border-radius: 12px; border: 2px dashed #444; box-shadow: inset 0 0 20px #000;
             overflow-x: auto; overflow-y: hidden; white-space: nowrap; padding: 20px 10px; box-sizing: border-box; display: flex; align-items: center;
-            cursor: grab; /* PC CURSOR */
-            -ms-overflow-style: none; scrollbar-width: none;
+            cursor: grab; -ms-overflow-style: none; scrollbar-width: none;
         }
         .chicken-road-horizontal::-webkit-scrollbar { display: none; }
         .chicken-road-horizontal.active { cursor: grabbing; }
-
         .road-step-wrapper { display: inline-flex; align-items: center; position: relative; }
         .road-step {
             width: 60px; height: 60px; background: #1a1a1a; border: 3px solid #333; border-radius: 50%;
@@ -274,16 +289,13 @@
             opacity: 0; pointer-events: none; transition: 0.3s;
         }
         .backdrop-overlay.active { opacity: 1; pointer-events: all; }
-
         .live-sheet {
             position: absolute; bottom: 0; left: 0; width: 100%; height: auto;
-            max-height: 50px; /* Collapsed Height */
-            background: #111; border-top: 2px solid #333; border-radius: 20px 20px 0 0;
+            max-height: 50px; background: #111; border-top: 2px solid #333; border-radius: 20px 20px 0 0;
             z-index: 250; transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
             overflow: hidden; box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
         }
         .live-sheet.expanded { max-height: 50vh; border-color: var(--accent-cyan); }
-
         .sheet-handle {
             width: 100%; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
             cursor: pointer; box-sizing: border-box; background: #161616;
@@ -292,7 +304,6 @@
         .sheet-title span { color: var(--brand-green); margin-left: 5px; }
         .sheet-icon { color: #888; transition: 0.3s; }
         .live-sheet.expanded .sheet-icon { transform: rotate(180deg); }
-
         .sheet-content { padding: 10px 20px; overflow-y: auto; max-height: calc(50vh - 50px); }
         .win-row {
             display: flex; justify-content: space-between; align-items: center;
@@ -311,26 +322,19 @@
     <div id="backdrop" class="backdrop-overlay" onclick="toggleLiveWins()"></div>
     
     <div id="app-wrapper">
-        
         <div id="preloader"><div class="terminal-text" id="term-text"></div></div>
-
         <div class="hud-bar">
             <div><span class="status-dot"></span>ONLINE <span id="online-users" class="online-count">1420</span></div>
             <div id="session-id">SID: ...</div>
         </div>
-        
         <div class="lang-container" id="lang-cont">
-            <select onchange="changeLang(this.value)" id="lang-select">
-                <option value="en">🇬🇧 EN</option>
-                <option value="es">🇪🇸 ES</option>
-                <option value="ar">🇦🇪 AR</option>
-            </select>
+            <select onchange="changeLang(this.value)" id="lang-select"><option value="en">🇬🇧 EN</option><option value="es">🇪🇸 ES</option><option value="ar">🇦🇪 AR</option></select>
         </div>
 
         <div id="screen-menu" class="screen">
             <div class="main-logo">
                 <div class="logo-title">AI PREDICTOR</div>
-                <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL v15.0</div>
+                <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL v16.0</div>
                 <div class="brand-sub">powered by Omar</div>
             </div>
             <div class="menu-grid">
@@ -346,10 +350,9 @@
         <div id="id-modal" class="modal-overlay">
             <div class="id-box">
                 <h3 style="color:#00f2ea; font-family:'Orbitron'; margin-bottom:5px;">AUTHORIZATION</h3>
-                <p style="font-size:11px; color:#aaa; margin-bottom:20px;">Secure connection to Server</p>
                 <input type="tel" id="user-id-input" class="id-input" placeholder="Account ID" maxlength="12">
                 <button id="btn-connect" class="id-btn" onclick="validateAndConnect()">CONNECT ACCOUNT</button>
-                <div id="id-error" style="color:#ff334b; font-size:10px; margin-top:10px; min-height:15px; font-weight:bold;"></div>
+                <div id="id-error" style="color:#ff334b; font-size:10px; margin-top:10px;"></div>
                 <div id="sync-log" class="sync-log"></div>
             </div>
         </div>
@@ -357,14 +360,11 @@
         <div id="screen-game" class="screen">
             
             <div id="aviator-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
-                <div class="game-header">
-                    <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
-                    <img src="img/aviator_logo.png" class="game-logo-hero">
-                </div>
+                <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/aviator_logo.png" class="game-logo-hero"></div>
                 <div class="aviator-wrapper">
-                    <svg class="aviator-graph-svg" id="aviator-graph" viewBox="0 0 350 200" preserveAspectRatio="none">
-                        <path d="M0,200 Q150,150 350,20 L350,200 Z" fill="rgba(255, 51, 75, 0.2)" />
-                        <path d="M0,200 Q150,150 350,20" fill="none" stroke="#ff334b" stroke-width="4" />
+                    <svg class="aviator-graph-svg" id="aviator-graph" viewBox="0 0 400 200" preserveAspectRatio="none">
+                        <path d="M0,200 Q200,150 400,20 L400,200 Z" fill="rgba(255, 51, 75, 0.2)" />
+                        <path d="M0,200 Q200,150 400,20" fill="none" stroke="#ff334b" stroke-width="4" />
                     </svg>
                     <img src="img/plane.png" id="aviator-plane" class="aviator-plane-img">
                     <div class="coef-text" id="coef-text">0.00x</div>
@@ -372,12 +372,22 @@
             </div>
 
             <div id="penalty-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
-                <div class="game-header">
-                    <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
-                    <img src="img/menu_penalty.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
-                </div>
-                <div class="penalty-strategy" id="pen-strat"></div>
+                <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/menu_penalty.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;"></div>
                 
+                <div class="calib-controls">
+                    <div class="calib-display" id="calib-debug">B: 25% L: 10px</div>
+                    <div class="calib-row">
+                        <button class="calib-btn" onclick="calibMove('y', 1)">⬆</button>
+                        <button class="calib-btn" onclick="calibMove('y', -1)">⬇</button>
+                    </div>
+                    <div class="calib-row">
+                        <button class="calib-btn" onclick="calibMove('x', -1)">⬅</button>
+                        <button class="calib-btn" onclick="calibToggle()">L / R</button>
+                        <button class="calib-btn" onclick="calibMove('x', 1)">➡</button>
+                    </div>
+                </div>
+
+                <div class="penalty-strategy" id="pen-strat"></div>
                 <div class="penalty-container">
                     <div class="target-zone z1" id="pz1"><div class="target-effect"></div></div>
                     <div class="target-zone z2" id="pz2"><div class="target-effect"></div></div>
@@ -388,10 +398,7 @@
             </div>
 
             <div id="mines-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
-                <div class="game-header">
-                    <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
-                    <img src="img/menu_mines.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
-                </div>
+                <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/menu_mines.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;"></div>
                 <div class="mines-wrapper" id="mines-wrap">
                     <div class="mines-mode-switch" id="mines-mode" data-mode="safe">
                         <div class="mode-bg"></div>
@@ -403,35 +410,20 @@
                         <div class="mines-btn-grid" id="btn-5" onclick="setMinesGrid(5)">5x5</div>
                     </div>
                     <div class="mines-stepper">
-                        <div style="display:flex; flex-direction:column; padding-left:5px;">
-                            <span class="mines-count-display" id="mines-val">3</span>
-                            <span class="mines-label-sm">TRAPS</span>
-                        </div>
-                        <div style="display:flex; gap:5px;">
-                            <button class="step-btn" onclick="stepMines(-1)">−</button>
-                            <button class="step-btn" onclick="stepMines(1)">+</button>
-                        </div>
+                        <div style="display:flex; flex-direction:column; padding-left:5px;"><span class="mines-count-display" id="mines-val">3</span><span class="mines-label-sm">TRAPS</span></div>
+                        <div style="display:flex; gap:5px;"><button class="step-btn" onclick="stepMines(-1)">−</button><button class="step-btn" onclick="stepMines(1)">+</button></div>
                     </div>
                     <div id="mines-board" class="mines-board"></div>
                 </div>
             </div>
 
             <div id="chicken-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
-                <div class="game-header">
-                    <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
-                    <img src="img/menu_chicken.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
-                </div>
+                <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/menu_chicken.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;"></div>
                 <div class="chicken-wrapper">
                     <div style="width:100%; text-align:right; margin-bottom:10px;">
-                        <select id="chicken-diff" onchange="renderChickenRoad()" style="padding: 8px 15px;">
-                            <option value="easy">EASY</option>
-                            <option value="medium" selected>MEDIUM</option>
-                            <option value="hard">HARD</option>
-                            <option value="hardcore">HARDCORE</option>
-                        </select>
+                        <select id="chicken-diff" onchange="renderChickenRoad()" style="padding: 8px 15px;"><option value="easy">EASY</option><option value="medium" selected>MEDIUM</option><option value="hard">HARD</option><option value="hardcore">HARDCORE</option></select>
                     </div>
-                    <div class="chicken-road-horizontal" id="chicken-road-container">
-                        </div>
+                    <div class="chicken-road-horizontal" id="chicken-road-container"></div>
                 </div>
             </div>
 
@@ -440,265 +432,151 @@
         </div>
 
         <div id="live-sheet" class="live-sheet">
-            <div class="sheet-handle" onclick="toggleLiveWins()">
-                <div class="sheet-title">🏆 LIVE WINS <span id="last-win-name"></span></div>
-                <div class="sheet-icon">▲</div>
-            </div>
+            <div class="sheet-handle" onclick="toggleLiveWins()"><div class="sheet-title">🏆 LIVE WINS <span id="last-win-name"></span></div><div class="sheet-icon">▲</div></div>
             <div class="sheet-content" id="live-list"></div>
         </div>
-
     </div>
 
     <div style="display:none;">
-        <img src="img/menu_aviator.png"><img src="img/menu_penalty.png">
-        <img src="img/menu_mines.png"><img src="img/menu_chicken.png">
-        <img src="img/plane.png"><img src="img/penalty_bg.png">
-        <img src="img/aviator_logo.png"><img src="img/mines_star.png">
+        <img src="img/menu_aviator.png"><img src="img/menu_penalty.png"><img src="img/menu_mines.png"><img src="img/menu_chicken.png">
+        <img src="img/plane.png"><img src="img/penalty_bg.png"><img src="img/aviator_logo.png"><img src="img/mines_star.png">
     </div>
 
     <script>
-        // --- CONSTANTS ---
-        const trans = {
-            en: { get_signal: "GET SIGNAL", exit: "EXIT", aviator: "AVIATOR", penalty: "PENALTY", soon: "SOON" },
-            es: { get_signal: "OBTENER SEÑAL", exit: "SALIR", aviator: "AVIATOR", penalty: "PENALTI", soon: "PRONTO" },
-            ar: { get_signal: "احصل على إشارة", exit: "خروج", aviator: "طيار", penalty: "ضربة جزاء", soon: "قريباً" }
-        };
-        const currData = { en: "$", es: "€", ar: "EGP" };
-        const CHICKEN_DATA = {
-            easy: ["1.03x", "1.07x", "1.12x", "1.17x", "1.23x", "1.29x", "1.36x", "1.44x", "1.53x", "1.63x", "1.75x", "1.88x", "2.04x", "2.22x", "2.45x", "2.72x", "3.06x", "3.50x", "4.08x", "4.90x", "6.13x", "6.61x", "9.81x", "19.44x"],
-            medium: ["1.12x", "1.28x", "1.47x", "1.70x", "1.98x", "2.33x", "2.76x", "3.32x", "4.03x", "4.96x", "6.20x", "6.91x", "8.90x", "11.76x", "15.99x", "22.61x", "33.58x", "53.20x", "92.17x", "182.51x", "451.71x", "1778.80x"],
-            hard: ["1.23x", "1.55x", "1.98x", "2.56x", "3.36x", "4.49x", "5.49x", "7.53x", "10.56x", "15.21x", "22.59x", "34.79x", "55.97x", "94.99x", "172.42x", "341.40x", "760.46x", "2007.63x", "6956.47x", "41321.43x"],
-            hardcore: ["1.63x", "2.80x", "4.95x", "9.08x", "15.21x", "30.12x", "62.96x", "140.24x", "337.19x", "890.19x", "2643.89x", "9161.08x", "39301.05x", "233448.29x", "254112.51x"]
-        };
-        const PENALTY_COEFFS = ["1.92x", "3.84x", "7.68x", "15.36x", "30.72x"];
-        
-        let curLang = 'en';
+        const trans={en:{get_signal:"GET SIGNAL",exit:"EXIT",aviator:"AVIATOR",penalty:"PENALTY",soon:"SOON"},es:{get_signal:"OBTENER SEÑAL",exit:"SALIR",aviator:"AVIATOR",penalty:"PENALTI",soon:"PRONTO"},ar:{get_signal:"احصل على إشارة",exit:"خروج",aviator:"طيار",penalty:"ضربة جزاء",soon:"قريباً"}};
+        const currData={en:"$",es:"€",ar:"EGP"};
+        const CHICKEN_DATA={easy:["1.03x","1.07x","1.12x","1.17x","1.23x","1.29x","1.36x","1.44x","1.53x","1.63x","1.75x","1.88x","2.04x","2.22x","2.45x","2.72x","3.06x","3.50x","4.08x","4.90x","6.13x","6.61x","9.81x","19.44x"],medium:["1.12x","1.28x","1.47x","1.70x","1.98x","2.33x","2.76x","3.32x","4.03x","4.96x","6.20x","6.91x","8.90x","11.76x","15.99x","22.61x","33.58x","53.20x","92.17x","182.51x","451.71x","1778.80x"],hard:["1.23x","1.55x","1.98x","2.56x","3.36x","4.49x","5.49x","7.53x","10.56x","15.21x","22.59x","34.79x","55.97x","94.99x","172.42x","341.40x","760.46x","2007.63x","6956.47x","41321.43x"],hardcore:["1.63x","2.80x","4.95x","9.08x","15.21x","30.12x","62.96x","140.24x","337.19x","890.19x","2643.89x","9161.08x","39301.05x","233448.29x","254112.51x"]};
+        let curLang='en';
 
-        // --- INIT ---
+        // --- PENALTY CALIBRATION VARS ---
+        let calibPos = { lb: 25, lx: 10, rb: 25, rx: 10 }; // b=bottom%, x=left/right px
+        let calibActive = 'left';
+
         window.onload = function() {
             const savedId = localStorage.getItem('user_id');
             if(savedId) document.getElementById('user-id-input').value = savedId;
-            
-            setInterval(() => {
-                let c = parseInt(document.getElementById('online-users').innerText);
-                c += Math.floor(Math.random() * 5) - 2;
-                document.getElementById('online-users').innerText = c;
-            }, 3000);
-
-            // Populate Live Wins
-            for(let i=0; i<15; i++) addLiveWinItem();
-            setInterval(addLiveWinItem, 3000);
-
-            // Init Drag Scroll
+            setInterval(() => { let c = parseInt(document.getElementById('online-users').innerText); c += Math.floor(Math.random()*5)-2; document.getElementById('online-users').innerText=c; }, 3000);
+            for(let i=0; i<15; i++) addLiveWinItem(); setInterval(addLiveWinItem, 3000);
             initDragScroll();
-
-            const termLines = ["INITIALIZING...", "CHECKING RESOURCES...", "ESTABLISHING SECURE TUNNEL...", "READY."];
-            let lineIdx = 0;
-            const term = document.getElementById('term-text');
-            function typeLine() {
-                if(lineIdx < termLines.length) { term.innerText = termLines[lineIdx++]; setTimeout(typeLine, 300); }
-                else { setTimeout(() => { document.getElementById('preloader').style.display='none'; document.getElementById('id-modal').style.display='flex'; }, 500); }
-            }
+            const term = document.getElementById('term-text'); const termLines = ["INITIALIZING...", "CHECKING RESOURCES...", "ESTABLISHING SECURE TUNNEL...", "READY."]; let lineIdx=0;
+            function typeLine() { if(lineIdx<termLines.length) { term.innerText=termLines[lineIdx++]; setTimeout(typeLine,300); } else { setTimeout(()=>{document.getElementById('preloader').style.display='none';document.getElementById('id-modal').style.display='flex';},500); } }
             typeLine();
         };
-
-        const sid = "SID-" + Math.random().toString(36).substr(2, 6).toUpperCase();
-        document.getElementById('session-id').innerText = sid;
+        const sid = "SID-" + Math.random().toString(36).substr(2, 6).toUpperCase(); document.getElementById('session-id').innerText = sid;
 
         function validateAndConnect() {
-            const val = document.getElementById('user-id-input').value;
-            const err = document.getElementById('id-error');
-            const btn = document.getElementById('btn-connect');
-            if (val.length < 5) { err.innerText = "ERROR: INVALID ID"; return; }
+            const val = document.getElementById('user-id-input').value; if(val.length<5) { document.getElementById('id-error').innerText="ERROR: INVALID ID"; return; }
             localStorage.setItem('user_id', val);
-            err.innerText = ""; btn.disabled = true; btn.style.background = "#333"; btn.innerText = "CONNECTING..."; document.getElementById('sync-log').style.display = "block";
-            setTimeout(() => { document.getElementById('sync-log').innerText = "> SYNCHRONIZED"; btn.innerText = "SUCCESS"; btn.style.background = "#00f2ea"; btn.style.color = "#000"; }, 2500);
-            setTimeout(() => { document.getElementById('id-modal').style.display = 'none'; document.getElementById('screen-menu').classList.add('active'); }, 3200);
+            const btn = document.getElementById('btn-connect'); btn.disabled=true; btn.style.background="#333"; btn.innerText="CONNECTING..."; document.getElementById('sync-log').style.display="block";
+            setTimeout(()=>{document.getElementById('sync-log').innerText="> SYNCHRONIZED"; btn.innerText="SUCCESS"; btn.style.background="#00f2ea"; btn.style.color="#000";},2500);
+            setTimeout(()=>{document.getElementById('id-modal').style.display='none'; document.getElementById('screen-menu').classList.add('active');},3200);
         }
-
-        function changeLang(l) {
-            curLang = l; document.body.className = "lang-" + l;
-            const cont = document.getElementById('lang-cont');
-            if(l === 'ar') cont.classList.add('ar-pos'); else cont.classList.remove('ar-pos');
-            document.querySelectorAll('[data-tr]').forEach(el => { if(trans[l][el.getAttribute('data-tr')]) el.innerText = trans[l][el.getAttribute('data-tr')]; });
-        }
-
-        // --- LIVE WINS ---
-        function toggleLiveWins() {
-            document.getElementById('live-sheet').classList.toggle('expanded');
-            document.getElementById('backdrop').classList.toggle('active');
-        }
+        function changeLang(l) { curLang=l; document.body.className="lang-"+l; const cont=document.getElementById('lang-cont'); if(l==='ar') cont.classList.add('ar-pos'); else cont.classList.remove('ar-pos'); document.querySelectorAll('[data-tr]').forEach(el=>{if(trans[l][el.getAttribute('data-tr')]) el.innerText=trans[l][el.getAttribute('data-tr')];}); }
+        function toggleLiveWins() { document.getElementById('live-sheet').classList.toggle('expanded'); document.getElementById('backdrop').classList.toggle('active'); }
         function addLiveWinItem() {
-            const list = document.getElementById('live-list');
-            const p = ['155','156','157'][Math.floor(Math.random()*3)];
-            const id = `${p}****${Math.floor(Math.random()*90)+10}`;
-            let amt = Math.floor(Math.random()*290)+10;
-            let isBig = Math.random()>0.95;
-            if(isBig) amt = Math.floor(Math.random()*2000)+1000;
+            const list = document.getElementById('live-list'); const p=['155','156','157'][Math.floor(Math.random()*3)]; const id=`${p}****${Math.floor(Math.random()*90)+10}`;
+            let amt = Math.floor(Math.random()*290)+10; let isBig = Math.random()>0.95; if(isBig) amt = Math.floor(Math.random()*2000)+1000;
             const game = ["Aviator","Mines","Penalty"][Math.floor(Math.random()*3)];
-            
-            const div = document.createElement('div');
-            div.className = 'win-row'; if(isBig) div.classList.add('big-win');
+            const div = document.createElement('div'); div.className='win-row'; if(isBig) div.classList.add('big-win');
             div.innerHTML = `<div><span class="win-name">${id}</span> <span style="font-size:9px;color:#888;margin-left:5px">${game}</span></div><div class="win-amt">+${amt}${currData[curLang]}</div>`;
-            
-            list.prepend(div);
-            if(list.children.length > 20) list.lastElementChild.remove();
-            
-            // Update Mini Label
-            document.getElementById('last-win-name').innerText = `• ${id} +${amt}${currData[curLang]}`;
+            list.prepend(div); if(list.children.length>20) list.lastElementChild.remove();
+            document.getElementById('last-win-name').innerText=`• ${id} +${amt}${currData[curLang]}`;
         }
-
-        // --- DRAG SCROLL FOR PC ---
         function initDragScroll() {
-            const slider = document.getElementById('chicken-road-container');
-            let isDown = false; let startX; let scrollLeft;
-            slider.addEventListener('mousedown', (e) => { isDown = true; slider.classList.add('active'); startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
-            slider.addEventListener('mouseleave', () => { isDown = false; slider.classList.remove('active'); });
-            slider.addEventListener('mouseup', () => { isDown = false; slider.classList.remove('active'); });
-            slider.addEventListener('mousemove', (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 2; slider.scrollLeft = scrollLeft - walk; });
+            const slider = document.getElementById('chicken-road-container'); let isDown=false; let startX; let scrollLeft;
+            slider.addEventListener('mousedown',(e)=>{isDown=true;slider.classList.add('active');startX=e.pageX-slider.offsetLeft;scrollLeft=slider.scrollLeft;});
+            slider.addEventListener('mouseleave',()=>{isDown=false;slider.classList.remove('active');});
+            slider.addEventListener('mouseup',()=>{isDown=false;slider.classList.remove('active');});
+            slider.addEventListener('mousemove',(e)=>{if(!isDown)return;e.preventDefault();const x=e.pageX-slider.offsetLeft;const walk=(x-startX)*2;slider.scrollLeft=scrollLeft-walk;});
         }
 
-        // --- GAME LOGIC ---
-        let activeGame = null; let minesSize=3; let minesCount=3; let minesMode='safe';
+        // --- PENALTY CALIB FUNCTIONS ---
+        function calibToggle() { calibActive = (calibActive === 'left') ? 'right' : 'left'; updateCalibUI(); }
+        function calibMove(axis, val) {
+            if(calibActive === 'left') {
+                if(axis==='y') calibPos.lb += val; else calibPos.lx += val;
+                document.querySelector('.z4').style.bottom = calibPos.lb + '%';
+                document.querySelector('.z4').style.left = calibPos.lx + 'px';
+            } else {
+                if(axis==='y') calibPos.rb += val; else calibPos.rx += val;
+                document.querySelector('.z5').style.bottom = calibPos.rb + '%';
+                document.querySelector('.z5').style.right = calibPos.rx + 'px';
+            }
+            updateCalibUI();
+        }
+        function updateCalibUI() {
+            const txt = (calibActive==='left') ? `LEFT | B:${calibPos.lb}% L:${calibPos.lx}px` : `RIGHT | B:${calibPos.rb}% R:${calibPos.rx}px`;
+            document.getElementById('calib-debug').innerText = txt;
+        }
 
+        let activeGame=null; let minesSize=3; let minesCount=3; let minesMode='safe';
         function openGame(g) {
-            activeGame = g;
-            document.getElementById('screen-menu').classList.remove('active');
-            document.getElementById('screen-game').classList.add('active');
-            ['aviator', 'penalty', 'mines', 'chicken'].forEach(id => document.getElementById(id+'-view').style.display = 'none');
-            document.getElementById('signal-btn').disabled = false;
-            document.getElementById('signal-btn').innerText = trans[curLang].get_signal;
-            document.getElementById(g+'-view').style.display = 'flex';
-
+            activeGame=g; document.getElementById('screen-menu').classList.remove('active'); document.getElementById('screen-game').classList.add('active');
+            ['aviator','penalty','mines','chicken'].forEach(id=>document.getElementById(id+'-view').style.display='none');
+            document.getElementById('signal-btn').disabled=false; document.getElementById('signal-btn').innerText=trans[curLang].get_signal;
+            document.getElementById(g+'-view').style.display='flex';
             if(g==='aviator') { document.getElementById('aviator-plane').classList.remove('taking-off'); document.getElementById('coef-text').classList.remove('visible'); }
-            if(g==='penalty') { 
-                document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning'));
-                document.getElementById('pen-strat').innerHTML = ''; // Clear strategy
-            }
-            if(g==='mines') setMinesGrid(3);
-            if(g==='chicken') renderChickenRoad();
+            if(g==='penalty') { document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning')); document.getElementById('pen-strat').innerHTML=''; }
+            if(g==='mines') setMinesGrid(3); if(g==='chicken') renderChickenRoad();
         }
-        function backMenu() {
-            document.getElementById('screen-game').classList.remove('active');
-            document.getElementById('screen-menu').classList.add('active');
-        }
-
-        // --- MINES ---
+        function backMenu() { document.getElementById('screen-game').classList.remove('active'); document.getElementById('screen-menu').classList.add('active'); }
         function setMinesGrid(s) {
-            minesSize = s; const b = document.getElementById('mines-board');
-            b.style.gridTemplateColumns = `repeat(${s}, 1fr)`; b.innerHTML = "";
+            minesSize=s; const b=document.getElementById('mines-board'); b.style.gridTemplateColumns=`repeat(${s}, 1fr)`; b.innerHTML="";
             document.getElementById('btn-3').classList.remove('active'); document.getElementById('btn-5').classList.remove('active'); document.getElementById(`btn-${s}`).classList.add('active');
-            for(let i=0; i<s*s; i++) {
-                const d = document.createElement('div'); d.className='mine-tile'; d.id='mt-'+i; 
-                d.innerHTML='<img src="img/mines_star.png">'; b.appendChild(d);
-            }
+            for(let i=0; i<s*s; i++) { const d=document.createElement('div'); d.className='mine-tile'; d.id='mt-'+i; d.innerHTML='<img src="img/mines_star.png">'; b.appendChild(d); }
         }
-        function stepMines(d) { minesCount+=d; if(minesCount<1) minesCount=1; document.getElementById('mines-val').innerText = minesCount; }
+        function stepMines(d) { minesCount+=d; if(minesCount<1) minesCount=1; document.getElementById('mines-val').innerText=minesCount; }
         function setMinesMode(m) {
-            minesMode = m; const el = document.getElementById('mines-mode');
-            document.querySelectorAll('.mode-opt').forEach(o => o.classList.remove('active'));
+            minesMode=m; const el=document.getElementById('mines-mode'); document.querySelectorAll('.mode-opt').forEach(o=>o.classList.remove('active'));
             if(m==='safe') { el.children[1].classList.add('active'); document.getElementById('mines-wrap').classList.remove('risk-mode'); }
             else { el.children[2].classList.add('active'); document.getElementById('mines-wrap').classList.add('risk-mode'); }
         }
-
-        // --- CHICKEN ---
         function renderChickenRoad() {
-            const diff = document.getElementById('chicken-diff').value;
-            const data = CHICKEN_DATA[diff];
-            const container = document.getElementById('chicken-road-container');
-            container.innerHTML = ""; container.scrollLeft = 0;
-            data.forEach((coef, i) => {
-                const w = document.createElement('div'); w.className = 'road-step-wrapper';
-                w.innerHTML = `<div class="road-step" id="rs-${i}"><span class="step-coef">${coef}</span><span class="step-label">STEP ${i+1}</span><div class="cashout-label">CASHOUT</div></div>`;
-                if(i < data.length-1) w.innerHTML += `<div class="road-connector"></div>`;
+            const diff=document.getElementById('chicken-diff').value; const data=CHICKEN_DATA[diff]; const container=document.getElementById('chicken-road-container'); container.innerHTML=""; container.scrollLeft=0;
+            data.forEach((coef,i)=>{
+                const w=document.createElement('div'); w.className='road-step-wrapper';
+                w.innerHTML=`<div class="road-step" id="rs-${i}"><span class="step-coef">${coef}</span><span class="step-label">STEP ${i+1}</span><div class="cashout-label">CASHOUT</div></div>`;
+                if(i<data.length-1) w.innerHTML+=`<div class="road-connector"></div>`;
                 container.appendChild(w);
             });
         }
-
-        // --- SIGNAL ---
         function getSignal() {
-            const btn = document.getElementById('signal-btn');
-            btn.disabled = true;
-            
-            // RESET
-            if(activeGame==='aviator') { const p = document.getElementById('aviator-plane'); p.classList.remove('taking-off'); void p.offsetWidth; document.getElementById('coef-text').classList.remove('visible'); }
+            const btn=document.getElementById('signal-btn'); btn.disabled=true;
+            if(activeGame==='aviator') { const p=document.getElementById('aviator-plane'); p.classList.remove('taking-off'); void p.offsetWidth; document.getElementById('coef-text').classList.remove('visible'); }
             if(activeGame==='penalty') { document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning')); document.getElementById('pen-strat').innerHTML=''; }
             if(activeGame==='mines') document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
             if(activeGame==='chicken') { document.querySelectorAll('.road-step').forEach(el=>el.classList.remove('safe','final')); document.getElementById('chicken-road-container').scrollLeft=0; }
-
-            let steps = ["CONNECTING...","ANALYZING...","PREDICTING..."]; if(curLang==='ar') steps=["جار الاتصال","تحليل","تنبؤ"];
-            let i = 0; btn.innerText = steps[0];
-            const t = setInterval(() => {
-                i++; if(i<steps.length) btn.innerText=steps[i];
-                else { clearInterval(t); showResult(btn); }
-            }, 600);
+            let steps=["CONNECTING...","ANALYZING...","PREDICTING..."]; if(curLang==='ar') steps=["جار الاتصال","تحليل","تنبؤ"];
+            let i=0; btn.innerText=steps[0];
+            const t=setInterval(()=>{ i++; if(i<steps.length) btn.innerText=steps[i]; else { clearInterval(t); showResult(btn); } },600);
         }
-
         function showResult(btn) {
             if(activeGame==='aviator') {
-                const final = (Math.random()*(5.0-1.2)+1.2).toFixed(2);
+                const final=(Math.random()*(5.0-1.2)+1.2).toFixed(2);
                 document.getElementById('aviator-plane').classList.add('taking-off');
-                const txt = document.getElementById('coef-text'); txt.classList.add('visible');
-                let val = 1.00;
-                const t = setInterval(() => { val+=0.05; if(val>=final) { clearInterval(t); txt.innerText=final+"x"; cooldown(btn); } else txt.innerText=val.toFixed(2)+"x"; }, 50);
+                const txt=document.getElementById('coef-text'); txt.classList.add('visible');
+                let val=1.00; const t=setInterval(()=>{ val+=0.05; if(val>=final) { clearInterval(t); txt.innerText=final+"x"; cooldown(btn); } else txt.innerText=val.toFixed(2)+"x"; },50);
             }
             else if(activeGame==='penalty') {
-                // Strategy Generation
-                const stratLen = Math.floor(Math.random()*3)+2; // 2 to 4 steps
-                const sBar = document.getElementById('pen-strat');
-                for(let k=0; k<stratLen; k++) {
-                    const d = document.createElement('div');
-                    if(k === stratLen-1) { d.className = 'strat-dot cashout'; d.innerText="CASHOUT"; }
-                    else { d.className = 'strat-dot win'; }
-                    sBar.appendChild(d);
-                }
-
-                // Animation
-                const targets = document.querySelectorAll('.target-zone');
-                let step = 0;
-                const t = setInterval(() => {
-                    targets.forEach(e=>e.classList.remove('scanning')); targets[Math.floor(Math.random()*5)].classList.add('scanning');
-                    step++;
-                    if(step>12) {
-                        clearInterval(t); targets.forEach(e=>e.classList.remove('scanning'));
-                        document.getElementById('pz'+(Math.floor(Math.random()*5)+1)).classList.add('winner');
-                        cooldown(btn);
-                    }
-                }, 100);
+                const stratLen = Math.floor(Math.random()*3)+2; const sBar = document.getElementById('pen-strat');
+                for(let k=0; k<stratLen; k++) { const d=document.createElement('div'); if(k===stratLen-1){d.className='strat-dot cashout';d.innerText="CASHOUT";}else{d.className='strat-dot win';} sBar.appendChild(d); }
+                const targets=document.querySelectorAll('.target-zone'); let step=0;
+                const t=setInterval(()=>{ targets.forEach(e=>e.classList.remove('scanning')); targets[Math.floor(Math.random()*5)].classList.add('scanning'); step++; if(step>12) { clearInterval(t); targets.forEach(e=>e.classList.remove('scanning')); document.getElementById('pz'+(Math.floor(Math.random()*5)+1)).classList.add('winner'); cooldown(btn); } },100);
             }
             else if(activeGame==='mines') {
-                const tot = minesSize*minesSize;
-                let open = minesMode==='safe' ? Math.floor(Math.random()*2)+3 : tot-minesCount;
-                let idxs = new Set(); while(idxs.size<open) idxs.add(Math.floor(Math.random()*tot));
-                let arr = Array.from(idxs); let k=0;
-                const t = setInterval(() => {
-                    if(k>=arr.length) { clearInterval(t); cooldown(btn); }
-                    else { document.getElementById('mt-'+arr[k]).classList.add('reveal'); k++; }
-                }, 100);
+                const tot=minesSize*minesSize; let open=minesMode==='safe'?Math.floor(Math.random()*2)+3:tot-minesCount;
+                let idxs=new Set(); while(idxs.size<open) idxs.add(Math.floor(Math.random()*tot));
+                let arr=Array.from(idxs); let k=0;
+                const t=setInterval(()=>{ if(k>=arr.length) { clearInterval(t); cooldown(btn); } else { document.getElementById('mt-'+arr[k]).classList.add('reveal'); k++; } },100);
             }
             else if(activeGame==='chicken') {
-                const c = document.getElementById('chicken-road-container');
-                const max = CHICKEN_DATA[document.getElementById('chicken-diff').value].length;
-                let safe = Math.floor(Math.random()*5)+3; if(Math.random()>0.8) safe+=5; if(safe>max) safe=max;
+                const c=document.getElementById('chicken-road-container'); const max=CHICKEN_DATA[document.getElementById('chicken-diff').value].length;
+                let safe=Math.floor(Math.random()*5)+3; if(Math.random()>0.8) safe+=5; if(safe>max) safe=max;
                 let k=0;
-                const t = setInterval(() => {
-                    if(k>=safe) { clearInterval(t); if(k>0) document.getElementById('rs-'+(k-1)).classList.add('final'); cooldown(btn); }
-                    else {
-                        const el = document.getElementById('rs-'+k); el.classList.add('safe');
-                        c.scrollTo({ left: el.offsetLeft - c.clientWidth/2 + 30, behavior: 'smooth' });
-                        k++;
-                    }
-                }, 500);
+                const t=setInterval(()=>{ if(k>=safe) { clearInterval(t); if(k>0) document.getElementById('rs-'+(k-1)).classList.add('final'); cooldown(btn); } else { const el=document.getElementById('rs-'+k); el.classList.add('safe'); c.scrollTo({left:el.offsetLeft-c.clientWidth/2+30,behavior:'smooth'}); k++; } },500);
             }
         }
-
-        function cooldown(btn) {
-            let s = 4;
-            const t = setInterval(() => {
-                btn.innerText = `WAIT ${s}s`; s--;
-                if(s<0) { clearInterval(t); btn.innerText = trans[curLang].get_signal; btn.disabled = false; }
-            }, 1000);
-        }
+        function cooldown(btn) { let s=4; const t=setInterval(()=>{ btn.innerText=`WAIT ${s}s`; s--; if(s<0) { clearInterval(t); btn.innerText=trans[curLang].get_signal; btn.disabled=false; } },1000); }
     </script>
 </body>
 </html>
