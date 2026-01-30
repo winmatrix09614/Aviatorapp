@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v11.0</title>
+    <title>AI Signal Bot Ultimate v12.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     
@@ -126,11 +126,24 @@
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 15px;
             text-align: center; cursor: pointer; transition: all 0.3s ease;
             position: relative; overflow: hidden;
+            min-height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .game-card:hover, .game-card:active {
             transform: translateY(-5px); border-color: var(--accent-cyan);
             box-shadow: 0 0 20px rgba(0, 242, 234, 0.3);
         }
+        
+        /* SOON BLOCKS */
+        .game-card.soon {
+            cursor: default; opacity: 0.5; border-color: rgba(255,255,255,0.05);
+        }
+        .game-card.soon:hover, .game-card.soon:active {
+            transform: none; box-shadow: none; border-color: rgba(255,255,255,0.05);
+        }
+        .soon-text {
+            font-family: 'Orbitron'; font-size: 18px; font-weight: bold; color: #666; letter-spacing: 2px;
+        }
+
         .game-img { width: 60px; height: 60px; margin-bottom: 8px; border-radius: 12px; object-fit: cover; }
         .game-title { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 12px; color: #fff; }
 
@@ -163,7 +176,7 @@
         
         .btn-back { margin-top: 15px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 25px; border-radius: 20px; font-size: 10px; font-family: 'Orbitron'; cursor: pointer; z-index: 100; }
 
-        /* --- AVIATOR FIXED v2 --- */
+        /* --- AVIATOR FIXED v3 (OFF SCREEN & RESET) --- */
         .aviator-wrapper {
             position: relative; width: 100%; height: 200px; margin-bottom: 10px;
             overflow: hidden;
@@ -177,14 +190,14 @@
         .aviator-plane-img {
             position: absolute; width: 60px; height: auto; z-index: 5; opacity: 0;
             filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
-            /* ADJUSTED PATH TO STAY ON SCREEN LONGER */
-            offset-path: path("M20,200 Q150,150 320,50"); 
+            /* Path goes way off screen (X=800) */
+            offset-path: path("M20,200 Q300,100 800,-100"); 
             offset-rotate: auto;
         }
-        .aviator-plane-img.taking-off { opacity: 1; animation: flySeamless 3s forwards ease-out; }
-        @keyframes flySeamless { 
+        .aviator-plane-img.taking-off { opacity: 1; animation: flyOffScreen 3s forwards ease-in; }
+        @keyframes flyOffScreen { 
             0% { offset-distance: 0%; transform: scale(0.6); } 
-            100% { offset-distance: 100%; transform: scale(1.1); } 
+            100% { offset-distance: 100%; transform: scale(1.2); } 
         }
         .coef-text { 
             position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
@@ -193,10 +206,10 @@
         }
         .coef-text.visible { opacity: 1; }
 
-        /* --- PENALTY PRO (ANIMATED) --- */
+        /* --- PENALTY PRO (FIXED ZONES) --- */
         .penalty-container {
             position: relative; width: 300px; height: 190px; margin-bottom: 10px;
-            background-image: url('/img/penalty_bg.png'); background-size: cover; background-position: center;
+            background-image: url('img/penalty_bg.png'); background-size: cover; background-position: center;
             border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
         .history-dots {
@@ -209,7 +222,8 @@
         .target-zone { position: absolute; width: 45px; height: 45px; border-radius: 50%; transition: 0.1s; display: flex; justify-content: center; align-items: center; }
         .z1 { top: 20px; left: 20px; } .z2 { top: 20px; right: 20px; } 
         .z3 { top: 20px; left: 50%; transform: translateX(-50%); } 
-        .z4 { bottom: 20px; left: 20px; } .z5 { bottom: 20px; right: 20px; }
+        /* Raised bottom zones */
+        .z4 { bottom: 36%; left: 20px; } .z5 { bottom: 36%; right: 20px; }
         
         .target-effect {
             width: 100%; height: 100%; border-radius: 50%;
@@ -222,7 +236,7 @@
         .target-zone.winner .target-effect { transform: scale(1.1); opacity: 1; animation: pulseTarget 1s infinite; }
         @keyframes pulseTarget { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
-        /* --- MINES (FIXED IMAGES) --- */
+        /* --- MINES (FIXED IMAGES v2) --- */
         .mines-wrapper { width: 90%; max-width: 320px; margin-bottom: 20px; }
         
         .mines-mode-switch {
@@ -255,11 +269,11 @@
         .mines-board { background: var(--mines-bg); padding: 10px; border-radius: 10px; display: grid; gap: 6px; border: 2px solid #3d3d5c; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); transition: all 0.3s; }
         .mine-tile { background-color: var(--mines-tile); border-radius: 6px; aspect-ratio: 1; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 0 rgba(0,0,0,0.3); }
         
-        /* FIXED IMAGE STYLES */
+        /* FIXED IMAGE STYLES - Z-INDEX BOOST */
         .mine-tile img { 
             width: 70%; height: 70%; object-fit: contain; 
             display: none; 
-            position: relative; z-index: 10; /* Ensure image is ON TOP */
+            position: relative; z-index: 20; 
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
         }
         @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
@@ -284,7 +298,7 @@
             box-shadow: 0 0 10px #00ff41; transform: scale(1.05); color: transparent; 
         }
 
-        /* --- NEW LIVE WINS LIST --- */
+        /* --- LIVE WINS LIST --- */
         .live-wins-list {
             position: absolute; bottom: 0; left: 0; width: 100%; height: 160px;
             background: linear-gradient(to top, #000 20%, transparent 100%);
@@ -334,14 +348,21 @@
         <div id="screen-menu" class="screen">
             <div class="main-logo">
                 <div class="logo-title">AI PREDICTOR</div>
-                <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL v11.0</div>
+                <div style="font-size:9px; color:#00f2ea; letter-spacing:2px; font-weight:bold; margin-top:5px;">NEURAL v12.0</div>
                 <div class="brand-sub">powered by Omar</div>
             </div>
             <div class="menu-grid">
-                <div class="game-card" onclick="openGame('aviator')"><img src="/img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
-                <div class="game-card" onclick="openGame('penalty')"><img src="/img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div>
-                <div class="game-card" onclick="openGame('mines')"><img src="/img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div>
-                <div class="game-card" onclick="openGame('chicken')"><img src="/img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div>
+                <div class="game-card" onclick="openGame('aviator')"><img src="img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
+                <div class="game-card" onclick="openGame('penalty')"><img src="img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div>
+                <div class="game-card" onclick="openGame('mines')"><img src="img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div>
+                <div class="game-card" onclick="openGame('chicken')"><img src="img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div>
+                
+                <div class="game-card soon">
+                    <div class="soon-text">SOON</div>
+                </div>
+                <div class="game-card soon">
+                    <div class="soon-text">SOON</div>
+                </div>
             </div>
         </div>
 
@@ -361,14 +382,14 @@
             <div id="aviator-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
                 <div class="game-header">
                     <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
-                    <img src="/img/aviator_logo.png" class="game-logo-hero">
+                    <img src="img/aviator_logo.png" class="game-logo-hero">
                 </div>
                 <div class="aviator-wrapper">
                     <svg class="aviator-graph-svg" id="aviator-graph" viewBox="0 0 350 200" preserveAspectRatio="none">
                         <path d="M0,200 Q150,150 350,20 L350,200 Z" fill="rgba(255, 51, 75, 0.2)" />
                         <path d="M0,200 Q150,150 350,20" fill="none" stroke="#ff334b" stroke-width="4" />
                     </svg>
-                    <img src="/img/plane.png" id="aviator-plane" class="aviator-plane-img">
+                    <img src="img/plane.png" id="aviator-plane" class="aviator-plane-img">
                     <div class="coef-text" id="coef-text">0.00x</div>
                 </div>
             </div>
@@ -376,7 +397,7 @@
             <div id="penalty-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
                 <div class="game-header">
                     <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
-                    <img src="/img/menu_penalty.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
+                    <img src="img/menu_penalty.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
                 </div>
                 <div class="history-dots" id="pen-history"></div>
                 <div class="penalty-container">
@@ -391,7 +412,7 @@
             <div id="mines-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
                 <div class="game-header">
                     <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
-                    <img src="/img/menu_mines.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
+                    <img src="img/menu_mines.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
                 </div>
                 <div class="mines-wrapper" id="mines-wrap">
                     <div class="mines-mode-switch" id="mines-mode" data-mode="safe">
@@ -420,7 +441,7 @@
             <div id="chicken-view" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
                 <div class="game-header">
                     <a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a>
-                    <img src="/img/menu_chicken.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
+                    <img src="img/menu_chicken.png" class="game-logo-hero" style="width:60px; height:60px; border-radius:12px;">
                 </div>
                 <div class="chicken-wrapper">
                     <div style="width:100%; text-align:right; margin-bottom:5px;">
@@ -443,10 +464,10 @@
     </div>
 
     <div style="display:none;">
-        <img src="/img/menu_aviator.png"><img src="/img/menu_penalty.png">
-        <img src="/img/menu_mines.png"><img src="/img/menu_chicken.png">
-        <img src="/img/plane.png"><img src="/img/penalty_bg.png">
-        <img src="/img/aviator_logo.png"><img src="/img/mines_star.png">
+        <img src="img/menu_aviator.png"><img src="img/menu_penalty.png">
+        <img src="img/menu_mines.png"><img src="img/menu_chicken.png">
+        <img src="img/plane.png"><img src="img/penalty_bg.png">
+        <img src="img/aviator_logo.png"><img src="img/mines_star.png">
     </div>
 
     <script>
@@ -624,7 +645,7 @@
             
             for(let i=0; i<s*s; i++) {
                 const d = document.createElement('div'); d.className='mine-tile'; d.id='mt-'+i; 
-                d.innerHTML='<img src="/img/mines_star.png">'; 
+                d.innerHTML='<img src="img/mines_star.png">'; 
                 b.appendChild(d);
             }
             minesCount = 3; document.getElementById('mines-val').innerText = minesCount;
@@ -655,10 +676,14 @@
             if(activeGame === 'aviator') {
                  const plane = document.getElementById('aviator-plane');
                  const graph = document.getElementById('aviator-graph');
+                 
+                 // Remove classes to reset
                  plane.classList.remove('taking-off');
                  graph.classList.remove('active');
                  document.getElementById('coef-text').classList.remove('visible');
-                 void plane.offsetWidth; // Force Reflow
+                 
+                 // FORCE REFLOW (Magic trigger)
+                 void plane.offsetWidth; 
             }
             if(activeGame === 'penalty') {
                  document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner', 'scanning'));
@@ -690,14 +715,14 @@
 
         function showResult(btn) {
             if(activeGame === 'aviator') {
-                 // FIXED: Generate FINAL value first
                  const finalVal = (Math.random() * (5.0 - 1.2) + 1.2).toFixed(2);
-                 const duration = 3000; // Animation time ms
+                 const duration = 3000; 
                  const steps = duration / 50;
                  const increment = (finalVal - 1.00) / steps;
                  
                  const plane = document.getElementById('aviator-plane');
-                 plane.classList.add('taking-off'); 
+                 plane.classList.add('taking-off'); // START FLIGHT
+                 
                  document.getElementById('aviator-graph').classList.add('active');
                  const textEl = document.getElementById('coef-text');
                  textEl.classList.add('visible');
