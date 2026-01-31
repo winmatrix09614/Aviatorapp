@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v21.0 Premium</title>
+    <title>AI Signal Bot Ultimate v22.0 Fixed</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -48,9 +48,9 @@
         .btn-small-reset { display:none; margin-top:5px; background:transparent; border:none; color:#666; font-size:10px; font-family:'Orbitron'; cursor:pointer; text-decoration:underline; z-index:100; } .btn-small-reset.visible { display:inline-block; }
         
         /* AVIATOR CANVAS */
-        .aviator-wrapper { position:relative; width:100%; height:200px; margin-bottom:10px; overflow:hidden; }
+        .aviator-wrapper { position:relative; width:100%; height:200px; margin-bottom:10px; overflow:hidden; border-bottom: 2px solid rgba(255,255,255,0.1); border-left: 2px solid rgba(255,255,255,0.1); }
         #aviator-canvas { position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; }
-        .aviator-plane-img { position:absolute; width:60px; height:auto; z-index:5; opacity:0; filter:drop-shadow(0 0 10px rgba(255,255,255,0.5)); transition: opacity 0.3s; }
+        .aviator-plane-img { position:absolute; width:60px; height:auto; z-index:5; opacity:0; filter:drop-shadow(0 0 10px rgba(255,255,255,0.5)); transition: opacity 0.3s; pointer-events:none; }
         .aviator-plane-img.active { opacity:1; }
         .coef-text { position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); font-family:'Orbitron'; font-size:48px; font-weight:900; color:#fff; z-index:10; text-shadow:0 0 20px rgba(0,0,0,1); opacity:0; transition:opacity 0.3s; }
         .coef-text.visible { opacity:1; }
@@ -105,7 +105,7 @@
         <div id="preloader"><div class="terminal-text" id="term-text"></div></div>
         <div class="hud-bar"><div><span class="status-dot"></span>ONLINE <span id="online-users" class="online-count">1420</span></div><div id="session-id">SID: ...</div></div>
         <div class="lang-container" id="lang-cont"><select onchange="changeLang(this.value)" id="lang-select"><option value="en">🇬🇧 EN</option><option value="es">🇪🇸 ES</option><option value="ar">🇦🇪 AR</option></select></div>
-        <div id="screen-menu" class="screen"><div class="main-logo"><div class="logo-title">AI PREDICTOR</div><div style="font-size:9px;color:#00f2ea;letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v21.0</div><div class="brand-sub">powered by Omar</div></div><div class="menu-grid"><div class="game-card" onclick="openGame('aviator')"><img src="img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div><div class="game-card" onclick="openGame('penalty')"><img src="img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div><div class="game-card" onclick="openGame('mines')"><img src="img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div><div class="game-card" onclick="openGame('chicken')"><img src="img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div><div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div><div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div></div></div>
+        <div id="screen-menu" class="screen"><div class="main-logo"><div class="logo-title">AI PREDICTOR</div><div style="font-size:9px;color:#00f2ea;letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v22.0</div><div class="brand-sub">powered by Omar</div></div><div class="menu-grid"><div class="game-card" onclick="openGame('aviator')"><img src="img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div><div class="game-card" onclick="openGame('penalty')"><img src="img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div><div class="game-card" onclick="openGame('mines')"><img src="img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div><div class="game-card" onclick="openGame('chicken')"><img src="img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div><div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div><div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div></div></div>
         <div id="id-modal" class="modal-overlay"><div class="id-box"><h3 style="color:#00f2ea;font-family:'Orbitron';margin-bottom:5px;">AUTHORIZATION</h3><input type="tel" id="user-id-input" class="id-input" placeholder="Account ID" maxlength="12"><button id="btn-connect" class="id-btn" onclick="validateAndConnect()">CONNECT ACCOUNT</button><div id="id-error" style="color:#ff334b;font-size:10px;margin-top:10px;"></div><div id="sync-log" class="sync-log"></div></div></div>
         
         <div id="screen-game" class="screen">
@@ -133,9 +133,11 @@
         const currData={en:"$",es:"€",ar:"EGP"};
         const CHICKEN_DATA={easy:["1.03x","1.07x","1.12x","1.17x","1.23x","1.29x","1.36x","1.44x","1.53x","1.63x","1.75x","1.88x","2.04x","2.22x","2.45x","2.72x","3.06x","3.50x","4.08x","4.90x","6.13x","6.61x","9.81x","19.44x"],medium:["1.12x","1.28x","1.47x","1.70x","1.98x","2.33x","2.76x","3.32x","4.03x","4.96x","6.20x","6.91x","8.90x","11.76x","15.99x","22.61x","33.58x","53.20x","92.17x","182.51x","451.71x","1778.80x"],hard:["1.23x","1.55x","1.98x","2.56x","3.36x","4.49x","5.49x","7.53x","10.56x","15.21x","22.59x","34.79x","55.97x","94.99x","172.42x","341.40x","760.46x","2007.63x","6956.47x","41321.43x"],hardcore:["1.63x","2.80x","4.95x","9.08x","15.21x","30.12x","62.96x","140.24x","337.19x","890.19x","2643.89x","9161.08x","39301.05x","233448.29x","254112.51x"]};
         let curLang='en'; let penState={step:0,maxSteps:0,active:false};
-        // AVIATOR CANVAS VARS
+        
+        // AVIATOR ENGINE (PATH STORAGE)
         let avCtx, avCanvas, avW, avH, avAnimId;
-        const avP0={x:0,y:200}, avP1={x:200,y:150}, avP2={x:400,y:20}; // Bezier points
+        let avPoints = []; // Stores path coordinates
+        const avP0={x:0,y:200}, avP1={x:200,y:150}, avP2={x:400,y:20};
 
         window.onload=function(){
             const savedId=localStorage.getItem('user_id');if(savedId)document.getElementById('user-id-input').value=savedId;
@@ -152,21 +154,41 @@
         function addLiveWinItem(){const list=document.getElementById('live-list');const p=['155','156','157'][Math.floor(Math.random()*3)];const id=`${p}****${Math.floor(Math.random()*90)+10}`;let amt=Math.floor(Math.random()*290)+10;let isBig=Math.random()>0.95;if(isBig)amt=Math.floor(Math.random()*2000)+1000;const game=["Aviator","Mines","Penalty"][Math.floor(Math.random()*3)];const div=document.createElement('div');div.className='win-row';if(isBig)div.classList.add('big-win');div.innerHTML=`<div><span class="win-name">${id}</span> <span style="font-size:9px;color:#888;margin-left:5px">${game}</span></div><div class="win-amt">+${amt}${currData[curLang]}</div>`;list.prepend(div);if(list.children.length>20)list.lastElementChild.remove();document.getElementById('last-win-name').innerText=`• ${id} +${amt}${currData[curLang]}`; }
         function initDragScroll(){const slider=document.getElementById('chicken-road-container');let isDown=false;let startX;let scrollLeft;slider.addEventListener('mousedown',(e)=>{isDown=true;slider.classList.add('active');startX=e.pageX-slider.offsetLeft;scrollLeft=slider.scrollLeft;});slider.addEventListener('mouseleave',()=>{isDown=false;slider.classList.remove('active');});slider.addEventListener('mouseup',()=>{isDown=false;slider.classList.remove('active');});slider.addEventListener('mousemove',(e)=>{if(!isDown)return;e.preventDefault();const x=e.pageX-slider.offsetLeft;const walk=(x-startX)*2;slider.scrollLeft=scrollLeft-walk;});}
 
-        // AVIATOR CANVAS FUNCTIONS
         function initAviatorCanvas() { avCanvas=document.getElementById('aviator-canvas'); avCtx=avCanvas.getContext('2d'); avW=avCanvas.offsetWidth; avH=avCanvas.offsetHeight; avCanvas.width=avW; avCanvas.height=avH; }
-        function drawAviatorFrame(t) {
-            avCtx.fillStyle = 'rgba(0,0,0,0.15)'; avCtx.fillRect(0,0,avW,avH); // Trail effect
-            avCtx.beginPath(); avCtx.moveTo(avP0.x, avP0.y);
-            // Calculate current point on Bezier curve
-            const mt = 1-t; const x = mt*mt*avP0.x + 2*mt*t*avP1.x + t*t*avP2.x; const y = mt*mt*avP0.y + 2*mt*t*avP1.y + t*t*avP2.y;
-            avCtx.quadraticCurveTo(avP1.x, avP1.y, x, y);
+        
+        function drawAviatorGraph(t) {
+            avCtx.clearRect(0,0,avW,avH);
+            
+            // Calc Current Pos
+            const mt=1-t; const x=mt*mt*avP0.x+2*mt*t*avP1.x+t*t*avP2.x; const y=mt*mt*avP0.y+2*mt*t*avP1.y+t*t*avP2.y;
+            avPoints.push({x:x, y:y}); // Store history
+
+            // 1. Draw Fill
+            avCtx.beginPath();
+            avCtx.moveTo(avPoints[0].x, avH); // Bottom Left
+            for(let p of avPoints) avCtx.lineTo(p.x, p.y); // Trace curve
+            avCtx.lineTo(x, avH); // Straight down
+            avCtx.closePath();
+            const grad = avCtx.createLinearGradient(0,0,0,avH);
+            grad.addColorStop(0, "rgba(255, 51, 75, 0.5)");
+            grad.addColorStop(1, "rgba(255, 51, 75, 0)");
+            avCtx.fillStyle = grad;
+            avCtx.fill();
+
+            // 2. Draw Stroke
+            avCtx.beginPath();
+            avCtx.moveTo(avPoints[0].x, avPoints[0].y);
+            for(let p of avPoints) avCtx.lineTo(p.x, p.y);
             avCtx.strokeStyle = '#ff334b'; avCtx.lineWidth = 4; avCtx.stroke();
-            // Move Plane Image
-            const plane = document.getElementById('aviator-plane'); plane.style.left = (x - plane.offsetWidth/2) + 'px'; plane.style.top = (y - plane.offsetHeight/2) + 'px';
+
+            // 3. Move Plane
+            const plane = document.getElementById('aviator-plane'); 
+            plane.style.left = (x - plane.offsetWidth/2) + 'px'; 
+            plane.style.top = (y - plane.offsetHeight/2) + 'px';
         }
 
         let activeGame=null;let minesSize=3;let minesCount=3;let minesMode='safe';
-        function openGame(g){activeGame=g;document.getElementById('screen-menu').classList.remove('active');document.getElementById('screen-game').classList.add('active');['aviator','penalty','mines','chicken'].forEach(id=>document.getElementById(id+'-view').style.display='none');document.getElementById('signal-btn').disabled=false;document.getElementById('signal-btn').innerText=trans[curLang].get_signal;document.getElementById('signal-btn').className='btn-signal';document.getElementById('reset-btn').classList.remove('visible');document.getElementById(g+'-view').style.display='flex';if(g==='aviator'){document.getElementById('aviator-plane').classList.remove('active');document.getElementById('coef-text').classList.remove('visible');if(avAnimId)cancelAnimationFrame(avAnimId);avCtx.clearRect(0,0,avW,avH);drawAviatorFrame(0);}if(g==='penalty'){resetPenaltyUI();}if(g==='mines')setMinesGrid(3);if(g==='chicken')renderChickenRoad();}
+        function openGame(g){activeGame=g;document.getElementById('screen-menu').classList.remove('active');document.getElementById('screen-game').classList.add('active');['aviator','penalty','mines','chicken'].forEach(id=>document.getElementById(id+'-view').style.display='none');document.getElementById('signal-btn').disabled=false;document.getElementById('signal-btn').innerText=trans[curLang].get_signal;document.getElementById('signal-btn').className='btn-signal';document.getElementById('reset-btn').classList.remove('visible');document.getElementById(g+'-view').style.display='flex';if(g==='aviator'){document.getElementById('aviator-plane').classList.remove('active');document.getElementById('coef-text').classList.remove('visible');if(avAnimId)cancelAnimationFrame(avAnimId);avCtx.clearRect(0,0,avW,avH);avPoints=[];}if(g==='penalty'){resetPenaltyUI();}if(g==='mines')setMinesGrid(3);if(g==='chicken')renderChickenRoad();}
         function backMenu(){document.getElementById('screen-game').classList.remove('active');document.getElementById('screen-menu').classList.add('active');if(avAnimId)cancelAnimationFrame(avAnimId);}
         function setMinesGrid(s){minesSize=s;const b=document.getElementById('mines-board');b.style.gridTemplateColumns=`repeat(${s}, 1fr)`;b.innerHTML="";document.getElementById('btn-3').classList.remove('active');document.getElementById('btn-5').classList.remove('active');document.getElementById(`btn-${s}`).classList.add('active');for(let i=0;i<s*s;i++){const d=document.createElement('div');d.className='mine-tile';d.id='mt-'+i;d.innerHTML='<img src="img/mines_star.png">';b.appendChild(d);}}
         function stepMines(d){minesCount+=d;if(minesCount<1)minesCount=1;document.getElementById('mines-val').innerText=minesCount;}
@@ -181,7 +203,7 @@
                 else{document.getElementById('pen-msg').classList.remove('visible');document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning','active'));document.querySelectorAll('.step-badge').forEach(el=>el.classList.remove('current'));const isJackpot=Math.random()>0.98;penState.maxSteps=isJackpot?5:Math.floor(Math.random()*3)+2;penState.step=0;penState.active=true;document.getElementById('reset-btn').classList.add('visible');}
             }
             btn.disabled=true;
-            if(activeGame==='aviator'){document.getElementById('aviator-plane').classList.remove('active');document.getElementById('coef-text').classList.remove('visible');if(avAnimId)cancelAnimationFrame(avAnimId);avCtx.clearRect(0,0,avW,avH);}
+            if(activeGame==='aviator'){document.getElementById('aviator-plane').classList.remove('active');document.getElementById('coef-text').classList.remove('visible');if(avAnimId)cancelAnimationFrame(avAnimId);avCtx.clearRect(0,0,avW,avH);avPoints=[];}
             if(activeGame==='mines')document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
             if(activeGame==='chicken'){document.querySelectorAll('.road-step').forEach(el=>el.classList.remove('safe','final'));document.getElementById('chicken-road-container').scrollLeft=0;}
             let steps=["CONNECTING...","ANALYZING...","PREDICTING..."];if(curLang==='ar')steps=["جار الاتصال","تحليل","تنبؤ"];let i=0;btn.innerText=steps[0];const t=setInterval(()=>{i++;if(i<steps.length)btn.innerText=steps[i];else{clearInterval(t);showResult(btn);}},600);}
@@ -190,9 +212,10 @@
             if(activeGame==='aviator'){
                 const final=(Math.random()*(5.0-1.2)+1.2).toFixed(2); const txt=document.getElementById('coef-text'); txt.classList.add('visible'); document.getElementById('aviator-plane').classList.add('active');
                 let val=1.00; let progress=0; const duration=3000; const start=performance.now();
+                avPoints = []; // Reset Path
                 function animate(time) {
                     progress = (time - start) / duration; if(progress>1) progress=1;
-                    drawAviatorFrame(progress);
+                    drawAviatorGraph(progress);
                     val = 1.00 + (final - 1.00) * progress; txt.innerText=val.toFixed(2)+"x";
                     if(progress<1) avAnimId=requestAnimationFrame(animate); else { cooldown(btn); }
                 } avAnimId=requestAnimationFrame(animate);
