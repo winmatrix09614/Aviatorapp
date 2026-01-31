@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v25.0 Physics Fix</title>
+    <title>AI Signal Bot Ultimate v26.0 Physics Fix</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -47,18 +47,24 @@
         .btn-back { margin-top:15px; background:transparent; border:1px solid rgba(255,255,255,0.2); color:#888; padding:8px 25px; border-radius:20px; font-size:10px; font-family:'Orbitron'; cursor:pointer; z-index:100; }
         .btn-small-reset { display:none; margin-top:5px; background:transparent; border:none; color:#666; font-size:10px; font-family:'Orbitron'; cursor:pointer; text-decoration:underline; z-index:100; } .btn-small-reset.visible { display:inline-block; }
         
-        /* AVIATOR (CORRECTED CURVE) */
+        /* AVIATOR (NEW PHYSICS CURVE) */
         .aviator-wrapper { position:relative; width:100%; height:200px; margin-bottom:10px; overflow:hidden; }
         .aviator-graph-svg { position:absolute; bottom:0; left:0; width:100%; height:100%; z-index:2; opacity:0; transition:opacity 0.5s; overflow:visible; }
         .aviator-graph-svg.active { opacity:1; }
-        /* NEW PATH: Exponential Curve (Flat start, steep end) */
-        /* M0,200: Start Bottom Left. C150,200: Ctrl1 Flat. 250,150: Ctrl2 Mid-Up. 400,-50: End Top-Right */
-        .aviator-plane-img { position:absolute; width:60px; height:auto; z-index:5; opacity:0; filter:drop-shadow(0 0 10px rgba(255,255,255,0.5)); 
-            offset-path: path("M0,200 C150,200 250,150 400,-50"); 
+        
+        /* PATH EXPLANATION: M0,200 (Start Bottom Left).
+           C150,200 320,200 (Control Points stay at Y=200, keeping it flat for 80% of X).
+           400,-50 (End Top Right - Sharp Rise).
+        */
+        .aviator-plane-img { 
+            position:absolute; width:60px; height:auto; z-index:5; opacity:0; 
+            filter:drop-shadow(0 0 10px rgba(255,255,255,0.5)); 
+            offset-path: path("M0,200 C150,200 320,200 400,-50"); 
             offset-rotate: auto; 
         }
         .aviator-plane-img.active { opacity:1; animation:flyPath 4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
         @keyframes flyPath { 0% { offset-distance:0%; transform:scale(0.6); } 100% { offset-distance:100%; transform:scale(1.2); } }
+        
         .coef-text { position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); font-family:'Orbitron'; font-size:48px; font-weight:900; color:#fff; z-index:10; text-shadow:0 0 20px rgba(0,0,0,1); opacity:0; transition:opacity 0.3s; }
         .coef-text.visible { opacity:1; }
 
@@ -112,15 +118,15 @@
         <div id="preloader"><div class="terminal-text" id="term-text"></div></div>
         <div class="hud-bar"><div><span class="status-dot"></span>ONLINE <span id="online-users" class="online-count">1420</span></div><div id="session-id">SID: ...</div></div>
         <div class="lang-container" id="lang-cont"><select onchange="changeLang(this.value)" id="lang-select"><option value="en">🇬🇧 EN</option><option value="es">🇪🇸 ES</option><option value="ar">🇦🇪 AR</option></select></div>
-        <div id="screen-menu" class="screen"><div class="main-logo"><div class="logo-title">AI PREDICTOR</div><div style="font-size:9px;color:#00f2ea;letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v25.0</div><div class="brand-sub">powered by Omar</div></div><div class="menu-grid"><div class="game-card" onclick="openGame('aviator')"><img src="img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div><div class="game-card" onclick="openGame('penalty')"><img src="img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div><div class="game-card" onclick="openGame('mines')"><img src="img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div><div class="game-card" onclick="openGame('chicken')"><img src="img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div><div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div><div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div></div></div>
+        <div id="screen-menu" class="screen"><div class="main-logo"><div class="logo-title">AI PREDICTOR</div><div style="font-size:9px;color:#00f2ea;letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v26.0</div><div class="brand-sub">powered by Omar</div></div><div class="menu-grid"><div class="game-card" onclick="openGame('aviator')"><img src="img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div><div class="game-card" onclick="openGame('penalty')"><img src="img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div><div class="game-card" onclick="openGame('mines')"><img src="img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div><div class="game-card" onclick="openGame('chicken')"><img src="img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div><div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div><div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div></div></div>
         <div id="id-modal" class="modal-overlay"><div class="id-box"><h3 style="color:#00f2ea;font-family:'Orbitron';margin-bottom:5px;">AUTHORIZATION</h3><input type="tel" id="user-id-input" class="id-input" placeholder="Account ID" maxlength="12"><button id="btn-connect" class="id-btn" onclick="validateAndConnect()">CONNECT ACCOUNT</button><div id="id-error" style="color:#ff334b;font-size:10px;margin-top:10px;"></div><div id="sync-log" class="sync-log"></div></div></div>
         
         <div id="screen-game" class="screen">
             <div id="aviator-view" style="display:none;width:100%;flex-direction:column;align-items:center;"><div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/aviator_logo.png" class="game-logo-hero"></div>
                 <div class="aviator-wrapper">
                     <svg class="aviator-graph-svg" id="aviator-graph" viewBox="0 0 350 200" preserveAspectRatio="none">
-                        <path d="M0,200 C150,200 250,150 400,-50 L400,200 Z" fill="rgba(255, 51, 75, 0.2)" />
-                        <path d="M0,200 C150,200 250,150 400,-50" fill="none" stroke="#ff334b" stroke-width="4" />
+                        <path d="M0,200 C150,200 320,200 400,-50 L400,200 Z" fill="rgba(255, 51, 75, 0.2)" />
+                        <path d="M0,200 C150,200 320,200 400,-50" fill="none" stroke="#ff334b" stroke-width="4" />
                     </svg>
                     <img src="img/plane.png" id="aviator-plane" class="aviator-plane-img"><div class="coef-text" id="coef-text">0.00x</div>
                 </div>
