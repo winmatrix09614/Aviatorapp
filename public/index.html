@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v18.0</title>
+    <title>AI Signal Bot Ultimate v19.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     
@@ -14,6 +14,7 @@
             --text-color: #ffffff;
             --brand-green: #00ff41;
             --brand-red: #ff334b;
+            --brand-blue: #0080ff;
             --glass-panel: rgba(20, 20, 30, 0.7);
             --mines-bg: #272749;
             --mines-tile: #2b2e55;
@@ -30,12 +31,10 @@
         #app-wrapper { width: 100%; max-width: 450px; height: 100%; position: relative; background: transparent; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
         body.lang-ar { font-family: 'Cairo', sans-serif; direction: rtl; } body.lang-ar .hud-bar { direction: ltr; }
 
-        /* PRELOADER & BG */
+        /* UI ELEMENTS */
         #preloader { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .terminal-text { color: var(--accent-cyan); font-family: 'Orbitron', monospace; font-size: 12px; line-height: 1.6; text-align: left; width: 80%; }
         .cyber-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, #020005 0%, #10002b 100%); z-index: -2; }
-
-        /* HUD & MODAL */
         .hud-bar { position: absolute; top: 0; left: 0; width: 100%; height: 50px; padding: 0 20px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; font-family: 'Orbitron', sans-serif; font-size: 10px; color: rgba(255, 255, 255, 0.5); z-index: 50; pointer-events: none; }
         .status-dot { width: 6px; height: 6px; background: var(--brand-green); border-radius: 50%; box-shadow: 0 0 5px var(--brand-green); display: inline-block; margin-right: 5px; }
         .online-count { color: var(--accent-cyan); font-weight: bold; margin-left: 5px; }
@@ -47,7 +46,6 @@
         .id-btn { background: linear-gradient(90deg, #00f2ea 0%, #0080ff 100%); color: #000; border: none; width: 100%; padding: 14px; font-family: 'Orbitron'; font-weight: 900; cursor: pointer; border-radius: 10px; font-size: 14px; text-transform: uppercase; }
         .sync-log { font-family: 'Orbitron'; font-size: 10px; color: #00ff41; margin-top: 15px; min-height: 15px; text-align: left; width: 100%; display: none; }
 
-        /* COMMON UI */
         .lang-container { position: absolute; top: 50px; right: 20px; z-index: 60; }
         .lang-container.ar-pos { right: auto; left: 20px; }
         select { background: rgba(0, 0, 0, 0.6); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 5px 10px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 12px; outline: none; }
@@ -68,9 +66,18 @@
         .telegram-link { text-decoration: none; font-family: 'Orbitron', sans-serif; color: var(--accent-cyan); border: 1px solid rgba(0, 242, 234, 0.3); padding: 8px 16px; border-radius: 20px; font-size: 12px; letter-spacing: 1px; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); margin-bottom: 10px; display: inline-block; }
         .game-logo-hero { width: 80px; height: auto; display: block; filter: drop-shadow(0 0 15px rgba(255,255,255,0.1)); animation: floatLogo 4s infinite ease-in-out; margin-bottom: 10px; }
         @keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        
+        /* MAIN BUTTON STYLES */
         .btn-signal { background: linear-gradient(90deg, #d6002a 0%, #8a001a 100%); border: none; width: 85%; max-width: 320px; padding: 16px; border-radius: 14px; color: white; font-family: 'Orbitron', sans-serif; font-size: 16px; letter-spacing: 1px; cursor: pointer; box-shadow: 0 5px 20px rgba(214, 0, 42, 0.25); text-transform: uppercase; margin-top: 10px; border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden; transition: 0.3s; z-index: 100; }
         .btn-signal:active { transform: scale(0.98); } .btn-signal:disabled { opacity: 0.8; cursor: not-allowed; background: #333; color: #888; box-shadow: none; }
+        
+        /* BUTTON VARIANTS FOR PENALTY */
+        .btn-signal.next-step { background: linear-gradient(90deg, #0080ff 0%, #0059b3 100%); box-shadow: 0 5px 20px rgba(0, 128, 255, 0.3); }
+        .btn-signal.reset { background: linear-gradient(90deg, #ff9d00 0%, #cc7a00 100%); box-shadow: 0 5px 20px rgba(255, 157, 0, 0.3); color: #000; font-weight: 900; }
+
         .btn-back { margin-top: 15px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 25px; border-radius: 20px; font-size: 10px; font-family: 'Orbitron'; cursor: pointer; z-index: 100; }
+        .btn-small-reset { display: none; margin-top: 5px; background: transparent; border: none; color: #666; font-size: 10px; font-family: 'Orbitron'; cursor: pointer; text-decoration: underline; z-index: 100; }
+        .btn-small-reset.visible { display: inline-block; }
 
         /* AVIATOR */
         .aviator-wrapper { position: relative; width: 100%; height: 200px; margin-bottom: 10px; overflow: hidden; }
@@ -84,8 +91,10 @@
 
         /* PENALTY (FINAL POSITIONS) */
         .penalty-container { position: relative; width: 300px; height: 190px; margin-bottom: 10px; background-image: url('img/penalty_bg.png'); background-size: cover; background-position: center; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .target-zone { position: absolute; width: 45px; height: 45px; border-radius: 50%; transition: 0.1s; display: flex; justify-content: center; align-items: center; }
-        /* APPLIED CALIBRATION */
+        .target-zone { position: absolute; width: 45px; height: 45px; border-radius: 50%; transition: 0.1s; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; }
+        .target-zone.active { opacity: 1; }
+        
+        /* CALIBRATED COORDINATES */
         .z1 { top: 20px; left: 21px; } 
         .z2 { top: 20px; right: 18px; } 
         .z3 { top: 18px; left: 50%; transform: translateX(-50%); } 
@@ -93,13 +102,17 @@
         .z5 { bottom: 28%; right: 13px; }
         
         .target-effect { width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--accent-cyan); background: radial-gradient(circle, rgba(0,242,234,0.6) 0%, transparent 70%); box-shadow: 0 0 20px var(--accent-cyan); transform: scale(0); opacity: 0; transition: 0.3s; }
-        .target-zone.scanning { border: 2px dashed rgba(255, 255, 255, 0.6); background: rgba(255,255,255,0.1); }
+        .target-zone.scanning { border: 2px dashed rgba(255, 255, 255, 0.6); background: rgba(255,255,255,0.1); opacity: 1; }
         .target-zone.winner .target-effect { transform: scale(1.1); opacity: 1; animation: pulseTarget 1s infinite; }
         @keyframes pulseTarget { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
-        .penalty-strategy { display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: 5px; height: 25px; }
-        .strat-dot { width: 12px; height: 12px; border-radius: 50%; background: #333; transition: 0.3s; box-shadow: 0 0 5px #000; }
-        .strat-dot.win { background: #00ff41; box-shadow: 0 0 8px #00ff41; }
-        .strat-dot.cashout { width: auto; height: auto; border-radius: 4px; padding: 2px 6px; background: #ff334b; color: #fff; font-size: 9px; font-family: 'Orbitron'; font-weight: bold; box-shadow: 0 0 8px #ff334b; }
+        
+        /* STRATEGY DISPLAY */
+        .penalty-strategy { display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: 5px; height: 25px; font-family: 'Orbitron'; font-size: 10px; color: #fff; }
+        .step-badge { background: #333; padding: 2px 6px; border-radius: 4px; color: #888; }
+        .step-badge.current { background: var(--accent-cyan); color: #000; font-weight: bold; box-shadow: 0 0 10px var(--accent-cyan); }
+        .cashout-msg { color: #ff334b; font-weight: bold; text-shadow: 0 0 10px #ff334b; display: none; }
+        .cashout-msg.visible { display: block; animation: flash 1s infinite; }
+        @keyframes flash { 0%,100%{opacity:1} 50%{opacity:0.5} }
 
         /* MINES */
         .mines-wrapper { width: 90%; max-width: 320px; margin-bottom: 20px; }
@@ -163,7 +176,7 @@
         <div class="lang-container" id="lang-cont"><select onchange="changeLang(this.value)" id="lang-select"><option value="en">🇬🇧 EN</option><option value="es">🇪🇸 ES</option><option value="ar">🇦🇪 AR</option></select></div>
 
         <div id="screen-menu" class="screen">
-            <div class="main-logo"><div class="logo-title">AI PREDICTOR</div><div style="font-size:9px;color:#00f2ea;letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v18.0</div><div class="brand-sub">powered by Omar</div></div>
+            <div class="main-logo"><div class="logo-title">AI PREDICTOR</div><div style="font-size:9px;color:#00f2ea;letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v19.0</div><div class="brand-sub">powered by Omar</div></div>
             <div class="menu-grid">
                 <div class="game-card" onclick="openGame('aviator')"><img src="img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
                 <div class="game-card" onclick="openGame('penalty')"><img src="img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div>
@@ -186,7 +199,16 @@
 
             <div id="penalty-view" style="display:none;width:100%;display:flex;flex-direction:column;align-items:center;">
                 <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/menu_penalty.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
-                <div class="penalty-strategy" id="pen-strat"></div>
+                
+                <div class="penalty-strategy" id="pen-strat">
+                    <span class="step-badge" id="ps-1">1</span>
+                    <span class="step-badge" id="ps-2">2</span>
+                    <span class="step-badge" id="ps-3">3</span>
+                    <span class="step-badge" id="ps-4">4</span>
+                    <span class="step-badge" id="ps-5">5</span>
+                </div>
+                <div class="cashout-msg" id="pen-msg">CASHOUT NOW!</div>
+
                 <div class="penalty-container">
                     <div class="target-zone z1" id="pz1"><div class="target-effect"></div></div>
                     <div class="target-zone z2" id="pz2"><div class="target-effect"></div></div>
@@ -212,6 +234,7 @@
             </div>
 
             <button id="signal-btn" class="btn-signal" onclick="getSignal()" data-tr="get_signal">GET SIGNAL</button>
+            <button id="reset-btn" class="btn-small-reset" onclick="resetPenaltyGame()">Reset Game</button>
             <button class="btn-back" onclick="backMenu()" data-tr="exit">EXIT</button>
         </div>
 
@@ -224,10 +247,13 @@
     <div style="display:none;"><img src="img/menu_aviator.png"><img src="img/menu_penalty.png"><img src="img/menu_mines.png"><img src="img/menu_chicken.png"><img src="img/plane.png"><img src="img/penalty_bg.png"><img src="img/aviator_logo.png"><img src="img/mines_star.png"></div>
 
     <script>
-        const trans={en:{get_signal:"GET SIGNAL",exit:"EXIT",aviator:"AVIATOR",penalty:"PENALTY",soon:"SOON"},es:{get_signal:"OBTENER SEÑAL",exit:"SALIR",aviator:"AVIATOR",penalty:"PENALTI",soon:"PRONTO"},ar:{get_signal:"احصل على إشارة",exit:"خروج",aviator:"طيار",penalty:"ضربة جزاء",soon:"قريباً"}};
+        const trans={en:{get_signal:"GET SIGNAL",exit:"EXIT",aviator:"AVIATOR",penalty:"PENALTY",soon:"SOON",next:"NEXT STEP",reset:"RESET GAME"},es:{get_signal:"OBTENER SEÑAL",exit:"SALIR",aviator:"AVIATOR",penalty:"PENALTI",soon:"PRONTO",next:"SIGUIENTE",reset:"REINICIAR"},ar:{get_signal:"احصل على إشارة",exit:"خروج",aviator:"طيار",penalty:"ضربة جزاء",soon:"قريباً",next:"الخطوة التالية",reset:"إعادة تعيين"}};
         const currData={en:"$",es:"€",ar:"EGP"};
         const CHICKEN_DATA={easy:["1.03x","1.07x","1.12x","1.17x","1.23x","1.29x","1.36x","1.44x","1.53x","1.63x","1.75x","1.88x","2.04x","2.22x","2.45x","2.72x","3.06x","3.50x","4.08x","4.90x","6.13x","6.61x","9.81x","19.44x"],medium:["1.12x","1.28x","1.47x","1.70x","1.98x","2.33x","2.76x","3.32x","4.03x","4.96x","6.20x","6.91x","8.90x","11.76x","15.99x","22.61x","33.58x","53.20x","92.17x","182.51x","451.71x","1778.80x"],hard:["1.23x","1.55x","1.98x","2.56x","3.36x","4.49x","5.49x","7.53x","10.56x","15.21x","22.59x","34.79x","55.97x","94.99x","172.42x","341.40x","760.46x","2007.63x","6956.47x","41321.43x"],hardcore:["1.63x","2.80x","4.95x","9.08x","15.21x","30.12x","62.96x","140.24x","337.19x","890.19x","2643.89x","9161.08x","39301.05x","233448.29x","254112.51x"]};
         let curLang='en';
+
+        // PENALTY LOGIC VARS
+        let penState = { step: 0, maxSteps: 0, active: false };
 
         window.onload = function() {
             const savedId=localStorage.getItem('user_id'); if(savedId)document.getElementById('user-id-input').value=savedId;
@@ -267,9 +293,11 @@
             activeGame=g; document.getElementById('screen-menu').classList.remove('active'); document.getElementById('screen-game').classList.add('active');
             ['aviator','penalty','mines','chicken'].forEach(id=>document.getElementById(id+'-view').style.display='none');
             document.getElementById('signal-btn').disabled=false; document.getElementById('signal-btn').innerText=trans[curLang].get_signal;
+            document.getElementById('signal-btn').className='btn-signal'; // Reset btn style
+            document.getElementById('reset-btn').classList.remove('visible'); // Hide reset
             document.getElementById(g+'-view').style.display='flex';
             if(g==='aviator') { document.getElementById('aviator-plane').classList.remove('taking-off'); document.getElementById('coef-text').classList.remove('visible'); }
-            if(g==='penalty') { document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning')); document.getElementById('pen-strat').innerHTML=''; }
+            if(g==='penalty') { resetPenaltyUI(); }
             if(g==='mines') setMinesGrid(3); if(g==='chicken') renderChickenRoad();
         }
         function backMenu() { document.getElementById('screen-game').classList.remove('active'); document.getElementById('screen-menu').classList.add('active'); }
@@ -293,16 +321,52 @@
                 container.appendChild(w);
             });
         }
+
+        // --- PENALTY LOGIC ---
+        function resetPenaltyUI() {
+            penState.active = false; penState.step = 0; penState.maxSteps = 0;
+            document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning','active'));
+            document.querySelectorAll('.step-badge').forEach(el=>el.classList.remove('current'));
+            document.getElementById('pen-msg').classList.remove('visible');
+            const btn = document.getElementById('signal-btn');
+            btn.innerText = trans[curLang].get_signal; btn.className = 'btn-signal'; btn.disabled = false;
+            document.getElementById('reset-btn').classList.remove('visible');
+        }
+        function resetPenaltyGame() {
+            resetPenaltyUI();
+        }
+
         function getSignal() {
-            const btn=document.getElementById('signal-btn'); btn.disabled=true;
+            const btn=document.getElementById('signal-btn'); 
+            
+            // PENALTY BRANCHING
+            if(activeGame === 'penalty') {
+                if(penState.active) {
+                    // NEXT STEP Logic
+                    showPenaltyStep(btn);
+                    return;
+                } else {
+                    // NEW GAME Logic
+                    // 2% chance for Jackpot (5 steps), else 1-4 steps
+                    const isJackpot = Math.random() > 0.98;
+                    penState.maxSteps = isJackpot ? 5 : Math.floor(Math.random() * 4) + 1;
+                    penState.step = 0;
+                    penState.active = true;
+                    document.getElementById('reset-btn').classList.add('visible');
+                }
+            }
+
+            btn.disabled=true;
+            // GENERIC RESET
             if(activeGame==='aviator') { const p=document.getElementById('aviator-plane'); p.classList.remove('taking-off'); void p.offsetWidth; document.getElementById('coef-text').classList.remove('visible'); }
-            if(activeGame==='penalty') { document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning')); document.getElementById('pen-strat').innerHTML=''; }
             if(activeGame==='mines') document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
             if(activeGame==='chicken') { document.querySelectorAll('.road-step').forEach(el=>el.classList.remove('safe','final')); document.getElementById('chicken-road-container').scrollLeft=0; }
+            
             let steps=["CONNECTING...","ANALYZING...","PREDICTING..."]; if(curLang==='ar') steps=["جار الاتصال","تحليل","تنبؤ"];
             let i=0; btn.innerText=steps[0];
             const t=setInterval(()=>{ i++; if(i<steps.length) btn.innerText=steps[i]; else { clearInterval(t); showResult(btn); } },600);
         }
+
         function showResult(btn) {
             if(activeGame==='aviator') {
                 const final=(Math.random()*(5.0-1.2)+1.2).toFixed(2);
@@ -311,10 +375,7 @@
                 let val=1.00; const t=setInterval(()=>{ val+=0.05; if(val>=final) { clearInterval(t); txt.innerText=final+"x"; cooldown(btn); } else txt.innerText=val.toFixed(2)+"x"; },50);
             }
             else if(activeGame==='penalty') {
-                const stratLen = Math.floor(Math.random()*3)+2; const sBar = document.getElementById('pen-strat');
-                for(let k=0; k<stratLen; k++) { const d=document.createElement('div'); if(k===stratLen-1){d.className='strat-dot cashout';d.innerText="CASHOUT";}else{d.className='strat-dot win';} sBar.appendChild(d); }
-                const targets=document.querySelectorAll('.target-zone'); let step=0;
-                const t=setInterval(()=>{ targets.forEach(e=>e.classList.remove('scanning')); targets[Math.floor(Math.random()*5)].classList.add('scanning'); step++; if(step>12) { clearInterval(t); targets.forEach(e=>e.classList.remove('scanning')); document.getElementById('pz'+(Math.floor(Math.random()*5)+1)).classList.add('winner'); cooldown(btn); } },100);
+                showPenaltyStep(btn);
             }
             else if(activeGame==='mines') {
                 const tot=minesSize*minesSize; let open=minesMode==='safe'?Math.floor(Math.random()*2)+3:tot-minesCount;
@@ -329,6 +390,47 @@
                 const t=setInterval(()=>{ if(k>=safe) { clearInterval(t); if(k>0) document.getElementById('rs-'+(k-1)).classList.add('final'); cooldown(btn); } else { const el=document.getElementById('rs-'+k); el.classList.add('safe'); c.scrollTo({left:el.offsetLeft-c.clientWidth/2+30,behavior:'smooth'}); k++; } },500);
             }
         }
+
+        function showPenaltyStep(btn) {
+            // Hide previous target
+            document.querySelectorAll('.target-zone').forEach(e=>e.classList.remove('active','winner','scanning'));
+            document.querySelectorAll('.step-badge').forEach(e=>e.classList.remove('current'));
+
+            penState.step++;
+            
+            // Check if Cashout
+            if(penState.step > penState.maxSteps) {
+                document.getElementById('pen-msg').classList.add('visible');
+                btn.innerText = trans[curLang].reset;
+                btn.className = 'btn-signal reset';
+                btn.disabled = false;
+                penState.active = false; // Game over
+                return;
+            }
+
+            // Highlight Step Badge
+            const badge = document.getElementById('ps-'+penState.step);
+            if(badge) badge.classList.add('current');
+
+            // Show Scanning then Target
+            const targets=document.querySelectorAll('.target-zone'); let step=0;
+            const t=setInterval(()=>{ 
+                targets.forEach(e=>e.classList.remove('scanning')); targets[Math.floor(Math.random()*5)].classList.add('scanning'); 
+                step++; 
+                if(step>8) { 
+                    clearInterval(t); 
+                    targets.forEach(e=>e.classList.remove('scanning')); 
+                    const winZone = document.getElementById('pz'+(Math.floor(Math.random()*5)+1));
+                    winZone.classList.add('active', 'winner');
+                    
+                    // Update Button for NEXT STEP
+                    btn.innerText = trans[curLang].next;
+                    btn.className = 'btn-signal next-step';
+                    btn.disabled = false;
+                } 
+            }, 80);
+        }
+
         function cooldown(btn) { let s=4; const t=setInterval(()=>{ btn.innerText=`WAIT ${s}s`; s--; if(s<0) { clearInterval(t); btn.innerText=trans[curLang].get_signal; btn.disabled=false; } },1000); }
     </script>
 </body>
