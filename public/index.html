@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v23.0 Fixed</title>
+    <title>AI Signal Bot Ultimate v24.0 Stable</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -47,11 +47,13 @@
         .btn-back { margin-top:15px; background:transparent; border:1px solid rgba(255,255,255,0.2); color:#888; padding:8px 25px; border-radius:20px; font-size:10px; font-family:'Orbitron'; cursor:pointer; z-index:100; }
         .btn-small-reset { display:none; margin-top:5px; background:transparent; border:none; color:#666; font-size:10px; font-family:'Orbitron'; cursor:pointer; text-decoration:underline; z-index:100; } .btn-small-reset.visible { display:inline-block; }
         
-        /* AVIATOR CANVAS - UPDATED: NO BORDERS, CORRECT SIZING */
-        .aviator-wrapper { position:relative; width:100%; height:200px; margin-bottom:10px; overflow:hidden; border:none; }
-        #aviator-canvas { position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; }
-        .aviator-plane-img { position:absolute; width:60px; height:auto; z-index:5; opacity:0; filter:drop-shadow(0 0 10px rgba(255,255,255,0.5)); transition: opacity 0.3s; pointer-events:none; }
-        .aviator-plane-img.active { opacity:1; }
+        /* AVIATOR (SVG) */
+        .aviator-wrapper { position:relative; width:100%; height:200px; margin-bottom:10px; overflow:hidden; }
+        .aviator-graph-svg { position:absolute; bottom:0; left:0; width:100%; height:100%; z-index:2; opacity:0; transition:opacity 0.5s; }
+        .aviator-graph-svg.active { opacity:1; }
+        .aviator-plane-img { position:absolute; width:60px; height:auto; z-index:5; opacity:0; filter:drop-shadow(0 0 10px rgba(255,255,255,0.5)); offset-path: path("M20,200 Q150,150 400,-50"); offset-rotate: auto; }
+        .aviator-plane-img.active { opacity:1; animation:flyPath 3s forwards ease-in; }
+        @keyframes flyPath { 0% { offset-distance:0%; transform:scale(0.6); } 100% { offset-distance:100%; transform:scale(1.2); } }
         .coef-text { position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); font-family:'Orbitron'; font-size:48px; font-weight:900; color:#fff; z-index:10; text-shadow:0 0 20px rgba(0,0,0,1); opacity:0; transition:opacity 0.3s; }
         .coef-text.visible { opacity:1; }
 
@@ -105,12 +107,15 @@
         <div id="preloader"><div class="terminal-text" id="term-text"></div></div>
         <div class="hud-bar"><div><span class="status-dot"></span>ONLINE <span id="online-users" class="online-count">1420</span></div><div id="session-id">SID: ...</div></div>
         <div class="lang-container" id="lang-cont"><select onchange="changeLang(this.value)" id="lang-select"><option value="en">🇬🇧 EN</option><option value="es">🇪🇸 ES</option><option value="ar">🇦🇪 AR</option></select></div>
-        <div id="screen-menu" class="screen"><div class="main-logo"><div class="logo-title">AI PREDICTOR</div><div style="font-size:9px;color:#00f2ea;letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v23.0</div><div class="brand-sub">powered by Omar</div></div><div class="menu-grid"><div class="game-card" onclick="openGame('aviator')"><img src="img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div><div class="game-card" onclick="openGame('penalty')"><img src="img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div><div class="game-card" onclick="openGame('mines')"><img src="img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div><div class="game-card" onclick="openGame('chicken')"><img src="img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div><div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div><div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div></div></div>
+        <div id="screen-menu" class="screen"><div class="main-logo"><div class="logo-title">AI PREDICTOR</div><div style="font-size:9px;color:#00f2ea;letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v24.0</div><div class="brand-sub">powered by Omar</div></div><div class="menu-grid"><div class="game-card" onclick="openGame('aviator')"><img src="img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div><div class="game-card" onclick="openGame('penalty')"><img src="img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div><div class="game-card" onclick="openGame('mines')"><img src="img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div><div class="game-card" onclick="openGame('chicken')"><img src="img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div><div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div><div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div></div></div>
         <div id="id-modal" class="modal-overlay"><div class="id-box"><h3 style="color:#00f2ea;font-family:'Orbitron';margin-bottom:5px;">AUTHORIZATION</h3><input type="tel" id="user-id-input" class="id-input" placeholder="Account ID" maxlength="12"><button id="btn-connect" class="id-btn" onclick="validateAndConnect()">CONNECT ACCOUNT</button><div id="id-error" style="color:#ff334b;font-size:10px;margin-top:10px;"></div><div id="sync-log" class="sync-log"></div></div></div>
         
         <div id="screen-game" class="screen">
             <div id="aviator-view" style="display:none;width:100%;flex-direction:column;align-items:center;"><div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/aviator_logo.png" class="game-logo-hero"></div>
-                <div class="aviator-wrapper"><canvas id="aviator-canvas"></canvas><img src="img/plane.png" id="aviator-plane" class="aviator-plane-img"><div class="coef-text" id="coef-text">0.00x</div></div>
+                <div class="aviator-wrapper">
+                    <svg class="aviator-graph-svg" id="aviator-graph" viewBox="0 0 350 200" preserveAspectRatio="none"><path d="M0,200 Q150,150 350,20 L350,200 Z" fill="rgba(255, 51, 75, 0.2)" /><path d="M0,200 Q150,150 350,20" fill="none" stroke="#ff334b" stroke-width="4" /></svg>
+                    <img src="img/plane.png" id="aviator-plane" class="aviator-plane-img"><div class="coef-text" id="coef-text">0.00x</div>
+                </div>
             </div>
             <div id="penalty-view" style="display:none;width:100%;flex-direction:column;align-items:center;"><div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/menu_penalty.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
                 <div class="penalty-strategy" id="pen-strat"><span class="step-badge" id="ps-1">1</span><span class="step-badge" id="ps-2">2</span><span class="step-badge" id="ps-3">3</span><span class="step-badge" id="ps-4">4</span><span class="step-badge" id="ps-5">5</span></div><div class="cashout-msg" id="pen-msg">CASHOUT NOW!</div>
@@ -133,11 +138,6 @@
         const currData={en:"$",es:"€",ar:"EGP"};
         const CHICKEN_DATA={easy:["1.03x","1.07x","1.12x","1.17x","1.23x","1.29x","1.36x","1.44x","1.53x","1.63x","1.75x","1.88x","2.04x","2.22x","2.45x","2.72x","3.06x","3.50x","4.08x","4.90x","6.13x","6.61x","9.81x","19.44x"],medium:["1.12x","1.28x","1.47x","1.70x","1.98x","2.33x","2.76x","3.32x","4.03x","4.96x","6.20x","6.91x","8.90x","11.76x","15.99x","22.61x","33.58x","53.20x","92.17x","182.51x","451.71x","1778.80x"],hard:["1.23x","1.55x","1.98x","2.56x","3.36x","4.49x","5.49x","7.53x","10.56x","15.21x","22.59x","34.79x","55.97x","94.99x","172.42x","341.40x","760.46x","2007.63x","6956.47x","41321.43x"],hardcore:["1.63x","2.80x","4.95x","9.08x","15.21x","30.12x","62.96x","140.24x","337.19x","890.19x","2643.89x","9161.08x","39301.05x","233448.29x","254112.51x"]};
         let curLang='en'; let penState={step:0,maxSteps:0,active:false};
-        
-        // AVIATOR ENGINE
-        let avCtx, avCanvas, avW, avH, avAnimId;
-        let avPoints = []; 
-        const avP0={x:0,y:200}, avP1={x:150,y:180}, avP2={x:800,y:-100}; // End point far off screen
 
         window.onload=function(){
             const savedId=localStorage.getItem('user_id');if(savedId)document.getElementById('user-id-input').value=savedId;
@@ -154,46 +154,17 @@
         function addLiveWinItem(){const list=document.getElementById('live-list');const p=['155','156','157'][Math.floor(Math.random()*3)];const id=`${p}****${Math.floor(Math.random()*90)+10}`;let amt=Math.floor(Math.random()*290)+10;let isBig=Math.random()>0.95;if(isBig)amt=Math.floor(Math.random()*2000)+1000;const game=["Aviator","Mines","Penalty"][Math.floor(Math.random()*3)];const div=document.createElement('div');div.className='win-row';if(isBig)div.classList.add('big-win');div.innerHTML=`<div><span class="win-name">${id}</span> <span style="font-size:9px;color:#888;margin-left:5px">${game}</span></div><div class="win-amt">+${amt}${currData[curLang]}</div>`;list.prepend(div);if(list.children.length>20)list.lastElementChild.remove();document.getElementById('last-win-name').innerText=`• ${id} +${amt}${currData[curLang]}`; }
         function initDragScroll(){const slider=document.getElementById('chicken-road-container');let isDown=false;let startX;let scrollLeft;slider.addEventListener('mousedown',(e)=>{isDown=true;slider.classList.add('active');startX=e.pageX-slider.offsetLeft;scrollLeft=slider.scrollLeft;});slider.addEventListener('mouseleave',()=>{isDown=false;slider.classList.remove('active');});slider.addEventListener('mouseup',()=>{isDown=false;slider.classList.remove('active');});slider.addEventListener('mousemove',(e)=>{if(!isDown)return;e.preventDefault();const x=e.pageX-slider.offsetLeft;const walk=(x-startX)*2;slider.scrollLeft=scrollLeft-walk;});}
 
-        function initAviatorCanvas() { avCanvas=document.getElementById('aviator-canvas'); avCtx=avCanvas.getContext('2d'); }
-        function resizeCanvas() { if(avCanvas){ avW=avCanvas.parentElement.offsetWidth; avH=avCanvas.parentElement.offsetHeight; avCanvas.width=avW; avCanvas.height=avH; } }
-        
-        function drawAviatorGraph(t) {
-            avCtx.clearRect(0,0,avW,avH);
-            const mt=1-t; const x=mt*mt*avP0.x+2*mt*t*avP1.x+t*t*avP2.x; const y=mt*mt*avP0.y+2*mt*t*avP1.y+t*t*avP2.y;
-            avPoints.push({x:x, y:y}); 
-            
-            // Draw Fill
-            avCtx.beginPath(); avCtx.moveTo(avPoints[0].x, avH);
-            for(let p of avPoints) avCtx.lineTo(p.x, p.y);
-            avCtx.lineTo(x, avH); avCtx.closePath();
-            const grad = avCtx.createLinearGradient(0,0,0,avH); grad.addColorStop(0,"rgba(255,51,75,0.3)"); grad.addColorStop(1,"rgba(255,51,75,0)");
-            avCtx.fillStyle=grad; avCtx.fill();
-
-            // Draw Line
-            avCtx.beginPath(); avCtx.moveTo(avPoints[0].x, avPoints[0].y);
-            for(let p of avPoints) avCtx.lineTo(p.x, p.y);
-            avCtx.strokeStyle='#ff334b'; avCtx.lineWidth=4; avCtx.stroke();
-
-            // Move Plane
-            const plane = document.getElementById('aviator-plane'); 
-            plane.style.left = (x - plane.offsetWidth/2) + 'px'; 
-            plane.style.top = (y - plane.offsetHeight/2) + 'px';
-        }
-
         let activeGame=null;let minesSize=3;let minesCount=3;let minesMode='safe';
         function openGame(g){
             activeGame=g;document.getElementById('screen-menu').classList.remove('active');document.getElementById('screen-game').classList.add('active');
             ['aviator','penalty','mines','chicken'].forEach(id=>document.getElementById(id+'-view').style.display='none');
             document.getElementById('signal-btn').disabled=false;document.getElementById('signal-btn').innerText=trans[curLang].get_signal;document.getElementById('signal-btn').className='btn-signal';document.getElementById('reset-btn').classList.remove('visible');
             document.getElementById(g+'-view').style.display='flex';
-            if(g==='aviator'){
-                document.getElementById('aviator-plane').classList.remove('active');document.getElementById('coef-text').classList.remove('visible');
-                resizeCanvas(); avCtx.clearRect(0,0,avW,avH); avPoints=[];
-            }
+            if(g==='aviator'){document.getElementById('aviator-plane').classList.remove('active');document.getElementById('aviator-graph').classList.remove('active');document.getElementById('coef-text').classList.remove('visible');}
             if(g==='penalty'){resetPenaltyUI();}
             if(g==='mines')setMinesGrid(3);if(g==='chicken')renderChickenRoad();
         }
-        function backMenu(){document.getElementById('screen-game').classList.remove('active');document.getElementById('screen-menu').classList.add('active');if(avAnimId)cancelAnimationFrame(avAnimId);}
+        function backMenu(){document.getElementById('screen-game').classList.remove('active');document.getElementById('screen-menu').classList.add('active');}
         function setMinesGrid(s){minesSize=s;const b=document.getElementById('mines-board');b.style.gridTemplateColumns=`repeat(${s}, 1fr)`;b.innerHTML="";document.getElementById('btn-3').classList.remove('active');document.getElementById('btn-5').classList.remove('active');document.getElementById(`btn-${s}`).classList.add('active');for(let i=0;i<s*s;i++){const d=document.createElement('div');d.className='mine-tile';d.id='mt-'+i;d.innerHTML='<img src="img/mines_star.png">';b.appendChild(d);}}
         function stepMines(d){minesCount+=d;if(minesCount<1)minesCount=1;document.getElementById('mines-val').innerText=minesCount;}
         function setMinesMode(m){minesMode=m;const el=document.getElementById('mines-mode');el.setAttribute('data-mode',m);document.querySelectorAll('.mode-opt').forEach(o=>o.classList.remove('active'));if(m==='safe'){el.children[1].classList.add('active');document.getElementById('mines-wrap').classList.remove('risk-mode');}else{el.children[2].classList.add('active');document.getElementById('mines-wrap').classList.add('risk-mode');}}
@@ -207,24 +178,16 @@
                 else{document.getElementById('pen-msg').classList.remove('visible');document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning','active'));document.querySelectorAll('.step-badge').forEach(el=>el.classList.remove('current'));const isJackpot=Math.random()>0.98;penState.maxSteps=isJackpot?5:Math.floor(Math.random()*3)+2;penState.step=0;penState.active=true;document.getElementById('reset-btn').classList.add('visible');}
             }
             btn.disabled=true;
-            if(activeGame==='aviator'){
-                document.getElementById('aviator-plane').classList.remove('active');document.getElementById('coef-text').classList.remove('visible');
-                if(avAnimId)cancelAnimationFrame(avAnimId); avPoints=[]; avCtx.clearRect(0,0,avW,avH);
-            }
+            if(activeGame==='aviator'){document.getElementById('aviator-plane').classList.remove('active');document.getElementById('aviator-graph').classList.remove('active');document.getElementById('coef-text').classList.remove('visible');}
             if(activeGame==='mines')document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
             if(activeGame==='chicken'){document.querySelectorAll('.road-step').forEach(el=>el.classList.remove('safe','final'));document.getElementById('chicken-road-container').scrollLeft=0;}
             let steps=["CONNECTING...","ANALYZING...","PREDICTING..."];if(curLang==='ar')steps=["جار الاتصال","تحليل","تنبؤ"];let i=0;btn.innerText=steps[0];const t=setInterval(()=>{i++;if(i<steps.length)btn.innerText=steps[i];else{clearInterval(t);showResult(btn);}},600);}
 
         function showResult(btn){
             if(activeGame==='aviator'){
-                const final=(Math.random()*(5.0-1.2)+1.2).toFixed(2); const txt=document.getElementById('coef-text'); txt.classList.add('visible'); document.getElementById('aviator-plane').classList.add('active');
-                let val=1.00; let progress=0; const duration=3000; const start=performance.now();
-                function animate(time) {
-                    progress = (time - start) / duration; if(progress>1) progress=1;
-                    drawAviatorGraph(progress);
-                    val = 1.00 + (final - 1.00) * progress; txt.innerText=val.toFixed(2)+"x";
-                    if(progress<1) avAnimId=requestAnimationFrame(animate); else { cooldown(btn); }
-                } avAnimId=requestAnimationFrame(animate);
+                const final=(Math.random()*(5.0-1.2)+1.2).toFixed(2); const txt=document.getElementById('coef-text'); txt.classList.add('visible'); 
+                document.getElementById('aviator-plane').classList.add('active'); document.getElementById('aviator-graph').classList.add('active');
+                let val=1.00; const t=setInterval(()=>{ val+=0.05; if(val>=final) { clearInterval(t); txt.innerText=final+"x"; cooldown(btn); } else txt.innerText=val.toFixed(2)+"x"; },50);
             }
             else if(activeGame==='penalty'){showPenaltyStep(btn);}
             else if(activeGame==='mines'){const tot=minesSize*minesSize;let open=minesMode==='safe'?Math.floor(Math.random()*2)+3:tot-minesCount;let idxs=new Set();while(idxs.size<open)idxs.add(Math.floor(Math.random()*tot));let arr=Array.from(idxs);let k=0;const t=setInterval(()=>{if(k>=arr.length){clearInterval(t);cooldown(btn);}else{document.getElementById('mt-'+arr[k]).classList.add('reveal');k++;}},100);}
