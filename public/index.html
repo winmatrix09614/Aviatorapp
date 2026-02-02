@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI PREDICTOR v29.3</title>
+    <title>AI PREDICTOR v29.5</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* (СТИЛИ ТЕ ЖЕ, СОКРАЩЕНО ДЛЯ УДОБСТВА - ОСТАВЛЯЙ КАК БЫЛО В ПРОШЛОЙ ВЕРСИИ, ИЛИ КОПИРУЙ ВЕСЬ БЛОК STYLE ИЗ v29.2) */
+        /* (СТИЛИ НЕ МЕНЯЛИСЬ) */
         :root { --accent-cyan: #00f2ea; --brand-green: #00ff41; --brand-red: #ff334b; --glass-panel: rgba(20, 20, 30, 0.75); --mines-bg: #272749; --mines-tile: #2b2e55; }
         body { margin: 0; padding: 0; overflow: hidden; user-select: none; height: 100vh; display: flex; justify-content: center; align-items: flex-start; font-family: 'Poppins', sans-serif; color: white; background: linear-gradient(-45deg, #020005, #0b1021, #130f40, #000000); background-size: 400% 400%; animation: gradientBG 15s ease infinite; }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
@@ -134,7 +134,7 @@
         <div id="screen-menu" class="screen">
             <div class="main-logo">
                 <div class="logo-title">AI PREDICTOR</div>
-                <div style="font-size:9px;color:var(--accent-cyan);letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v29.3</div>
+                <div style="font-size:9px;color:var(--accent-cyan);letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v29.5</div>
                 <div class="brand-sub">powered by Omar</div>
             </div>
             <div class="menu-grid">
@@ -190,7 +190,6 @@
     <script>
         const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH'];
         const STORAGE_KEY = 'ai_pred_v29_data';
-        // ВСТАВЬ СЮДА ССЫЛКУ ПОСЛЕ ДЕПЛОЯ
         const SERVER_URL = "https://ai-signal-server-production.up.railway.app";
         
         let currentKey = '';
@@ -228,7 +227,7 @@
                 }
             },1000);
             for(let i=0;i<15;i++)addLiveWinItem();setInterval(addLiveWinItem,3000);initDragScroll();initAviatorCanvas();
-            const term=document.getElementById('term-text');const termLines=["INITIALIZING...","LOADING v29.3 KERNEL...","BYPASSING SECURITY...","READY."];let lineIdx=0;
+            const term=document.getElementById('term-text');const termLines=["INITIALIZING...","LOADING v29.5 KERNEL...","BYPASSING SECURITY...","READY."];let lineIdx=0;
             function typeLine(){if(lineIdx<termLines.length){term.innerText=termLines[lineIdx++];setTimeout(typeLine,300);}else{setTimeout(()=>{document.getElementById('preloader').style.display='none';document.getElementById('id-modal').style.display='flex';},500);}}typeLine();
             const sid="SID-"+Math.random().toString(36).substr(2,6).toUpperCase();document.getElementById('session-id').innerText=sid;
             
@@ -263,12 +262,10 @@
             setTimeout(()=>{document.getElementById('id-modal').style.display='none';document.getElementById('screen-menu').classList.add('active');},2200);
         }
 
-        // UPDATED: BURN ATTEMPT DOES NOT LOCK IMMEDIATELY
         function burnAttempt(){
             if(attemptsLeft > 0) {
                 attemptsLeft--; document.getElementById('attempts-display').innerText = attemptsLeft;
                 let store = getStorageData(); store[currentKey] = attemptsLeft; saveStorageData(store);
-                // DO NOT SHOW LOCK SCREEN HERE. IT WILL BE SHOWN IN COOLDOWN()
             }
         }
 
@@ -316,11 +313,7 @@
         }
 
         function getSignal(){
-            if(attemptsLeft <= 0) {
-                // If already 0, show lock immediately
-                document.getElementById('lock-modal').style.display = 'flex';
-                return;
-            }
+            if(attemptsLeft <= 0) { document.getElementById('lock-modal').style.display = 'flex'; return; }
             const btn=document.getElementById('signal-btn');
             
             if(activeGame==='penalty'){
@@ -331,8 +324,19 @@
                     document.querySelectorAll('.step-badge').forEach(el=>el.classList.remove('current'));
                     
                     let forcedMoves = null;
-                    if(activeOverride && activeOverride.game === 'penalty') { forcedMoves = activeOverride.payload.moves; activeOverride = null; }
-                    penState.forcedMoves = forcedMoves; penState.maxSteps = 5; penState.step=0;penState.active=true;
+                    let customLimit = 5;
+                    
+                    if(activeOverride && activeOverride.game === 'penalty') { 
+                        forcedMoves = activeOverride.payload.moves; 
+                        // NEW: CHECK LIMIT FROM ADMIN
+                        if(activeOverride.payload.limit) customLimit = activeOverride.payload.limit;
+                        activeOverride = null; 
+                    }
+                    
+                    penState.forcedMoves = forcedMoves; 
+                    penState.maxSteps = customLimit; // SET CUSTOM LIMIT (e.g. 3)
+                    penState.step=0;
+                    penState.active=true;
                 }
             } else {
                 burnAttempt();
@@ -361,9 +365,9 @@
             else if(activeGame==='mines'){
                 let arr = [];
                 if(activeOverride && activeOverride.game === 'mines') {
-                    // FORCE MODE SWITCH
                     setMinesMode(activeOverride.payload.mode);
                     setMinesGrid(activeOverride.payload.grid);
+                    if(activeOverride.payload.traps) { minesCount = activeOverride.payload.traps; document.getElementById('mines-val').innerText = minesCount; }
                     arr = activeOverride.payload.spots;
                     activeOverride = null;
                 } else {
@@ -376,9 +380,8 @@
                 const c=document.getElementById('chicken-road-container');
                 let safe=0;
                 if(activeOverride && activeOverride.game === 'chicken') {
-                    // FORCE DIFF SWITCH
                     document.getElementById('chicken-diff').value = activeOverride.payload.diff;
-                    renderChickenRoad(); // Re-render to update arrays
+                    renderChickenRoad(); 
                     safe = parseInt(activeOverride.payload.steps);
                     activeOverride = null;
                 } else {
@@ -392,8 +395,10 @@
         function showPenaltyStep(btn){
             document.querySelectorAll('.target-zone').forEach(e=>e.classList.remove('active','winner','scanning'));
             penState.step++;
-            if(penState.step>penState.maxSteps){
-                document.getElementById('pen-msg').classList.add('visible');
+            
+            // CHECK LIMIT (Custom or Default)
+            if(penState.step > penState.maxSteps){
+                document.getElementById('pen-msg').classList.add('visible'); // SHOW CASHOUT
                 btn.style.display='none';
                 const rBtn = document.getElementById('reset-btn');
                 rBtn.style.display='block';
@@ -401,6 +406,7 @@
                 penState.active=false;
                 return;
             }
+
             const badge=document.getElementById('ps-'+penState.step);if(badge)badge.classList.add('current');
             const targets=document.querySelectorAll('.target-zone');let step=0;
             const t=setInterval(()=>{
@@ -427,13 +433,7 @@
                 btn.innerText=`WAIT ${s}s`;s--;
                 if(s<0){
                     clearInterval(t);
-                    
-                    // CHECK FOR LOCK HERE (AFTER ANIMATION)
-                    if(attemptsLeft <= 0) {
-                        document.getElementById('lock-modal').style.display = 'flex';
-                        return; // Stop here
-                    }
-
+                    if(attemptsLeft <= 0) { document.getElementById('lock-modal').style.display = 'flex'; return; }
                     btn.innerText=trans[curLang].get_signal;
                     btn.disabled=false;
                     if(activeGame==='penalty'&&!penState.active)btn.className='btn-signal';

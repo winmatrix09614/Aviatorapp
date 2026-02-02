@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OMAR CONTROL PANEL v2.2</title>
+    <title>OMAR CONTROL PANEL v2.4</title>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -28,14 +28,14 @@
         .pen-steps-viz { display: flex; flex-direction: column; gap: 10px; } .pen-step-row { display: flex; align-items: center; gap: 10px; }
         .mini-goal-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 2px; flex: 1; height: 50px; background: #222; padding: 2px; }
         .goal-zone { background: #1a1a1a; cursor: pointer; } .goal-zone.selected { background: var(--accent); }
-        .mines-grid-viz { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .mines-grid-viz { display: grid; gap: 8px; }
         .mine-cell { aspect-ratio: 1; background: #222; border: 2px solid #444; border-radius: 8px; cursor: pointer; display: flex; justify-content: center; align-items: center; font-family:'Orbitron'; font-size:12px; }
         .mine-cell.selected { border-color: var(--green); background: rgba(0, 255, 65, 0.2); color: var(--green); }
     </style>
 </head>
 <body>
 <div class="admin-panel">
-    <div class="header"><div class="title">CONTROL // PANEL v2.2</div><div class="status-indicator" id="status-box"><div class="status-dot"></div><span id="status-text">OFFLINE</span></div></div>
+    <div class="header"><div class="title">CONTROL // PANEL v2.4</div><div class="status-indicator" id="status-box"><div class="status-dot"></div><span id="status-text">OFFLINE</span></div></div>
     
     <div class="control-box">
         <input type="text" id="server-url" value="https://ai-signal-server-production.up.railway.app" style="display:none;">
@@ -67,7 +67,15 @@
 
     <div id="tab-penalty" class="tab-content">
         <div class="control-box">
-            <label>SCENARIO</label>
+            <label>WIN STREAK (STEPS BEFORE CASHOUT)</label>
+            <select id="pen-limit" onchange="renderPenaltyUI()" style="margin-bottom: 10px;">
+                <option value="1">1 GOAL (Then Cashout)</option>
+                <option value="2">2 GOALS (Then Cashout)</option>
+                <option value="3">3 GOALS (Then Cashout)</option>
+                <option value="4">4 GOALS (Then Cashout)</option>
+                <option value="5" selected>5 GOALS (Full Win)</option>
+            </select>
+            <label>SCENARIO SETUP</label>
             <div class="pen-steps-viz" id="pen-viz-container"></div>
         </div>
         <div class="control-box"><label>SCHEDULE (HH:MM)</label><input type="time" id="pen-time" style="text-align: center;"></div>
@@ -79,8 +87,10 @@
             <label>GAME SETTINGS</label>
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                 <select id="mines-mode"><option value="safe">SAFE MODE</option><option value="risk">HIGH RISK</option></select>
-                <select id="mines-grid-size"><option value="3">3x3 GRID</option><option value="5">5x5 GRID</option></select>
+                <select id="mines-grid-size" onchange="renderMinesUI()"><option value="3">3x3 GRID</option><option value="5" selected>5x5 GRID</option></select>
             </div>
+            <label>TRAPS COUNT</label>
+            <input type="number" id="mines-count" value="3" min="1" max="24" style="text-align:center; margin-bottom:10px;">
             <label>WINNING SPOTS</label>
             <div class="mines-grid-viz" id="mines-grid-viz"></div>
         </div>
@@ -101,13 +111,17 @@
 
 <script>
     let socket;
+    
     // Penalty Init
     const penContainer = document.getElementById('pen-viz-container');
     let penaltyMoves = [2, 2, 2, 2, 2];
     const vizToGameMap = {0:0, 2:1, 1:2, 3:3, 5:4};
+    
     function renderPenaltyUI() {
         penContainer.innerHTML = '';
-        for(let i=0; i<5; i++) {
+        const limit = parseInt(document.getElementById('pen-limit').value);
+        
+        for(let i=0; i<limit; i++) { // Render only up to limit
             let row = document.createElement('div'); row.className = 'pen-step-row';
             row.innerHTML = `<div style="font-size:10px;width:20px;">#${i+1}</div>`;
             let grid = document.createElement('div'); grid.className = 'mini-goal-grid';
@@ -126,14 +140,20 @@
     // Mines Init
     const minesContainer = document.getElementById('mines-grid-viz');
     let minesSpots = [];
-    for(let i=0; i<25; i++) {
-        let cell = document.createElement('div'); cell.className = 'mine-cell'; cell.innerText = i+1;
-        cell.onclick = function() {
-            this.classList.toggle('selected');
-            if(minesSpots.includes(i)) minesSpots = minesSpots.filter(x=>x!==i); else minesSpots.push(i);
-        };
-        minesContainer.appendChild(cell);
+    function renderMinesUI() {
+        minesContainer.innerHTML = ''; minesSpots = [];
+        const size = parseInt(document.getElementById('mines-grid-size').value);
+        minesContainer.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+        for(let i=0; i<size*size; i++) {
+            let cell = document.createElement('div'); cell.className = 'mine-cell'; cell.innerText = i+1;
+            cell.onclick = function() {
+                this.classList.toggle('selected');
+                if(minesSpots.includes(i)) minesSpots = minesSpots.filter(x=>x!==i); else minesSpots.push(i);
+            };
+            minesContainer.appendChild(cell);
+        }
     }
+    renderMinesUI();
 
     function switchTab(game, btn) {
         document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
@@ -159,14 +179,16 @@
         const timeId = game==='aviator'?'av-time':game==='penalty'?'pen-time':game==='mines'?'mines-time':'ch-time';
         const timeVal = document.getElementById(timeId).value;
         let payload = {};
+        
         if(game === 'aviator') payload = { coef: document.getElementById('av-coef').value };
-        if(game === 'penalty') payload = { moves: penaltyMoves };
-        if(game === 'mines') {
+        if(game === 'penalty') {
             payload = { 
-                spots: minesSpots,
-                mode: document.getElementById('mines-mode').value,
-                grid: parseInt(document.getElementById('mines-grid-size').value)
+                moves: penaltyMoves,
+                limit: parseInt(document.getElementById('pen-limit').value) // Sending the limit!
             };
+        }
+        if(game === 'mines') {
+            payload = { spots: minesSpots, mode: document.getElementById('mines-mode').value, grid: parseInt(document.getElementById('mines-grid-size').value), traps: parseInt(document.getElementById('mines-count').value) };
         }
         if(game === 'chicken') payload = { diff: document.getElementById('ch-diff').value, steps: document.getElementById('ch-steps').value };
         
