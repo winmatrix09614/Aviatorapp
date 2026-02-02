@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>OMAR CONTROL V2.0</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        body { background: #050505; color: #00f2ea; font-family: monospace; padding: 15px; margin: 0; }
+        .box { border: 1px solid #333; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: #111; }
+        h2 { margin: 0 0 10px 0; font-size: 16px; color: #fff; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        input, select, button { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #444; color: #fff; font-family: inherit; box-sizing: border-box; }
+        button { background: #004d13; border: none; font-weight: bold; cursor: pointer; }
+        button:active { background: #00f2ea; color: #000; }
+        .status { font-size: 12px; color: #666; margin-bottom: 10px; }
+        .connected { color: #00ff41; }
+        
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .tab { flex: 1; padding: 10px; background: #222; text-align: center; cursor: pointer; border: 1px solid #444; color: #888; font-size: 12px; }
+        .tab.active { background: #00f2ea; color: #000; font-weight: bold; }
+        .hidden { display: none; }
+
+        .grid-5x5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+        .cell { aspect-ratio: 1; background: #222; border: 1px solid #444; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .cell.selected { background: #00f2ea; color: #000; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="status">SERVER: <span id="status-text">OFFLINE</span></div>
+
+    <div class="box">
+        <input type="text" id="server-url" placeholder="Railway URL (https://...)" value="ai-signal-server-production.up.railway.app">
+        <input type="text" id="target-id" placeholder="TARGET SESSION ID (e.g. SID-XYZ)">
+        <button onclick="connectServer()">CONNECT TO GAME</button>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="tab('aviator')">AVIA</div>
+        <div class="tab" onclick="tab('penalty')">PENALTY</div>
+        <div class="tab" onclick="tab('mines')">MINES</div>
+        <div class="tab" onclick="tab('chicken')">CHICK</div>
+    </div>
+
+    <div id="p-aviator" class="panel">
+        <div class="box">
+            <h2>✈️ AVIATOR SETUP</h2>
+            <input type="number" id="av-coef" placeholder="Coefficient (e.g. 62.55)" step="0.01">
+            <label style="font-size:10px; color:#888;">SCHEDULE TIME (HH:MM)</label>
+            <div style="display:flex; gap:10px;">
+                <input type="time" id="av-time" style="flex:1;">
+                <button onclick="send('aviator')" style="flex:2;">SEND SIGNAL</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="p-penalty" class="panel hidden">
+        <div class="box">
+            <h2>⚽ PENALTY SCENARIO</h2>
+            <div id="pen-rows"></div> <label style="font-size:10px; color:#888;">SCHEDULE TIME (HH:MM)</label>
+            <div style="display:flex; gap:10px;">
+                <input type="time" id="pen-time" style="flex:1;">
+                <button onclick="send('penalty')" style="flex:2;">SEND SCENARIO</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="p-mines" class="panel hidden">
+        <div class="box">
+            <h2>💣 MINES MAP</h2>
+            <div class="grid-5x5" id="mines-grid"></div>
+            <label style="font-size:10px; color:#888;">SCHEDULE TIME (HH:MM)</label>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <input type="time" id="mines-time" style="flex:1;">
+                <button onclick="send('mines')" style="flex:2;">SEND MAP</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="p-chicken" class="panel hidden">
+        <div class="box">
+            <h2>🍗 CHICKEN PATH</h2>
+            <select id="ch-diff">
+                <option value="easy">EASY</option>
+                <option value="medium">MEDIUM</option>
+                <option value="hard">HARD</option>
+                <option value="hardcore">HARDCORE</option>
+            </select>
+            <input type="number" id="ch-steps" placeholder="Winning Steps (e.g. 8)">
+            <label style="font-size:10px; color:#888;">SCHEDULE TIME (HH:MM)</label>
+            <div style="display:flex; gap:10px;">
+                <input type="time" id="ch-time" style="flex:1;">
+                <button onclick="send('chicken')" style="flex:2;">SEND SETUP</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    let socket;
+    
+    // UI INIT
+    const penDiv = document.getElementById('pen-rows');
+    for(let i=0; i<5; i++){
+        penDiv.innerHTML += `
+            <div style="display:flex; gap:5px; margin-bottom:5px;">
+                <div style="width:20px; padding-top:10px; font-size:10px;">#${i+1}</div>
+                <select id="ps-${i}" style="flex:1; margin:0;">
+                    <option value="0">Left Top</option><option value="1">Right Top</option>
+                    <option value="2">Center</option>
+                    <option value="3">Left Bot</option><option value="4">Right Bot</option>
+                </select>
+            </div>`;
+    }
+
+    const minesDiv = document.getElementById('mines-grid');
+    let minesMap = [];
+    for(let i=0; i<25; i++){
+        let d = document.createElement('div');
+        d.className = 'cell'; d.innerText = i+1;
+        d.onclick = function(){
+            this.classList.toggle('selected');
+            if(minesMap.includes(i)) minesMap = minesMap.filter(x=>x!==i);
+            else minesMap.push(i);
+        };
+        minesDiv.appendChild(d);
+    }
+
+    function tab(name){
+        document.querySelectorAll('.panel').forEach(e=>e.classList.add('hidden'));
+        document.getElementById('p-'+name).classList.remove('hidden');
+        document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    function connectServer(){
+        const url = document.getElementById('server-url').value;
+        if(!url) return alert("Enter Server URL");
+        socket = io(url);
+        socket.on('connect', ()=>{
+            document.getElementById('status-text').innerText = "CONNECTED 🟢";
+            document.getElementById('status-text').classList.add('connected');
+        });
+    }
+
+    function send(game){
+        if(!socket) return alert("Connect first!");
+        const sid = document.getElementById('target-id').value;
+        const time = document.getElementById(game==='aviator'?'av-time':game==='penalty'?'pen-time':game==='mines'?'mines-time':'ch-time').value;
+        
+        let payload = {};
+        if(game === 'aviator') payload = { coef: document.getElementById('av-coef').value };
+        if(game === 'penalty') {
+            let moves = [];
+            for(let i=0; i<5; i++) moves.push(parseInt(document.getElementById(`ps-${i}`).value));
+            payload = { moves: moves };
+        }
+        if(game === 'mines') payload = { spots: minesMap };
+        if(game === 'chicken') payload = { diff: document.getElementById('ch-diff').value, steps: document.getElementById('ch-steps').value };
+
+        socket.emit('send_command', { sessionId: sid, game: game, payload: payload, time: time || null });
+        alert(`SENT TO ${sid} [${time || 'INSTANT'}]`);
+    }
+</script>
+</body>
+</html>

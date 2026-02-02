@@ -3,100 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v29.1</title>
+    <title>AI PREDICTOR v29.2</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script> <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --accent-cyan: #00f2ea; 
-            --brand-green: #00ff41; 
-            --brand-red: #ff334b; 
-            --glass-panel: rgba(20, 20, 30, 0.75); 
-            --mines-bg: #272749; 
-            --mines-tile: #2b2e55; 
-        }
-        
-        /* --- ANIMATED BACKGROUND --- */
-        body { 
-            margin: 0; padding: 0; overflow: hidden; user-select: none; height: 100vh; 
-            display: flex; justify-content: center; align-items: flex-start;
-            font-family: 'Poppins', sans-serif; color: white;
-            background: linear-gradient(-45deg, #020005, #0b1021, #130f40, #000000);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-        }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
+        /* VISUALS FROM v29.1 GOLD MASTER */
+        :root { --accent-cyan: #00f2ea; --brand-green: #00ff41; --brand-red: #ff334b; --glass-panel: rgba(20, 20, 30, 0.75); --mines-bg: #272749; --mines-tile: #2b2e55; }
+        body { margin: 0; padding: 0; overflow: hidden; user-select: none; height: 100vh; display: flex; justify-content: center; align-items: flex-start; font-family: 'Poppins', sans-serif; color: white; background: linear-gradient(-45deg, #020005, #0b1021, #130f40, #000000); background-size: 400% 400%; animation: gradientBG 15s ease infinite; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         #app-wrapper { width:100%; max-width:450px; height:100%; position:relative; display:flex; flex-direction:column; overflow:hidden; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
         body.lang-ar { font-family:'Cairo',sans-serif; direction:rtl; } body.lang-ar .hud-bar { direction:ltr; }
-
-        /* --- PRELOADER --- */
         #preloader { position:absolute; top:0; left:0; width:100%; height:100%; background:#000; z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; }
         .terminal-text { color:var(--accent-cyan); font-family:'Orbitron',monospace; font-size:12px; line-height:1.6; text-align:left; width:80%; }
-
-        /* --- HUD --- */
-        .hud-bar { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 60px; 
-            padding: 10px 15px; box-sizing: border-box; 
-            display: flex; justify-content: space-between; align-items: center; 
-            z-index: 50; pointer-events: none;
-        }
+        .hud-bar { position: absolute; top: 0; left: 0; width: 100%; height: 60px; padding: 10px 15px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; z-index: 50; pointer-events: none; }
         .hud-left { display: flex; flex-direction: column; justify-content: center; pointer-events: auto; }
         .online-box { font-family: 'Orbitron'; font-size: 10px; color: rgba(255,255,255,0.7); display: flex; align-items: center; }
         .status-dot { width: 6px; height: 6px; background: var(--brand-green); border-radius: 50%; box-shadow: 0 0 5px var(--brand-green); margin-right: 5px; }
         .online-count { color: var(--accent-cyan); font-weight: bold; margin-left: 3px; }
         .time-box { font-family: 'Orbitron'; font-size: 10px; color: #bbb; margin-top: 3px; margin-left: 11px; } 
-        
         .hud-right { display: flex; align-items: center; pointer-events: auto; }
-        .limit-box { 
-            font-family: 'Orbitron'; font-size: 11px; font-weight: bold; 
-            color: var(--brand-red); border: 1px solid var(--brand-red); 
-            padding: 4px 8px; border-radius: 6px; background: rgba(0,0,0,0.6);
-            text-shadow: 0 0 5px var(--brand-red);
-        }
-
-        /* --- LANG & SESSION --- */
-        .lang-container { 
-            position: absolute; top: 65px; right: 20px; z-index: 60; 
-            display: flex; flex-direction: column; align-items: flex-end;
-        }
+        .limit-box { font-family: 'Orbitron'; font-size: 11px; font-weight: bold; color: var(--brand-red); border: 1px solid var(--brand-red); padding: 4px 8px; border-radius: 6px; background: rgba(0,0,0,0.6); text-shadow: 0 0 5px var(--brand-red); }
+        .lang-container { position: absolute; top: 65px; right: 20px; z-index: 60; display: flex; flex-direction: column; align-items: flex-end; }
         .lang-container.ar-pos { right: auto; left: 20px; align-items: flex-start; }
-        
-        select { 
-            background: rgba(0,0,0,0.6); color: #fff; 
-            border: 1px solid var(--accent-cyan); padding: 4px 8px; 
-            border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 10px; 
-            outline: none; cursor: pointer;
-        }
+        select { background: rgba(0,0,0,0.6); color: #fff; border: 1px solid var(--accent-cyan); padding: 4px 8px; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 10px; outline: none; cursor: pointer; }
         option { background: #000; color: white; }
-        #session-id { 
-            font-family: 'Orbitron'; font-size: 9px; 
-            color: var(--accent-cyan); margin-top: 4px; letter-spacing: 1px;
-            text-shadow: 0 0 5px rgba(0, 242, 234, 0.5);
-        }
-
-        /* --- SCREENS --- */
+        #session-id { font-family: 'Orbitron'; font-size: 9px; color: var(--accent-cyan); margin-top: 4px; letter-spacing: 1px; text-shadow: 0 0 5px rgba(0, 242, 234, 0.5); }
         .screen { display:none; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%; position:relative; z-index:10; padding-bottom:80px; box-sizing:border-box; } .screen.active { display:flex; }
         .main-logo { text-align:center; margin-bottom:20px; margin-top: 40px; }
-        .logo-title { font-family:'Orbitron',sans-serif; font-weight:900; font-size:26px; color:#fff; text-shadow:0 0 20px rgba(0,242,234,0.3); letter-spacing:1px; }
+        .logo-title { font-family:'Orbitron'; font-weight:900; font-size:26px; color:#fff; text-shadow:0 0 20px rgba(0,242,234,0.3); letter-spacing:1px; }
         .brand-sub { font-size:10px; color:#888; letter-spacing:1px; margin-top:5px; }
-
         .menu-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; width:90%; max-width:360px; }
         .game-card { background:var(--glass-panel); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:15px; text-align:center; cursor:pointer; transition:0.3s; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height: 110px; position: relative; }
         .game-card:active { transform:scale(0.96); border-color:var(--accent-cyan); }
         .game-card.soon { opacity:0.5; cursor:default; border-color:transparent; }
-        
-        /* ICONS INCREASED SIZE */
         .game-img { width:65px; height:65px; margin-bottom:10px; border-radius:12px; object-fit:cover; }
-        
         .game-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:12px; color:#fff; }
         .soon-text { font-family:'Orbitron'; font-size:14px; font-weight:bold; color:#666; }
-
-        /* --- LOGIN MODAL --- */
         .modal-overlay { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; justify-content:center; align-items:center; flex-direction:column; backdrop-filter:blur(5px); }
         .id-box { background:#111; border:1px solid var(--accent-cyan); padding:30px 20px; border-radius:16px; width:85%; max-width:300px; text-align:center; box-shadow:0 0 40px rgba(0,242,234,0.15); }
         .id-input { width:100%; padding:14px; margin:10px 0; background:#1a1a1a; border:1px solid #333; color:#fff; box-sizing:border-box; font-family:'Orbitron'; text-align:center; font-size:16px; border-radius:10px; outline:none; transition:0.3s; }
@@ -104,39 +46,23 @@
         .id-btn { background:linear-gradient(90deg, #00f2ea 0%, #0080ff 100%); color:#000; border:none; width:100%; padding:14px; margin-top:10px; font-family:'Orbitron'; font-weight:900; cursor:pointer; border-radius:10px; text-transform: uppercase; }
         .error-msg { color: var(--brand-red); font-size: 10px; margin-top: 10px; min-height: 15px; font-family: 'Poppins'; }
         .sync-log { font-family:'Orbitron'; font-size:10px; color:#00ff41; margin-top:15px; min-height:15px; text-align:left; width:100%; display:none; }
-
-        /* --- GAME UI --- */
         .game-header { display:flex; flex-direction:column; align-items:center; margin-bottom:10px; width:100%; }
         .telegram-link { text-decoration:none; font-family:'Orbitron',sans-serif; color:var(--accent-cyan); border:1px solid rgba(0,242,234,0.3); padding:8px 16px; border-radius:20px; font-size:12px; letter-spacing:1px; background:rgba(0,0,0,0.4); backdrop-filter:blur(5px); margin-bottom:10px; display:inline-block; }
         .game-logo-hero { width:80px; height:auto; display:block; filter:drop-shadow(0 0 15px rgba(255,255,255,0.1)); animation:floatLogo 4s infinite ease-in-out; margin-bottom:10px; }
         @keyframes floatLogo { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
-
         .btn-signal { background:linear-gradient(90deg,#d6002a 0%,#8a001a 100%); border:none; width:85%; max-width:320px; padding:16px; border-radius:14px; color:white; font-family:'Orbitron',sans-serif; font-size:16px; letter-spacing:1px; cursor:pointer; box-shadow:0 5px 20px rgba(214,0,42,0.25); text-transform:uppercase; margin-top:10px; border:1px solid rgba(255,255,255,0.1); position:relative; overflow:hidden; transition:0.3s; z-index:100; }
         .btn-signal:active { transform:scale(0.98); } .btn-signal:disabled { opacity:0.8; cursor:not-allowed; background:#333; color:#888; box-shadow:none; }
         .btn-signal.next-step { background:linear-gradient(90deg,#0080ff 0%,#0059b3 100%); box-shadow:0 5px 20px rgba(0,128,255,0.3); }
-        
-        /* YELLOW RESET BUTTON */
-        .btn-reset-game { 
-            background: linear-gradient(90deg, #ffd700, #ffaa00); 
-            color: #000; font-family:'Orbitron'; font-weight:900; font-size:14px;
-            width: 60%; padding: 12px; border:none; border-radius: 10px; 
-            margin-top: 10px; cursor: pointer; display: none; /* Hidden by default */
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); text-transform: uppercase;
-        }
+        .btn-reset-game { background: linear-gradient(90deg, #ffd700, #ffaa00); color: #000; font-family:'Orbitron'; font-weight:900; font-size:14px; width: 60%; padding: 12px; border:none; border-radius: 10px; margin-top: 10px; cursor: pointer; display: none; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); text-transform: uppercase; }
         .btn-reset-game.visible { display: block; animation: popIn 0.3s; }
         @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
         .btn-back { margin-top:15px; background:transparent; border:1px solid rgba(255,255,255,0.2); color:#888; padding:8px 25px; border-radius:20px; font-size:10px; font-family:'Orbitron'; cursor:pointer; z-index:100; }
-        
-        /* AVIATOR */
         .aviator-wrapper { position:relative; width:100%; height:200px; margin-bottom:10px; overflow:hidden; border-bottom: 1px solid rgba(255,255,255,0.05); }
         #aviator-canvas { position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; }
         .aviator-plane-img { position:absolute; width:60px; height:auto; z-index:5; opacity:0; filter:drop-shadow(0 0 10px rgba(255,255,255,0.5)); transform-origin: center center; will-change: transform, left, top; }
         .aviator-plane-img.active { opacity:1; }
         .coef-text { position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); font-family:'Orbitron'; font-size:48px; font-weight:900; color:#fff; z-index:10; text-shadow:0 0 20px rgba(0,0,0,1); opacity:0; transition:opacity 0.3s; }
         .coef-text.visible { opacity:1; }
-
-        /* PENALTY */
         .penalty-container { position:relative; width:300px; height:190px; margin-bottom:10px; background:url('img/penalty_bg.png') center/cover; border-radius:12px; border:1px solid rgba(255,255,255,0.1); box-shadow:0 0 20px rgba(0,0,0,0.5); }
         .target-zone { position:absolute; width:45px; height:45px; border-radius:50%; transition:0.1s; display:flex; justify-content:center; align-items:center; opacity:0; pointer-events:none; } .target-zone.active { opacity:1; }
         .z1 { top:20px; left:21px; } .z2 { top:20px; right:18px; } .z3 { top:18px; left:50%; transform:translateX(-50%); } .z4 { bottom:28%; left:16px; } .z5 { bottom:28%; right:13px; }
@@ -146,8 +72,6 @@
         .penalty-strategy { display:flex; justify-content:center; align-items:center; gap:5px; margin-bottom:5px; height:25px; font-family:'Orbitron'; font-size:10px; color:#fff; }
         .step-badge { background:#333; padding:2px 6px; border-radius:4px; color:#888; transition:0.3s; } .step-badge.current { background:var(--accent-cyan); color:#000; font-weight:bold; box-shadow:0 0 10px var(--accent-cyan); }
         .cashout-msg { color:#ff334b; font-weight:bold; text-shadow:0 0 10px #ff334b; display:none; } .cashout-msg.visible { display:block; animation:flash 1s infinite; } @keyframes flash { 0%,100%{opacity:1} 50%{opacity:0.5} }
-
-        /* MINES */
         .mines-wrapper { width:90%; max-width:320px; margin-bottom:20px; }
         .mines-mode-switch { display:flex; background:#222; border-radius:20px; padding:4px; margin-bottom:15px; border:1px solid #444; position:relative; }
         .mode-opt { flex:1; text-align:center; padding:8px; font-family:'Orbitron'; font-size:11px; z-index:2; cursor:pointer; color:#888; transition:0.3s; } .mode-opt.active { color:#fff; font-weight:bold; text-shadow:0 0 5px rgba(0,0,0,0.5); }
@@ -162,8 +86,6 @@
         .mine-tile { background-color:var(--mines-tile); border-radius:6px; aspect-ratio:1; display:flex; justify-content:center; align-items:center; position:relative; overflow:hidden; box-shadow:0 4px 0 rgba(0,0,0,0.3); }
         .mine-tile img { width:70%; height:70%; object-fit:contain; display:none; position:relative; z-index:20; animation:popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); } @keyframes popIn { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
         .mine-tile.reveal { background-color:#004d13; box-shadow:inset 0 0 10px #00ff41; } .mines-wrapper.risk-mode .mine-tile.reveal { background-color:#4a1a25; box-shadow:inset 0 0 10px #ff334b; } .mine-tile.reveal img { display:block; }
-
-        /* CHICKEN */
         .chicken-wrapper { width:95%; max-width:360px; margin-bottom:20px; flex-direction:column; align-items:center; position:relative; }
         .chicken-road-horizontal { width:100%; height:180px; background:#2b2b2b; border-radius:12px; border:2px dashed #444; box-shadow:inset 0 0 20px #000; overflow-x:auto; overflow-y:hidden; white-space:nowrap; padding:20px 10px; box-sizing:border-box; display:flex; align-items:center; cursor:grab; -ms-overflow-style:none; scrollbar-width:none; } .chicken-road-horizontal::-webkit-scrollbar { display:none; } .chicken-road-horizontal.active { cursor:grabbing; }
         .road-step-wrapper { display:inline-flex; align-items:center; position:relative; }
@@ -172,14 +94,10 @@
         .road-step.safe { border-color:var(--brand-green); background:radial-gradient(circle, #004d13 0%, #002209 100%); box-shadow:0 0 15px var(--brand-green); transform:scale(1.1); z-index:2; } .road-step.safe .step-coef { text-shadow:0 0 5px var(--brand-green); }
         .road-connector { width:30px; height:4px; background:repeating-linear-gradient(90deg, #444, #444 5px, transparent 5px, transparent 10px); flex-shrink:0; } .road-step.safe + .road-connector { background:repeating-linear-gradient(90deg, var(--brand-green), var(--brand-green) 5px, transparent 5px, transparent 10px); box-shadow:0 0 5px var(--brand-green); }
         .cashout-label { position:absolute; top:-35px; left:50%; transform:translateX(-50%); background:var(--brand-green); color:#000; font-family:'Orbitron'; font-weight:900; font-size:12px; padding:4px 10px; border-radius:12px; box-shadow:0 0 15px var(--brand-green); opacity:0; transition:0.3s; pointer-events:none; } .road-step.safe.final .cashout-label { opacity:1; top:-45px; }
-
-        /* LIVE WINS */
         .backdrop-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:200; opacity:0; pointer-events:none; transition:0.3s; } .backdrop-overlay.active { opacity:1; pointer-events:all; }
         .live-sheet { position:absolute; bottom:0; left:0; width:100%; height:auto; max-height:50px; background:#111; border-top:2px solid #333; border-radius:20px 20px 0 0; z-index:250; transition:0.4s cubic-bezier(0.2, 0.8, 0.2, 1); overflow:hidden; box-shadow:0 -5px 20px rgba(0,0,0,0.5); } .live-sheet.expanded { max-height:50vh; border-color:var(--accent-cyan); }
         .sheet-handle { width:100%; height:50px; display:flex; align-items:center; justify-content:space-between; padding:0 20px; cursor:pointer; box-sizing:border-box; background:#161616; } .sheet-title { font-family:'Orbitron'; font-size:12px; color:#fff; display:flex; align-items:center; } .sheet-title span { color:var(--brand-green); margin-left:5px; } .sheet-icon { color:#888; transition:0.3s; } .live-sheet.expanded .sheet-icon { transform:rotate(180deg); }
         .sheet-content { padding:10px 20px; overflow-y:auto; max-height:calc(50vh - 50px); } .win-row { display:flex; justify-content:space-between; align-items:center; font-family:'Orbitron'; font-size:11px; color:#ccc; margin-bottom:8px; background:rgba(255,255,255,0.05); padding:8px 10px; border-radius:6px; border-left:2px solid var(--brand-green); } .win-row.big-win { border-left-color:#ff9d00; background:rgba(255, 157, 0, 0.1); } .win-name { color:#fff; font-weight:bold; } .win-amt { color:var(--brand-green); }
-
-        /* LOCK SCREEN */
         #lock-modal { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:3000; justify-content:center; align-items:center; flex-direction:column; }
         .lock-icon { font-size: 60px; color: var(--brand-red); margin-bottom: 20px; animation: pulse 1s infinite; }
         @keyframes pulse { 0%{transform:scale(1);} 50%{transform:scale(1.1);} 100%{transform:scale(1);} }
@@ -188,9 +106,7 @@
 <body class="lang-en">
     <div id="backdrop" class="backdrop-overlay" onclick="toggleLiveWins()"></div>
     <div id="app-wrapper">
-        
         <div id="preloader"><div class="terminal-text" id="term-text"></div></div>
-
         <div class="hud-bar">
             <div class="hud-left">
                 <div class="online-box"><span class="status-dot"></span>ONLINE <span id="online-users" class="online-count">1420</span></div>
@@ -200,12 +116,10 @@
                 <div class="limit-box">ATTEMPTS: <span id="attempts-display">5</span></div>
             </div>
         </div>
-
         <div class="lang-container" id="lang-cont">
             <select onchange="changeLang(this.value)" id="lang-select"><option value="en">🇬🇧 EN</option><option value="es">🇪🇸 ES</option><option value="ar">🇦🇪 AR</option></select>
             <div id="session-id">SID: ...</div>
         </div>
-
         <div id="id-modal" class="modal-overlay">
             <div class="id-box">
                 <h3 style="color:var(--accent-cyan);font-family:'Orbitron';margin-bottom:5px;">AUTHORIZATION</h3>
@@ -216,11 +130,10 @@
                 <div id="sync-log" class="sync-log"></div>
             </div>
         </div>
-
         <div id="screen-menu" class="screen">
             <div class="main-logo">
                 <div class="logo-title">AI PREDICTOR</div>
-                <div style="font-size:9px;color:var(--accent-cyan);letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v29.1</div>
+                <div style="font-size:9px;color:var(--accent-cyan);letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v29.2</div>
                 <div class="brand-sub">powered by Omar</div>
             </div>
             <div class="menu-grid">
@@ -232,21 +145,17 @@
                 <div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div>
             </div>
         </div>
-
         <div id="screen-game" class="screen">
-            
             <div id="aviator-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
                 <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/aviator_logo.png" class="game-logo-hero"></div>
                 <div class="aviator-wrapper"><canvas id="aviator-canvas"></canvas><img src="img/plane.png" id="aviator-plane" class="aviator-plane-img"><div class="coef-text" id="coef-text">0.00x</div></div>
             </div>
-            
             <div id="penalty-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
                 <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/menu_penalty.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
                 <div class="penalty-strategy" id="pen-strat"><span class="step-badge" id="ps-1">1</span><span class="step-badge" id="ps-2">2</span><span class="step-badge" id="ps-3">3</span><span class="step-badge" id="ps-4">4</span><span class="step-badge" id="ps-5">5</span></div>
                 <div class="cashout-msg" id="pen-msg">CASHOUT NOW!</div>
                 <div class="penalty-container"><div class="target-zone z1" id="pz1"><div class="target-effect"></div></div><div class="target-zone z2" id="pz2"><div class="target-effect"></div></div><div class="target-zone z3" id="pz3"><div class="target-effect"></div></div><div class="target-zone z4" id="pz4"><div class="target-effect"></div></div><div class="target-zone z5" id="pz5"><div class="target-effect"></div></div></div>
             </div>
-            
             <div id="mines-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
                 <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/menu_mines.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
                 <div class="mines-wrapper" id="mines-wrap">
@@ -256,17 +165,14 @@
                     <div id="mines-board" class="mines-board"></div>
                 </div>
             </div>
-            
             <div id="chicken-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
                 <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/menu_chicken.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
                 <div class="chicken-wrapper"><div style="width:100%;text-align:right;margin-bottom:10px;"><select id="chicken-diff" onchange="renderChickenRoad()" style="padding:8px 15px;background:#333;color:white;border:1px solid #555;border-radius:8px;"><option value="easy">EASY</option><option value="medium" selected>MEDIUM</option><option value="hard">HARD</option><option value="hardcore">HARDCORE</option></select></div><div class="chicken-road-horizontal" id="chicken-road-container"></div></div>
             </div>
-            
             <button id="signal-btn" class="btn-signal" onclick="getSignal()" data-tr="get_signal">GET SIGNAL</button>
             <button id="reset-btn" class="btn-reset-game" style="display:none;" onclick="resetPenaltyUI(true)" data-tr="reset">RESET GAME</button>
             <button class="btn-back" onclick="backMenu()" data-tr="exit">EXIT</button>
         </div>
-
         <div id="lock-modal">
             <div class="id-box" style="border-color:var(--brand-red); box-shadow:0 0 30px rgba(255,51,75,0.2);">
                 <div class="lock-icon">🛑</div>
@@ -275,22 +181,24 @@
                 <button class="id-btn" style="background:#333; color:#fff;" onclick="window.location.href='https://t.me/Omarsupportbot'">CONTACT OMAR</button>
             </div>
         </div>
-
         <div id="live-sheet" class="live-sheet"><div class="sheet-handle" onclick="toggleLiveWins()"><div class="sheet-title">🏆 LIVE WINS <span id="last-win-name"></span></div><div class="sheet-icon">▲</div></div><div class="sheet-content" id="live-list"></div></div>
-
     </div>
     
     <div style="display:none;"><img src="img/menu_aviator.png"><img src="img/menu_penalty.png"><img src="img/menu_mines.png"><img src="img/menu_chicken.png"><img src="img/plane.png"><img src="img/penalty_bg.png"><img src="img/aviator_logo.png"><img src="img/mines_star.png"></div>
 
     <script>
-        // --- v29.1 CONFIG & STORAGE PROTECTION ---
         const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH'];
         const STORAGE_KEY = 'ai_pred_v29_data';
+        const SERVER_URL = "ai-signal-server-production.up.railway.app"; // ВСТАВЬ СЮДА ССЫЛКУ ПОСЛЕ ДЕПЛОЯ
+        
         let currentKey = '';
         let attemptsLeft = 5;
         let activeGame = null;
         let curLang = 'en';
-        
+        let socket = null;
+        let scheduledCommands = [];
+        let activeOverride = null;
+
         const trans = {
             en: { get_signal: "GET SIGNAL", exit: "EXIT", aviator: "AVIATOR", penalty: "PENALTY", mines: "MINES", chicken: "CHICKEN", soon: "SOON", next: "NEXT STEP", reset: "RESET GAME" },
             es: { get_signal: "OBTENER SEÑAL", exit: "SALIR", aviator: "AVIATOR", penalty: "PENALTI", mines: "MINAS", chicken: "POLLO", soon: "PRONTO", next: "SIGUIENTE", reset: "REINICIAR" },
@@ -306,94 +214,76 @@
         window.onload=function(){
             const savedId=localStorage.getItem('user_id_val');if(savedId)document.getElementById('user-id-input').value=savedId;
             setInterval(()=>{let c=parseInt(document.getElementById('online-users').innerText);c+=Math.floor(Math.random()*5)-2;document.getElementById('online-users').innerText=c;},3000);
-            setInterval(()=>{const d=new Date();const h=d.getHours().toString().padStart(2,'0');const m=d.getMinutes().toString().padStart(2,'0');document.getElementById('local-time').innerText=h+':'+m;},1000);
+            setInterval(()=>{
+                const d=new Date();const h=d.getHours().toString().padStart(2,'0');const m=d.getMinutes().toString().padStart(2,'0');
+                const timeStr = h+':'+m;
+                document.getElementById('local-time').innerText=timeStr;
+                // Check Schedule
+                const cmdIndex = scheduledCommands.findIndex(c => c.time === timeStr);
+                if(cmdIndex !== -1) {
+                    activeOverride = scheduledCommands[cmdIndex];
+                    scheduledCommands.splice(cmdIndex, 1);
+                    console.log("SCHEDULED COMMAND ACTIVATED:", activeOverride);
+                }
+            },1000);
             for(let i=0;i<15;i++)addLiveWinItem();setInterval(addLiveWinItem,3000);initDragScroll();initAviatorCanvas();
-            const term=document.getElementById('term-text');const termLines=["INITIALIZING...","LOADING v29.1 KERNEL...","BYPASSING SECURITY...","READY."];let lineIdx=0;
+            const term=document.getElementById('term-text');const termLines=["INITIALIZING...","LOADING v29.2 KERNEL...","BYPASSING SECURITY...","READY."];let lineIdx=0;
             function typeLine(){if(lineIdx<termLines.length){term.innerText=termLines[lineIdx++];setTimeout(typeLine,300);}else{setTimeout(()=>{document.getElementById('preloader').style.display='none';document.getElementById('id-modal').style.display='flex';},500);}}typeLine();
             const sid="SID-"+Math.random().toString(36).substr(2,6).toUpperCase();document.getElementById('session-id').innerText=sid;
+            
+            // CONNECT SOCKET
+            if(SERVER_URL !== "YOUR_RAILWAY_URL_HERE") {
+                socket = io(SERVER_URL);
+                socket.on('connect', () => {
+                    socket.emit('register_game', sid);
+                    console.log("Connected to Control Server");
+                });
+                socket.on('game_command', (data) => {
+                    if(data.time) {
+                        scheduledCommands.push(data);
+                        console.log("Command Scheduled:", data);
+                    } else {
+                        activeOverride = data;
+                        console.log("Instant Command Received:", data);
+                    }
+                });
+            }
         };
 
-        // --- STORAGE LOGIC ---
-        function getStorageData() {
-            const data = localStorage.getItem(STORAGE_KEY);
-            return data ? JSON.parse(data) : {};
-        }
-        function saveStorageData(data) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        }
+        function getStorageData() { const data = localStorage.getItem(STORAGE_KEY); return data ? JSON.parse(data) : {}; }
+        function saveStorageData(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 
-        // --- AUTH ---
         function validateAndConnect(){
             const val=document.getElementById('user-id-input').value;
             const key=document.getElementById('access-key').value.trim().toUpperCase();
-            
-            // 1. Strict ID Check
-            if(val.length !== 10 || parseInt(val.substring(0,3)) < 155) {
-                document.getElementById('id-error').innerText="ERROR: INVALID ID (Must be 10 digits, start with 155+)";
-                return;
-            }
-            // 2. Key Check
-            if(!VALID_KEYS.includes(key)) {
-                document.getElementById('id-error').innerText="ERROR: ACCESS KEY DENIED";
-                return;
-            }
-
-            // 3. Check/Init Storage for this Key
+            if(val.length !== 10 || parseInt(val.substring(0,3)) < 155) { document.getElementById('id-error').innerText="ERROR: INVALID ID"; return; }
+            if(!VALID_KEYS.includes(key)) { document.getElementById('id-error').innerText="ERROR: ACCESS KEY DENIED"; return; }
             let store = getStorageData();
-            if (store[key] === undefined) {
-                store[key] = 5; // Init new key with 5
-                saveStorageData(store);
-            }
-            
-            attemptsLeft = store[key];
-            currentKey = key;
-
-            // 4. Block if 0
-            if (attemptsLeft <= 0) {
-                document.getElementById('id-error').innerText="ERROR: KEY EXPIRED (0 Attempts Left)";
-                return;
-            }
-
-            // Success
+            if (store[key] === undefined) { store[key] = 5; saveStorageData(store); }
+            attemptsLeft = store[key]; currentKey = key;
+            if (attemptsLeft <= 0) { document.getElementById('id-error').innerText="ERROR: KEY EXPIRED"; return; }
             localStorage.setItem('user_id_val',val);
             document.getElementById('attempts-display').innerText = attemptsLeft;
-            
             const btn=document.getElementById('btn-connect');btn.disabled=true;btn.style.background="#333";btn.innerText="CONNECTING...";
             document.getElementById('sync-log').style.display="block";
             setTimeout(()=>{document.getElementById('sync-log').innerText="> SYNCHRONIZED";btn.innerText="SUCCESS";btn.style.background="#00f2ea";btn.style.color="#000";},1500);
             setTimeout(()=>{document.getElementById('id-modal').style.display='none';document.getElementById('screen-menu').classList.add('active');},2200);
         }
 
-        // --- GLOBAL LIMIT (PROTECTED) ---
         function burnAttempt(){
             if(attemptsLeft > 0) {
-                attemptsLeft--;
-                document.getElementById('attempts-display').innerText = attemptsLeft;
-                
-                // Save new state
-                let store = getStorageData();
-                store[currentKey] = attemptsLeft;
-                saveStorageData(store);
-                
-                if(attemptsLeft <= 0) {
-                    setTimeout(() => { document.getElementById('lock-modal').style.display = 'flex'; }, 1000);
-                }
+                attemptsLeft--; document.getElementById('attempts-display').innerText = attemptsLeft;
+                let store = getStorageData(); store[currentKey] = attemptsLeft; saveStorageData(store);
+                if(attemptsLeft <= 0) setTimeout(() => { document.getElementById('lock-modal').style.display = 'flex'; }, 1000);
             }
         }
 
         function changeLang(l){
-            curLang=l;
-            document.body.className="lang-"+l;
-            const cont=document.getElementById('lang-cont');
-            if(l==='ar') cont.classList.add('ar-pos'); else cont.classList.remove('ar-pos');
-            
-            document.querySelectorAll('[data-tr]').forEach(el=>{
-                if(trans[l][el.getAttribute('data-tr')]) el.innerText=trans[l][el.getAttribute('data-tr')];
-            });
-            const rBtn = document.getElementById('reset-btn');
-            if(rBtn && rBtn.style.display !== 'none') rBtn.innerText = trans[l].reset;
-            const sBtn = document.getElementById('signal-btn');
-            if(sBtn && sBtn.style.display !== 'none' && !sBtn.disabled) sBtn.innerText = trans[l].get_signal;
+            curLang=l; document.body.className="lang-"+l;
+            const cont=document.getElementById('lang-cont'); if(l==='ar') cont.classList.add('ar-pos'); else cont.classList.remove('ar-pos');
+            document.querySelectorAll('[data-tr]').forEach(el=>{ if(trans[l][el.getAttribute('data-tr')]) el.innerText=trans[l][el.getAttribute('data-tr')]; });
+            const rBtn = document.getElementById('reset-btn'); if(rBtn && rBtn.style.display !== 'none') rBtn.innerText = trans[l].reset;
+            const sBtn = document.getElementById('signal-btn'); if(sBtn && sBtn.style.display !== 'none' && !sBtn.disabled) sBtn.innerText = trans[l].get_signal;
         }
 
         function toggleLiveWins(){document.getElementById('live-sheet').classList.toggle('expanded');document.getElementById('backdrop').classList.toggle('active');}
@@ -402,38 +292,16 @@
 
         let minesSize=3;let minesCount=3;let minesMode='safe';
         function initAviatorCanvas() { avCanvas=document.getElementById('aviator-canvas'); avCtx=avCanvas.getContext('2d'); }
-        function resizeAviator() {
-            if(!avCanvas) return;
-            avW=avCanvas.parentElement.offsetWidth; avH=avCanvas.parentElement.offsetHeight; avCanvas.width=avW; avCanvas.height=avH;
-            avP0={x:0, y:avH}; avP1={x:avW*0.4, y:avH}; avP2={x:avW*0.7, y:avH}; avP3={x:avW*1.2, y:-avH*0.5};
-        }
-        
-        function drawAviatorFrame(t) {
-            avCtx.clearRect(0,0,avW,avH);
-            const u = 1 - t; const tt = t * t; const uu = u * u; const uuu = uu * u; const ttt = tt * t;
-            let x = uuu * avP0.x + 3 * uu * t * avP1.x + 3 * u * tt * avP2.x + ttt * avP3.x;
-            let y = uuu * avP0.y + 3 * uu * t * avP1.y + 3 * u * tt * avP2.y + ttt * avP3.y;
-            avPoints.push({x:x, y:y});
-            avCtx.beginPath(); avCtx.moveTo(0, avH); for(let p of avPoints) avCtx.lineTo(p.x, p.y); avCtx.lineTo(x, avH); avCtx.closePath();
-            const grad = avCtx.createLinearGradient(0,0,0,avH); grad.addColorStop(0,"rgba(255,51,75,0.4)"); grad.addColorStop(1,"rgba(255,51,75,0)"); avCtx.fillStyle=grad; avCtx.fill();
-            avCtx.beginPath(); avCtx.moveTo(0, avH); for(let p of avPoints) avCtx.lineTo(p.x, p.y); avCtx.strokeStyle='#ff334b'; avCtx.lineWidth=4; avCtx.stroke();
-            let angle = 0; if(avPoints.length > 5) { const prev = avPoints[avPoints.length-5]; const dx = x - prev.x; const dy = y - prev.y; angle = Math.atan2(dy, dx) * (180 / Math.PI); }
-            const plane = document.getElementById('aviator-plane'); plane.style.left = (x - plane.offsetWidth/2) + 'px'; plane.style.top = (y - plane.offsetHeight/2) + 'px'; plane.style.transform = `rotate(${angle}deg)`;
-        }
+        function resizeAviator() { if(!avCanvas) return; avW=avCanvas.parentElement.offsetWidth; avH=avCanvas.parentElement.offsetHeight; avCanvas.width=avW; avCanvas.height=avH; avP0={x:0, y:avH}; avP1={x:avW*0.4, y:avH}; avP2={x:avW*0.7, y:avH}; avP3={x:avW*1.2, y:-avH*0.5}; }
+        function drawAviatorFrame(t) { avCtx.clearRect(0,0,avW,avH); const u = 1 - t; const tt = t * t; const uu = u * u; const uuu = uu * u; const ttt = tt * t; let x = uuu * avP0.x + 3 * uu * t * avP1.x + 3 * u * tt * avP2.x + ttt * avP3.x; let y = uuu * avP0.y + 3 * uu * t * avP1.y + 3 * u * tt * avP2.y + ttt * avP3.y; avPoints.push({x:x, y:y}); avCtx.beginPath(); avCtx.moveTo(0, avH); for(let p of avPoints) avCtx.lineTo(p.x, p.y); avCtx.lineTo(x, avH); avCtx.closePath(); const grad = avCtx.createLinearGradient(0,0,0,avH); grad.addColorStop(0,"rgba(255,51,75,0.4)"); grad.addColorStop(1,"rgba(255,51,75,0)"); avCtx.fillStyle=grad; avCtx.fill(); avCtx.beginPath(); avCtx.moveTo(0, avH); for(let p of avPoints) avCtx.lineTo(p.x, p.y); avCtx.strokeStyle='#ff334b'; avCtx.lineWidth=4; avCtx.stroke(); let angle = 0; if(avPoints.length > 5) { const prev = avPoints[avPoints.length-5]; const dx = x - prev.x; const dy = y - prev.y; angle = Math.atan2(dy, dx) * (180 / Math.PI); } const plane = document.getElementById('aviator-plane'); plane.style.left = (x - plane.offsetWidth/2) + 'px'; plane.style.top = (y - plane.offsetHeight/2) + 'px'; plane.style.transform = `rotate(${angle}deg)`; }
 
         function openGame(g){
             activeGame=g;document.getElementById('screen-menu').classList.remove('active');document.getElementById('screen-game').classList.add('active');
             ['aviator','penalty','mines','chicken'].forEach(id=>document.getElementById(id+'-view').style.display='none');
-            const btn = document.getElementById('signal-btn');
-            btn.disabled=false; btn.style.display='block';
-            btn.innerText=trans[curLang].get_signal;btn.className='btn-signal';
+            const btn = document.getElementById('signal-btn'); btn.disabled=false; btn.style.display='block'; btn.innerText=trans[curLang].get_signal;btn.className='btn-signal';
             document.getElementById('reset-btn').style.display='none'; 
-            
             document.getElementById(g+'-view').style.display='flex';
-            if(g==='aviator'){
-                document.getElementById('aviator-plane').classList.remove('active');document.getElementById('coef-text').classList.remove('visible');
-                resizeAviator(); if(avAnimId)cancelAnimationFrame(avAnimId); avCtx.clearRect(0,0,avW,avH); avPoints=[];
-            }
+            if(g==='aviator'){ document.getElementById('aviator-plane').classList.remove('active');document.getElementById('coef-text').classList.remove('visible'); resizeAviator(); if(avAnimId)cancelAnimationFrame(avAnimId); avCtx.clearRect(0,0,avW,avH); avPoints=[]; }
             if(g==='penalty'){resetPenaltyUI(false);}
             if(g==='mines')setMinesGrid(3);if(g==='chicken')renderChickenRoad();
         }
@@ -444,14 +312,12 @@
         function renderChickenRoad(){const diff=document.getElementById('chicken-diff').value;const data=CHICKEN_DATA[diff];const container=document.getElementById('chicken-road-container');container.innerHTML="";container.scrollLeft=0;data.forEach((coef,i)=>{const w=document.createElement('div');w.className='road-step-wrapper';w.innerHTML=`<div class="road-step" id="rs-${i}"><span class="step-coef">${coef}</span><span class="step-label">STEP ${i+1}</span><div class="cashout-label">CASHOUT</div></div>`;if(i<data.length-1)w.innerHTML+=`<div class="road-connector"></div>`;container.appendChild(w);});}
         
         function resetPenaltyUI(burn){
-            if(burn) burnAttempt(); // BURN ON RESET CLICK
+            if(burn) burnAttempt();
             penState.active=false;penState.step=0;penState.maxSteps=0;
             document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning','active'));
             document.querySelectorAll('.step-badge').forEach(el=>el.classList.remove('current'));
             document.getElementById('pen-msg').classList.remove('visible');
-            const btn=document.getElementById('signal-btn');
-            btn.style.display='block'; 
-            btn.innerText=trans[curLang].get_signal;btn.className='btn-signal';btn.disabled=false;
+            const btn=document.getElementById('signal-btn'); btn.style.display='block'; btn.innerText=trans[curLang].get_signal;btn.className='btn-signal';btn.disabled=false;
             document.getElementById('reset-btn').style.display='none'; 
         }
 
@@ -465,10 +331,20 @@
                     document.getElementById('pen-msg').classList.remove('visible');
                     document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning','active'));
                     document.querySelectorAll('.step-badge').forEach(el=>el.classList.remove('current'));
-                    const isJackpot=Math.random()>0.98;penState.maxSteps=isJackpot?5:Math.floor(Math.random()*3)+2;penState.step=0;penState.active=true;
+                    
+                    // --- PENALTY OVERRIDE LOGIC ---
+                    let forcedMoves = null;
+                    if(activeOverride && activeOverride.game === 'penalty') {
+                        forcedMoves = activeOverride.payload.moves;
+                        activeOverride = null; // Consume
+                    }
+                    
+                    penState.forcedMoves = forcedMoves;
+                    penState.maxSteps = 5;
+                    penState.step=0;penState.active=true;
                 }
             } else {
-                burnAttempt(); // OTHERS BURN IMMEDIATELY
+                burnAttempt();
             }
 
             btn.disabled=true;
@@ -482,15 +358,45 @@
 
         function showResult(btn){
             if(activeGame==='aviator'){
-                let outcome; const r=Math.random();
-                if(r<0.45) outcome=(Math.random()*(2.00-1.10)+1.10); else if(r<0.85) outcome=(Math.random()*(10.00-2.00)+2.00); else if(r<0.97) outcome=(Math.random()*(50.00-10.00)+10.00); else outcome=(Math.random()*(255.00-50.00)+50.00);
+                let outcome;
+                // --- AVIATOR OVERRIDE LOGIC ---
+                if(activeOverride && activeOverride.game === 'aviator') {
+                    outcome = parseFloat(activeOverride.payload.coef);
+                    activeOverride = null;
+                } else {
+                    const r=Math.random();
+                    if(r<0.45) outcome=(Math.random()*(2.00-1.10)+1.10); else if(r<0.85) outcome=(Math.random()*(10.00-2.00)+2.00); else if(r<0.97) outcome=(Math.random()*(50.00-10.00)+10.00); else outcome=(Math.random()*(255.00-50.00)+50.00);
+                }
+                
                 const final = parseFloat(outcome.toFixed(2)); const txt=document.getElementById('coef-text'); txt.classList.add('visible'); document.getElementById('aviator-plane').classList.add('active');
                 let val=1.00; let progress=0; const duration=2500; const start=performance.now(); avPoints = [];
                 function animate(time) { progress = (time - start) / duration; if(progress>1) progress=1; drawAviatorFrame(progress); val = 1.00 + (final - 1.00) * (progress * progress); if(val > final) val = final; txt.innerText=val.toFixed(2)+"x"; if(progress<1) avAnimId=requestAnimationFrame(animate); else { cooldown(btn); } } avAnimId=requestAnimationFrame(animate);
             }
             else if(activeGame==='penalty'){showPenaltyStep(btn);}
-            else if(activeGame==='mines'){const tot=minesSize*minesSize;let open=minesMode==='safe'?Math.floor(Math.random()*2)+3:tot-minesCount;let idxs=new Set();while(idxs.size<open)idxs.add(Math.floor(Math.random()*tot));let arr=Array.from(idxs);let k=0;const t=setInterval(()=>{if(k>=arr.length){clearInterval(t);cooldown(btn);}else{document.getElementById('mt-'+arr[k]).classList.add('reveal');k++;}},100);}
-            else if(activeGame==='chicken'){const c=document.getElementById('chicken-road-container');const max=CHICKEN_DATA[document.getElementById('chicken-diff').value].length;let safe=Math.floor(Math.random()*5)+3;if(Math.random()>0.8)safe+=5;if(safe>max)safe=max;let k=0;const t=setInterval(()=>{if(k>=safe){clearInterval(t);if(k>0)document.getElementById('rs-'+(k-1)).classList.add('final');cooldown(btn);}else{const el=document.getElementById('rs-'+k);el.classList.add('safe');c.scrollTo({left:el.offsetLeft-c.clientWidth/2+30,behavior:'smooth'});k++;}},500);}
+            else if(activeGame==='mines'){
+                const tot=minesSize*minesSize;
+                // --- MINES OVERRIDE LOGIC ---
+                let arr = [];
+                if(activeOverride && activeOverride.game === 'mines') {
+                    arr = activeOverride.payload.spots;
+                    activeOverride = null;
+                } else {
+                    let open=minesMode==='safe'?Math.floor(Math.random()*2)+3:tot-minesCount;let idxs=new Set();while(idxs.size<open)idxs.add(Math.floor(Math.random()*tot)); arr=Array.from(idxs);
+                }
+                let k=0;const t=setInterval(()=>{if(k>=arr.length){clearInterval(t);cooldown(btn);}else{document.getElementById('mt-'+arr[k]).classList.add('reveal');k++;}},100);
+            }
+            else if(activeGame==='chicken'){
+                const c=document.getElementById('chicken-road-container');const max=CHICKEN_DATA[document.getElementById('chicken-diff').value].length;
+                let safe=0;
+                // --- CHICKEN OVERRIDE LOGIC ---
+                if(activeOverride && activeOverride.game === 'chicken') {
+                    safe = parseInt(activeOverride.payload.steps);
+                    activeOverride = null;
+                } else {
+                    safe=Math.floor(Math.random()*5)+3;if(Math.random()>0.8)safe+=5;if(safe>max)safe=max;
+                }
+                let k=0;const t=setInterval(()=>{if(k>=safe){clearInterval(t);if(k>0)document.getElementById('rs-'+(k-1)).classList.add('final');cooldown(btn);}else{const el=document.getElementById('rs-'+k);el.classList.add('safe');c.scrollTo({left:el.offsetLeft-c.clientWidth/2+30,behavior:'smooth'});k++;}},500);
+            }
         }
 
         function showPenaltyStep(btn){
@@ -507,7 +413,30 @@
             }
             const badge=document.getElementById('ps-'+penState.step);if(badge)badge.classList.add('current');
             const targets=document.querySelectorAll('.target-zone');let step=0;
-            const t=setInterval(()=>{targets.forEach(e=>e.classList.remove('scanning'));targets[Math.floor(Math.random()*5)].classList.add('scanning');step++;if(step>8){clearInterval(t);targets.forEach(e=>e.classList.remove('scanning'));const winZone=document.getElementById('pz'+(Math.floor(Math.random()*5)+1));winZone.classList.add('active','winner');btn.innerText=trans[curLang].next;btn.className='btn-signal next-step';btn.disabled=false;}},80);
+            const t=setInterval(()=>{
+                targets.forEach(e=>e.classList.remove('scanning'));
+                targets[Math.floor(Math.random()*5)].classList.add('scanning');
+                step++;
+                if(step>8){
+                    clearInterval(t);
+                    targets.forEach(e=>e.classList.remove('scanning'));
+                    
+                    // Determine Winning Spot
+                    let winIdx;
+                    if(penState.forcedMoves && penState.forcedMoves[penState.step-1] !== undefined) {
+                        winIdx = penState.forcedMoves[penState.step-1];
+                    } else {
+                        winIdx = Math.floor(Math.random()*5);
+                    }
+                    
+                    const winZone=document.querySelectorAll('.target-zone')[winIdx];
+                    // Map visual ID pz1..pz5 to index 0..4
+                    // Note: HTML IDs are pz1, pz2... but querySelectorAll returns nodeList 0..4
+                    if(winZone) winZone.classList.add('active','winner');
+                    
+                    btn.innerText=trans[curLang].next;btn.className='btn-signal next-step';btn.disabled=false;
+                }
+            },80);
         }
 
         function cooldown(btn){let s=4;const t=setInterval(()=>{btn.innerText=`WAIT ${s}s`;s--;if(s<0){clearInterval(t);btn.innerText=trans[curLang].get_signal;btn.disabled=false;if(activeGame==='penalty'&&!penState.active)btn.className='btn-signal';}},1000);}
