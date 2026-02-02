@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Signal Bot Ultimate v29.0</title>
+    <title>AI Signal Bot Ultimate v29.1</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -16,7 +16,7 @@
             --mines-tile: #2b2e55; 
         }
         
-        /* --- ANIMATED BACKGROUND (Deep Neural) --- */
+        /* --- ANIMATED BACKGROUND --- */
         body { 
             margin: 0; padding: 0; overflow: hidden; user-select: none; height: 100vh; 
             display: flex; justify-content: center; align-items: flex-start;
@@ -89,11 +89,14 @@
         .game-card { background:var(--glass-panel); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:15px; text-align:center; cursor:pointer; transition:0.3s; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height: 110px; position: relative; }
         .game-card:active { transform:scale(0.96); border-color:var(--accent-cyan); }
         .game-card.soon { opacity:0.5; cursor:default; border-color:transparent; }
-        .game-img { width:50px; height:50px; margin-bottom:10px; border-radius:10px; object-fit:cover; }
+        
+        /* ICONS INCREASED SIZE */
+        .game-img { width:65px; height:65px; margin-bottom:10px; border-radius:12px; object-fit:cover; }
+        
         .game-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:12px; color:#fff; }
         .soon-text { font-family:'Orbitron'; font-size:14px; font-weight:bold; color:#666; }
 
-        /* --- LOGIN MODAL (Strict) --- */
+        /* --- LOGIN MODAL --- */
         .modal-overlay { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; justify-content:center; align-items:center; flex-direction:column; backdrop-filter:blur(5px); }
         .id-box { background:#111; border:1px solid var(--accent-cyan); padding:30px 20px; border-radius:16px; width:85%; max-width:300px; text-align:center; box-shadow:0 0 40px rgba(0,242,234,0.15); }
         .id-input { width:100%; padding:14px; margin:10px 0; background:#1a1a1a; border:1px solid #333; color:#fff; box-sizing:border-box; font-family:'Orbitron'; text-align:center; font-size:16px; border-radius:10px; outline:none; transition:0.3s; }
@@ -111,7 +114,18 @@
         .btn-signal { background:linear-gradient(90deg,#d6002a 0%,#8a001a 100%); border:none; width:85%; max-width:320px; padding:16px; border-radius:14px; color:white; font-family:'Orbitron',sans-serif; font-size:16px; letter-spacing:1px; cursor:pointer; box-shadow:0 5px 20px rgba(214,0,42,0.25); text-transform:uppercase; margin-top:10px; border:1px solid rgba(255,255,255,0.1); position:relative; overflow:hidden; transition:0.3s; z-index:100; }
         .btn-signal:active { transform:scale(0.98); } .btn-signal:disabled { opacity:0.8; cursor:not-allowed; background:#333; color:#888; box-shadow:none; }
         .btn-signal.next-step { background:linear-gradient(90deg,#0080ff 0%,#0059b3 100%); box-shadow:0 5px 20px rgba(0,128,255,0.3); }
-        .btn-signal.reset { background:linear-gradient(90deg,#ff9d00 0%,#cc7a00 100%); box-shadow:0 5px 20px rgba(255,157,0,0.3); color:#000; font-weight:900; }
+        
+        /* YELLOW RESET BUTTON */
+        .btn-reset-game { 
+            background: linear-gradient(90deg, #ffd700, #ffaa00); 
+            color: #000; font-family:'Orbitron'; font-weight:900; font-size:14px;
+            width: 60%; padding: 12px; border:none; border-radius: 10px; 
+            margin-top: 10px; cursor: pointer; display: none; /* Hidden by default */
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); text-transform: uppercase;
+        }
+        .btn-reset-game.visible { display: block; animation: popIn 0.3s; }
+        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
         .btn-back { margin-top:15px; background:transparent; border:1px solid rgba(255,255,255,0.2); color:#888; padding:8px 25px; border-radius:20px; font-size:10px; font-family:'Orbitron'; cursor:pointer; z-index:100; }
         
         /* AVIATOR */
@@ -123,7 +137,7 @@
         .coef-text.visible { opacity:1; }
 
         /* PENALTY */
-        .penalty-container { position:relative; width:300px; height:190px; margin-bottom:10px; background-image:url('img/penalty_bg.png'); background-size:cover; background-position:center; border-radius:12px; border:1px solid rgba(255,255,255,0.1); box-shadow:0 0 20px rgba(0,0,0,0.5); }
+        .penalty-container { position:relative; width:300px; height:190px; margin-bottom:10px; background:url('img/penalty_bg.png') center/cover; border-radius:12px; border:1px solid rgba(255,255,255,0.1); box-shadow:0 0 20px rgba(0,0,0,0.5); }
         .target-zone { position:absolute; width:45px; height:45px; border-radius:50%; transition:0.1s; display:flex; justify-content:center; align-items:center; opacity:0; pointer-events:none; } .target-zone.active { opacity:1; }
         .z1 { top:20px; left:21px; } .z2 { top:20px; right:18px; } .z3 { top:18px; left:50%; transform:translateX(-50%); } .z4 { bottom:28%; left:16px; } .z5 { bottom:28%; right:13px; }
         .target-effect { width:100%; height:100%; border-radius:50%; border:3px solid var(--accent-cyan); background:radial-gradient(circle, rgba(0,242,234,0.6) 0%, transparent 70%); box-shadow:0 0 20px var(--accent-cyan); transform:scale(0); opacity:0; transition:0.3s; }
@@ -206,7 +220,7 @@
         <div id="screen-menu" class="screen">
             <div class="main-logo">
                 <div class="logo-title">AI PREDICTOR</div>
-                <div style="font-size:9px;color:var(--accent-cyan);letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v29.0</div>
+                <div style="font-size:9px;color:var(--accent-cyan);letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v29.1</div>
                 <div class="brand-sub">powered by Omar</div>
             </div>
             <div class="menu-grid">
@@ -249,7 +263,7 @@
             </div>
             
             <button id="signal-btn" class="btn-signal" onclick="getSignal()" data-tr="get_signal">GET SIGNAL</button>
-            <button id="reset-btn" class="btn-signal reset" style="display:none;" onclick="resetPenaltyUI(true)" data-tr="reset">RESET GAME</button>
+            <button id="reset-btn" class="btn-reset-game" style="display:none;" onclick="resetPenaltyUI(true)" data-tr="reset">RESET GAME</button>
             <button class="btn-back" onclick="backMenu()" data-tr="exit">EXIT</button>
         </div>
 
@@ -257,7 +271,7 @@
             <div class="id-box" style="border-color:var(--brand-red); box-shadow:0 0 30px rgba(255,51,75,0.2);">
                 <div class="lock-icon">🛑</div>
                 <h3 style="color:var(--brand-red);font-family:'Orbitron';margin-bottom:5px;">SESSION EXPIRED</h3>
-                <p style="font-size:12px;color:#888;">Security Limit Reached (5/5).<br>Connection Terminated.</p>
+                <p style="font-size:12px;color:#888;">Security Limit Reached (0 attempts).<br>Get a new key from Omar.</p>
                 <button class="id-btn" style="background:#333; color:#fff;" onclick="window.location.href='https://t.me/Omarsupportbot'">CONTACT OMAR</button>
             </div>
         </div>
@@ -269,8 +283,10 @@
     <div style="display:none;"><img src="img/menu_aviator.png"><img src="img/menu_penalty.png"><img src="img/menu_mines.png"><img src="img/menu_chicken.png"><img src="img/plane.png"><img src="img/penalty_bg.png"><img src="img/aviator_logo.png"><img src="img/mines_star.png"></div>
 
     <script>
-        // --- v29 CONFIG ---
+        // --- v29.1 CONFIG & STORAGE PROTECTION ---
         const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH'];
+        const STORAGE_KEY = 'ai_pred_v29_data';
+        let currentKey = '';
         let attemptsLeft = 5;
         let activeGame = null;
         let curLang = 'en';
@@ -288,21 +304,30 @@
         let avPoints = []; let avP0, avP1, avP2, avP3;
 
         window.onload=function(){
-            const savedId=localStorage.getItem('user_id');if(savedId)document.getElementById('user-id-input').value=savedId;
+            const savedId=localStorage.getItem('user_id_val');if(savedId)document.getElementById('user-id-input').value=savedId;
             setInterval(()=>{let c=parseInt(document.getElementById('online-users').innerText);c+=Math.floor(Math.random()*5)-2;document.getElementById('online-users').innerText=c;},3000);
             setInterval(()=>{const d=new Date();const h=d.getHours().toString().padStart(2,'0');const m=d.getMinutes().toString().padStart(2,'0');document.getElementById('local-time').innerText=h+':'+m;},1000);
             for(let i=0;i<15;i++)addLiveWinItem();setInterval(addLiveWinItem,3000);initDragScroll();initAviatorCanvas();
-            const term=document.getElementById('term-text');const termLines=["INITIALIZING...","LOADING v29 KERNEL...","BYPASSING SECURITY...","READY."];let lineIdx=0;
+            const term=document.getElementById('term-text');const termLines=["INITIALIZING...","LOADING v29.1 KERNEL...","BYPASSING SECURITY...","READY."];let lineIdx=0;
             function typeLine(){if(lineIdx<termLines.length){term.innerText=termLines[lineIdx++];setTimeout(typeLine,300);}else{setTimeout(()=>{document.getElementById('preloader').style.display='none';document.getElementById('id-modal').style.display='flex';},500);}}typeLine();
             const sid="SID-"+Math.random().toString(36).substr(2,6).toUpperCase();document.getElementById('session-id').innerText=sid;
         };
+
+        // --- STORAGE LOGIC ---
+        function getStorageData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : {};
+        }
+        function saveStorageData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
 
         // --- AUTH ---
         function validateAndConnect(){
             const val=document.getElementById('user-id-input').value;
             const key=document.getElementById('access-key').value.trim().toUpperCase();
             
-            // 1. Strict ID Check: 10 digits, starts with 155 or higher
+            // 1. Strict ID Check
             if(val.length !== 10 || parseInt(val.substring(0,3)) < 155) {
                 document.getElementById('id-error').innerText="ERROR: INVALID ID (Must be 10 digits, start with 155+)";
                 return;
@@ -313,19 +338,46 @@
                 return;
             }
 
-            localStorage.setItem('user_id',val);
+            // 3. Check/Init Storage for this Key
+            let store = getStorageData();
+            if (store[key] === undefined) {
+                store[key] = 5; // Init new key with 5
+                saveStorageData(store);
+            }
+            
+            attemptsLeft = store[key];
+            currentKey = key;
+
+            // 4. Block if 0
+            if (attemptsLeft <= 0) {
+                document.getElementById('id-error').innerText="ERROR: KEY EXPIRED (0 Attempts Left)";
+                return;
+            }
+
+            // Success
+            localStorage.setItem('user_id_val',val);
+            document.getElementById('attempts-display').innerText = attemptsLeft;
+            
             const btn=document.getElementById('btn-connect');btn.disabled=true;btn.style.background="#333";btn.innerText="CONNECTING...";
             document.getElementById('sync-log').style.display="block";
             setTimeout(()=>{document.getElementById('sync-log').innerText="> SYNCHRONIZED";btn.innerText="SUCCESS";btn.style.background="#00f2ea";btn.style.color="#000";},1500);
             setTimeout(()=>{document.getElementById('id-modal').style.display='none';document.getElementById('screen-menu').classList.add('active');},2200);
         }
 
-        // --- GLOBAL LIMIT ---
+        // --- GLOBAL LIMIT (PROTECTED) ---
         function burnAttempt(){
-            attemptsLeft--;
-            document.getElementById('attempts-display').innerText = attemptsLeft;
-            if(attemptsLeft <= 0) {
-                setTimeout(() => { document.getElementById('lock-modal').style.display = 'flex'; }, 1000);
+            if(attemptsLeft > 0) {
+                attemptsLeft--;
+                document.getElementById('attempts-display').innerText = attemptsLeft;
+                
+                // Save new state
+                let store = getStorageData();
+                store[currentKey] = attemptsLeft;
+                saveStorageData(store);
+                
+                if(attemptsLeft <= 0) {
+                    setTimeout(() => { document.getElementById('lock-modal').style.display = 'flex'; }, 1000);
+                }
             }
         }
 
@@ -338,9 +390,10 @@
             document.querySelectorAll('[data-tr]').forEach(el=>{
                 if(trans[l][el.getAttribute('data-tr')]) el.innerText=trans[l][el.getAttribute('data-tr')];
             });
-            // Update Reset Button text if visible
             const rBtn = document.getElementById('reset-btn');
-            if(rBtn) rBtn.innerText = trans[l].reset;
+            if(rBtn && rBtn.style.display !== 'none') rBtn.innerText = trans[l].reset;
+            const sBtn = document.getElementById('signal-btn');
+            if(sBtn && sBtn.style.display !== 'none' && !sBtn.disabled) sBtn.innerText = trans[l].get_signal;
         }
 
         function toggleLiveWins(){document.getElementById('live-sheet').classList.toggle('expanded');document.getElementById('backdrop').classList.toggle('active');}
@@ -374,7 +427,7 @@
             const btn = document.getElementById('signal-btn');
             btn.disabled=false; btn.style.display='block';
             btn.innerText=trans[curLang].get_signal;btn.className='btn-signal';
-            document.getElementById('reset-btn').style.display='none'; // Hide reset initially
+            document.getElementById('reset-btn').style.display='none'; 
             
             document.getElementById(g+'-view').style.display='flex';
             if(g==='aviator'){
@@ -391,22 +444,21 @@
         function renderChickenRoad(){const diff=document.getElementById('chicken-diff').value;const data=CHICKEN_DATA[diff];const container=document.getElementById('chicken-road-container');container.innerHTML="";container.scrollLeft=0;data.forEach((coef,i)=>{const w=document.createElement('div');w.className='road-step-wrapper';w.innerHTML=`<div class="road-step" id="rs-${i}"><span class="step-coef">${coef}</span><span class="step-label">STEP ${i+1}</span><div class="cashout-label">CASHOUT</div></div>`;if(i<data.length-1)w.innerHTML+=`<div class="road-connector"></div>`;container.appendChild(w);});}
         
         function resetPenaltyUI(burn){
-            if(burn) burnAttempt(); // BURN ATTEMPT ONLY ON RESET
+            if(burn) burnAttempt(); // BURN ON RESET CLICK
             penState.active=false;penState.step=0;penState.maxSteps=0;
             document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning','active'));
             document.querySelectorAll('.step-badge').forEach(el=>el.classList.remove('current'));
             document.getElementById('pen-msg').classList.remove('visible');
             const btn=document.getElementById('signal-btn');
-            btn.style.display='block'; // Show Get Signal
+            btn.style.display='block'; 
             btn.innerText=trans[curLang].get_signal;btn.className='btn-signal';btn.disabled=false;
-            document.getElementById('reset-btn').style.display='none'; // Hide Reset
+            document.getElementById('reset-btn').style.display='none'; 
         }
 
         function getSignal(){
             if(attemptsLeft <= 0) return;
             const btn=document.getElementById('signal-btn');
             
-            // PENALTY LOGIC (Does NOT burn attempt on Get Signal)
             if(activeGame==='penalty'){
                 if(penState.active){showPenaltyStep(btn);return;}
                 else{
@@ -414,11 +466,9 @@
                     document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning','active'));
                     document.querySelectorAll('.step-badge').forEach(el=>el.classList.remove('current'));
                     const isJackpot=Math.random()>0.98;penState.maxSteps=isJackpot?5:Math.floor(Math.random()*3)+2;penState.step=0;penState.active=true;
-                    // Note: Reset button stays hidden until game over
                 }
             } else {
-                // OTHER GAMES: BURN IMMEDIATELY
-                burnAttempt();
+                burnAttempt(); // OTHERS BURN IMMEDIATELY
             }
 
             btn.disabled=true;
@@ -448,7 +498,6 @@
             penState.step++;
             if(penState.step>penState.maxSteps){
                 document.getElementById('pen-msg').classList.add('visible');
-                // Hide Get Signal, Show Reset
                 btn.style.display='none';
                 const rBtn = document.getElementById('reset-btn');
                 rBtn.style.display='block';
