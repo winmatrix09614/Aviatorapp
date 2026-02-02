@@ -1,7 +1,6 @@
 {
-  "name": "aviator-predictor",
+  "name": "aviator-app-frontend",
   "version": "1.0.0",
-  "description": "Simple predictor app",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
