@@ -189,7 +189,7 @@
     <script>
         const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH'];
         const STORAGE_KEY = 'ai_pred_v29_data';
-        const SERVER_URL = "ai-signal-server-production.up.railway.app"; // ВСТАВЬ СЮДА ССЫЛКУ ПОСЛЕ ДЕПЛОЯ
+        const SERVER_URL = "https://ai-signal-server-production.up.railway.app"; // ВСТАВЬ СЮДА ССЫЛКУ ПОСЛЕ ДЕПЛОЯ
         
         let currentKey = '';
         let attemptsLeft = 5;
@@ -232,7 +232,7 @@
             const sid="SID-"+Math.random().toString(36).substr(2,6).toUpperCase();document.getElementById('session-id').innerText=sid;
             
             // CONNECT SOCKET
-            if(SERVER_URL !== "ai-signal-server-production.up.railway.app") {
+            if(SERVER_URL !== "https://ai-signal-server-production.up.railway.app") {
                 socket = io(SERVER_URL);
                 socket.on('connect', () => {
                     socket.emit('register_game', sid);
