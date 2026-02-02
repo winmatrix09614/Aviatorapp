@@ -3,475 +3,414 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI PREDICTOR v29.0</title>
+    <title>AI Signal Bot Ultimate v29.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-dark: #0b0f19;
-            --neon-cyan: #00f2ea;
-            --neon-red: #ff334b;
-            --card-bg: rgba(22, 29, 45, 0.9);
-            --text-main: #ffffff;
-        }
-
-        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        :root { --bg-deep:#050010; --accent-cyan:#00f2ea; --text-color:#ffffff; --brand-green:#00ff41; --brand-red:#ff334b; --glass-panel:rgba(20, 20, 30, 0.7); --mines-bg:#272749; --mines-tile:#2b2e55; }
+        body { background-color:var(--bg-deep); color:var(--text-color); font-family:'Poppins',sans-serif; margin:0; padding:0; overflow:hidden; user-select:none; height:100vh; display:flex; justify-content:center; align-items:flex-start; }
+        #app-wrapper { width:100%; max-width:450px; height:100%; position:relative; background:transparent; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 0 50px rgba(0,0,0,0.5); }
+        body.lang-ar { font-family:'Cairo',sans-serif; direction:rtl; } body.lang-ar .hud-bar { direction:ltr; }
         
-        body {
-            margin: 0; padding: 0;
-            background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at 50% 0%, #1a253a 0%, #0b0f19 70%);
-            font-family: 'Poppins', sans-serif;
-            color: var(--text-main);
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        /* --- UI ELEMENTS --- */
-        .hidden { display: none !important; }
+        /* PRELOADER */
+        #preloader { position:absolute; top:0; left:0; width:100%; height:100%; background:#000; z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; }
+        .terminal-text { color:var(--accent-cyan); font-family:'Orbitron',monospace; font-size:12px; line-height:1.6; text-align:left; width:80%; }
         
-        /* HEADER & HUD */
-        .hud-bar {
-            width: 90%; margin-top: 15px;
-            display: flex; justify-content: space-between; align-items: center;
-            font-family: 'Orbitron', sans-serif; font-size: 10px; color: rgba(255,255,255,0.5);
-        }
-        .status-dot { width: 6px; height: 6px; background: var(--neon-cyan); border-radius: 50%; display: inline-block; margin-right: 5px; box-shadow: 0 0 5px var(--neon-cyan); }
-        .limit-box { color: var(--neon-red); font-weight: bold; border: 1px solid var(--neon-red); padding: 2px 8px; border-radius: 4px; }
+        /* BACKGROUND */
+        .cyber-wrapper { position:fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(to bottom, #020005 0%, #10002b 100%); z-index:-2; }
+        
+        /* HEADER HUD */
+        .hud-bar { position:absolute; top:0; left:0; width:100%; height:50px; padding:0 20px; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; font-family:'Orbitron',sans-serif; font-size:10px; color:rgba(255,255,255,0.5); z-index:50; pointer-events:none; }
+        .status-dot { width:6px; height:6px; background:var(--brand-green); border-radius:50%; box-shadow:0 0 5px var(--brand-green); display:inline-block; margin-right:5px; }
+        .limit-box { color:var(--brand-red); border:1px solid var(--brand-red); padding:2px 6px; border-radius:4px; font-weight:bold; }
+
+        /* MODALS */
+        .modal-overlay { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; justify-content:center; align-items:center; flex-direction:column; backdrop-filter:blur(10px); }
+        .id-box { background:#111; border:1px solid var(--accent-cyan); padding:30px 20px; border-radius:16px; width:85%; max-width:300px; text-align:center; box-shadow:0 0 40px rgba(0,242,234,0.15); }
+        .id-input { width:100%; padding:14px; margin:10px 0; background:#1a1a1a; border:1px solid #333; color:#fff; box-sizing:border-box; font-family:'Orbitron'; text-align:center; font-size:18px; border-radius:10px; outline:none; transition:0.3s; }
+        .id-input:focus { border-color:var(--accent-cyan); box-shadow:0 0 10px rgba(0,242,234,0.2); }
+        .id-btn { background:linear-gradient(90deg, #00f2ea 0%, #0080ff 100%); color:#000; border:none; width:100%; padding:14px; margin-top:10px; font-family:'Orbitron'; font-weight:900; cursor:pointer; border-radius:10px; font-size:14px; text-transform:uppercase; }
+        .sync-log { font-family:'Orbitron'; font-size:10px; color:#00ff41; margin-top:15px; min-height:15px; text-align:left; width:100%; display:none; }
+        
+        /* LOCK SCREEN SPECIFIC */
+        .lock-icon { font-size:50px; margin-bottom:15px; animation:pulse 2s infinite; }
+        @keyframes pulse { 0%{transform:scale(1);} 50%{transform:scale(1.1);} 100%{transform:scale(1);} }
 
         /* SCREENS */
-        .screen { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: flex; flex-direction: column; align-items: center; transition: opacity 0.3s; }
+        .screen { display:none; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%; position:relative; z-index:10; padding-bottom:80px; box-sizing:border-box; } .screen.active { display:flex; }
+        .main-logo { text-align:center; margin-bottom:20px; }
+        .logo-title { font-family:'Orbitron',sans-serif; font-weight:900; font-size:26px; color:#fff; text-shadow:0 0 20px rgba(58,134,255,0.6); letter-spacing:1px; }
+        .brand-sub { font-size:10px; color:#888; letter-spacing:1px; margin-top:5px; font-family:'Poppins'; }
         
-        /* MENU SCREEN */
-        .main-logo { margin-top: 40px; text-align: center; margin-bottom: 30px; }
-        .logo-title { font-family: 'Orbitron'; font-weight: 900; font-size: 28px; letter-spacing: 2px; text-shadow: 0 0 15px rgba(0, 242, 234, 0.3); }
-        .logo-ver { font-size: 10px; color: var(--neon-cyan); letter-spacing: 3px; font-weight: 700; margin-top: 5px; }
-        .logo-sub { font-size: 9px; color: #555; margin-top: 2px; letter-spacing: 1px; }
+        /* MENU GRID */
+        .menu-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; width:90%; max-width:360px; }
+        .game-card { background:var(--glass-panel); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:15px; text-align:center; cursor:pointer; transition:all 0.3s ease; position:relative; overflow:hidden; min-height:100px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+        .game-card:hover,.game-card:active { transform:translateY(-5px); border-color:var(--accent-cyan); box-shadow:0 0 20px rgba(0,242,234,0.3); }
+        .game-card.soon { cursor:default; opacity:0.5; border-color:rgba(255,255,255,0.05); } 
+        .soon-text { font-family:'Orbitron'; font-size:18px; font-weight:bold; color:#666; letter-spacing:2px; }
+        .game-img { width:60px; height:60px; margin-bottom:8px; border-radius:12px; object-fit:cover; }
+        .game-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:12px; color:#fff; }
 
-        .menu-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-            width: 90%; max-width: 350px;
-        }
-        .game-card {
-            background: linear-gradient(145deg, #161d2d, #0f1420);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px; height: 120px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            cursor: pointer; position: relative; overflow: hidden;
-            transition: transform 0.1s, border-color 0.2s;
-        }
-        .game-card:active { transform: scale(0.97); border-color: var(--neon-cyan); }
-        .game-icon { font-size: 35px; margin-bottom: 10px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
-        .game-title { font-family: 'Orbitron'; font-size: 11px; color: #fff; letter-spacing: 1px; }
+        /* GAME HEADER */
+        .game-header { display:flex; flex-direction:column; align-items:center; margin-bottom:10px; width:100%; }
+        .telegram-link { text-decoration:none; font-family:'Orbitron',sans-serif; color:var(--accent-cyan); border:1px solid rgba(0,242,234,0.3); padding:8px 16px; border-radius:20px; font-size:12px; letter-spacing:1px; background:rgba(0,0,0,0.4); backdrop-filter:blur(5px); margin-bottom:10px; display:inline-block; }
+        .game-logo-hero { width:80px; height:auto; display:block; filter:drop-shadow(0 0 15px rgba(255,255,255,0.1)); animation:floatLogo 4s infinite ease-in-out; margin-bottom:10px; }
+        @keyframes floatLogo { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+
+        /* BUTTONS */
+        .btn-signal { background:linear-gradient(90deg,#d6002a 0%,#8a001a 100%); border:none; width:85%; max-width:320px; padding:16px; border-radius:14px; color:white; font-family:'Orbitron',sans-serif; font-size:16px; letter-spacing:1px; cursor:pointer; box-shadow:0 5px 20px rgba(214,0,42,0.25); text-transform:uppercase; margin-top:10px; border:1px solid rgba(255,255,255,0.1); position:relative; overflow:hidden; transition:0.3s; z-index:100; }
+        .btn-signal:active { transform:scale(0.98); } .btn-signal:disabled { opacity:0.8; cursor:not-allowed; background:#333; color:#888; box-shadow:none; }
+        .btn-signal.next-step { background:linear-gradient(90deg,#0080ff 0%,#0059b3 100%); box-shadow:0 5px 20px rgba(0,128,255,0.3); }
+        .btn-signal.reset { background:linear-gradient(90deg,#ff9d00 0%,#cc7a00 100%); box-shadow:0 5px 20px rgba(255,157,0,0.3); color:#000; font-weight:900; }
+        .btn-back { margin-top:15px; background:transparent; border:1px solid rgba(255,255,255,0.2); color:#888; padding:8px 25px; border-radius:20px; font-size:10px; font-family:'Orbitron'; cursor:pointer; z-index:100; }
         
-        .game-card.soon { opacity: 0.5; cursor: default; }
-        .soon-text { font-size: 10px; color: #555; border: 1px solid #333; padding: 2px 6px; border-radius: 4px; }
+        /* AVIATOR CANVAS */
+        .aviator-wrapper { position:relative; width:100%; height:200px; margin-bottom:10px; overflow:hidden; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        #aviator-canvas { position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; }
+        .aviator-plane-img { position:absolute; width:60px; height:auto; z-index:5; opacity:0; filter:drop-shadow(0 0 10px rgba(255,255,255,0.5)); transform-origin: center center; will-change: transform, left, top; }
+        .aviator-plane-img.active { opacity:1; }
+        .coef-text { position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); font-family:'Orbitron'; font-size:48px; font-weight:900; color:#fff; z-index:10; text-shadow:0 0 20px rgba(0,0,0,1); opacity:0; transition:opacity 0.3s; }
+        .coef-text.visible { opacity:1; }
 
-        /* LOGIN MODAL (V28 STYLE + V29 LOGIC) */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            display: flex; justify-content: center; align-items: center;
-        }
-        .login-box {
-            width: 80%; max-width: 300px;
-            background: #111625;
-            border: 1px solid var(--neon-cyan);
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(0, 242, 234, 0.1);
-        }
-        .input-field {
-            width: 100%; background: #0b0f19; border: 1px solid #333; color: white;
-            padding: 12px; margin-bottom: 15px; border-radius: 8px; text-align: center;
-            font-family: 'Orbitron'; font-size: 14px; outline: none;
-        }
-        .input-field:focus { border-color: var(--neon-cyan); }
-        .btn-main {
-            width: 100%; padding: 12px;
-            background: var(--neon-cyan); color: #000;
-            font-family: 'Orbitron'; font-weight: 700; border: none; border-radius: 8px;
-            cursor: pointer; font-size: 14px;
-        }
-        .error-msg { color: var(--neon-red); font-size: 10px; margin-top: 10px; min-height: 15px; }
-
-        /* GAME SCREEN & AVIATOR CANVAS (V28 ENGINE) */
-        .game-header { width: 90%; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .back-btn { background: none; border: none; color: #777; font-size: 24px; cursor: pointer; }
+        /* PENALTY, MINES, CHICKEN STYLES (FROM v28) */
+        .penalty-container { position:relative; width:300px; height:190px; margin-bottom:10px; background-image:url('img/penalty_bg.png'); background-size:cover; background-position:center; border-radius:12px; border:1px solid rgba(255,255,255,0.1); box-shadow:0 0 20px rgba(0,0,0,0.5); }
+        .target-zone { position:absolute; width:45px; height:45px; border-radius:50%; transition:0.1s; display:flex; justify-content:center; align-items:center; opacity:0; pointer-events:none; } .target-zone.active { opacity:1; }
+        .z1 { top:20px; left:21px; } .z2 { top:20px; right:18px; } .z3 { top:18px; left:50%; transform:translateX(-50%); } .z4 { bottom:28%; left:16px; } .z5 { bottom:28%; right:13px; }
+        .target-effect { width:100%; height:100%; border-radius:50%; border:3px solid var(--accent-cyan); background:radial-gradient(circle, rgba(0,242,234,0.6) 0%, transparent 70%); box-shadow:0 0 20px var(--accent-cyan); transform:scale(0); opacity:0; transition:0.3s; }
+        .target-zone.scanning { border:2px dashed rgba(255,255,255,0.6); background:rgba(255,255,255,0.1); opacity:1; }
+        .target-zone.winner .target-effect { transform:scale(1.1); opacity:1; animation:pulseTarget 1s infinite; } @keyframes pulseTarget { 0%{transform:scale(1)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
+        .penalty-strategy { display:flex; justify-content:center; align-items:center; gap:5px; margin-bottom:5px; height:25px; font-family:'Orbitron'; font-size:10px; color:#fff; }
+        .step-badge { background:#333; padding:2px 6px; border-radius:4px; color:#888; transition:0.3s; } .step-badge.current { background:var(--accent-cyan); color:#000; font-weight:bold; box-shadow:0 0 10px var(--accent-cyan); }
+        .cashout-msg { color:#ff334b; font-weight:bold; text-shadow:0 0 10px #ff334b; display:none; } .cashout-msg.visible { display:block; animation:flash 1s infinite; } @keyframes flash { 0%,100%{opacity:1} 50%{opacity:0.5} }
         
-        .aviator-wrapper {
-            position: relative; width: 100%; height: 220px;
-            margin-top: 20px; margin-bottom: 20px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            background: radial-gradient(circle at 50% 50%, #1a253a 0%, #0b0f19 100%);
-            overflow: hidden;
-        }
-        #aviator-canvas { width: 100%; height: 100%; }
+        .mines-wrapper { width:90%; max-width:320px; margin-bottom:20px; }
+        .mines-grid-select { display:flex; gap:10px; margin-bottom:15px; }
+        .mines-btn-grid { flex:1; background:#333; border:1px solid #555; color:#fff; padding:12px 0; border-radius:8px; font-family:'Orbitron'; font-size:12px; cursor:pointer; text-align:center; transition:0.2s; } .mines-btn-grid.active { background:var(--brand-green); color:#000; border-color:var(--brand-green); font-weight:900; box-shadow:0 0 15px rgba(0,255,65,0.3); }
+        .mines-board { background:var(--mines-bg); padding:10px; border-radius:10px; display:grid; gap:6px; border:2px solid #3d3d5c; box-shadow:inset 0 0 20px rgba(0,0,0,0.5); transition:all 0.3s; }
+        .mine-tile { background-color:var(--mines-tile); border-radius:6px; aspect-ratio:1; display:flex; justify-content:center; align-items:center; position:relative; overflow:hidden; box-shadow:0 4px 0 rgba(0,0,0,0.3); }
+        .mine-tile img { width:70%; height:70%; object-fit:contain; display:none; position:relative; z-index:20; animation:popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); } @keyframes popIn { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
+        .mine-tile.reveal { background-color:#004d13; box-shadow:inset 0 0 10px #00ff41; } .mine-tile.reveal img { display:block; }
         
-        .coef-display {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-family: 'Orbitron'; font-size: 48px; font-weight: bold; color: white;
-            opacity: 0; transition: opacity 0.2s;
-            text-shadow: 0 0 20px rgba(255,255,255,0.2);
-            z-index: 10;
-        }
-        .coef-display.visible { opacity: 1; }
-
-        .controls-area { width: 90%; display: flex; flex-direction: column; align-items: center; }
-        .big-btn {
-            width: 100%; padding: 18px;
-            background: linear-gradient(90deg, #00f2ea, #0080ff);
-            border: none; border-radius: 12px;
-            color: #fff; font-family: 'Orbitron'; font-weight: bold; font-size: 18px;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-            box-shadow: 0 5px 20px rgba(0, 242, 234, 0.3);
-            cursor: pointer; transition: transform 0.1s;
-        }
-        .big-btn:active { transform: scale(0.98); }
-        .big-btn:disabled { background: #333; box-shadow: none; color: #888; }
-
-        /* OTHER GAMES */
-        .grid-game { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 300px; margin: 20px auto; }
-        .cell { aspect-ratio: 1; background: #161d2d; border-radius: 6px; display: flex; justify-content: center; align-items: center; font-size: 20px; transition: 0.3s; border: 1px solid #222; }
-        .cell.active { background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); border-color: #fff; }
-        .cell.chicken { background: #ffcc00; box-shadow: 0 0 10px #ffcc00; }
-
-        /* LOCK SCREEN (V29 LOGIC) */
-        .lock-icon { font-size: 60px; color: var(--neon-red); margin-bottom: 20px; }
-        .lock-text { font-family: 'Orbitron'; font-size: 20px; color: var(--neon-red); margin-bottom: 10px; }
-        .lock-sub { font-size: 12px; color: #888; text-align: center; width: 80%; line-height: 1.5; }
-
-        /* TERMINAL LOADER */
-        #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; padding: 20px; font-family: 'Courier New', monospace; font-size: 12px; color: var(--neon-cyan); display: flex; flex-direction: column; justify-content: flex-end; }
-
+        .chicken-wrapper { width:95%; max-width:360px; margin-bottom:20px; flex-direction:column; align-items:center; position:relative; }
+        .chicken-road-horizontal { width:100%; height:180px; background:#2b2b2b; border-radius:12px; border:2px dashed #444; box-shadow:inset 0 0 20px #000; overflow-x:auto; overflow-y:hidden; white-space:nowrap; padding:20px 10px; box-sizing:border-box; display:flex; align-items:center; cursor:grab; -ms-overflow-style:none; scrollbar-width:none; }
+        .road-step { width:60px; height:60px; background:#1a1a1a; border:3px solid #333; border-radius:50%; display:flex; flex-direction:column; justify-content:center; align-items:center; position:relative; transition:0.3s; box-shadow:0 4px 5px rgba(0,0,0,0.5); flex-shrink:0; margin-right:20px; }
+        .road-step.safe { border-color:var(--brand-green); background:radial-gradient(circle, #004d13 0%, #002209 100%); box-shadow:0 0 15px var(--brand-green); transform:scale(1.1); z-index:2; }
     </style>
 </head>
-<body>
+<body class="lang-en">
+    <div class="cyber-wrapper"></div>
+    <div id="app-wrapper">
+        <div id="preloader"><div class="terminal-text" id="term-text"></div></div>
 
-    <div id="preloader"></div>
-
-    <div id="id-modal" class="modal-overlay hidden">
-        <div class="login-box">
-            <h3 style="color:var(--neon-cyan); font-family:'Orbitron'; margin:0 0 20px 0;">SYSTEM AUTH</h3>
-            <input type="number" class="input-field" placeholder="ACCOUNT ID" value="15592023">
-            <input type="text" id="access-key" class="input-field" placeholder="ACCESS KEY" style="text-transform: uppercase;">
-            <button class="btn-main" onclick="attemptLogin()">CONNECT</button>
-            <div id="login-error" class="error-msg"></div>
-        </div>
-    </div>
-
-    <div id="screen-menu" class="screen hidden">
         <div class="hud-bar">
-            <div><span class="status-dot"></span>ONLINE <span id="online">1,420</span></div>
-            <div class="limit-box">SIG: <span id="sig-count-menu">5</span></div>
+            <div><span class="status-dot"></span>ONLINE <span id="online-users" class="online-count">1420</span></div>
+            <div id="limit-display" class="limit-box">ATTEMPTS: 5</div>
         </div>
 
-        <div class="main-logo">
-            <div class="logo-title">AI PREDICTOR</div>
-            <div class="logo-ver">NEURAL v29.0</div>
-            <div class="logo-sub">powered by Omar</div>
-        </div>
-
-        <div class="menu-grid">
-            <div class="game-card" onclick="openGame('aviator')">
-                <div class="game-icon">✈️</div>
-                <div class="game-title">AVIATOR</div>
+        <div id="screen-menu" class="screen">
+            <div class="main-logo">
+                <div class="logo-title">AI PREDICTOR</div>
+                <div style="font-size:9px;color:#00f2ea;letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v29.0</div>
+                <div class="brand-sub">powered by Omar</div>
             </div>
-            <div class="game-card" onclick="openGame('penalty')">
-                <div class="game-icon">⚽</div>
-                <div class="game-title">PENALTY</div>
-            </div>
-            <div class="game-card" onclick="openGame('mines')">
-                <div class="game-icon">💣</div>
-                <div class="game-title">MINES</div>
-            </div>
-            <div class="game-card" onclick="openGame('chicken')">
-                <div class="game-icon">🍗</div>
-                <div class="game-title">CHICKEN</div>
-            </div>
-            <div class="game-card soon"><div class="soon-text">SOON</div></div>
-            <div class="game-card soon"><div class="soon-text">SOON</div></div>
-        </div>
-    </div>
-
-    <div id="screen-game" class="screen hidden">
-        <div class="game-header">
-            <button class="back-btn" onclick="backToMenu()">❮</button>
-            <div style="font-family:'Orbitron'; font-size:14px; letter-spacing:1px;" id="game-name">GAME</div>
-            <div class="limit-box">LEFT: <span id="sig-count-game">5</span></div>
-        </div>
-
-        <div id="game-content-area" style="width:100%; flex:1; display:flex; justify-content:center; align-items:center; position:relative;">
-            </div>
-
-        <div class="controls-area" style="margin-bottom: 30px;">
-            <button id="signal-btn" class="big-btn" onclick="getSignal()">GET SIGNAL</button>
-        </div>
-    </div>
-
-    <div id="lock-modal" class="modal-overlay hidden">
-        <div class="login-box" style="border-color: var(--neon-red); box-shadow: none;">
-            <div class="lock-icon">🛑</div>
-            <div class="lock-text">SESSION EXPIRED</div>
-            <div class="lock-sub">
-                Safety Limit Reached (5/5).<br>
-                Connection terminated.<br><br>
-                Contact Omar for a new Access Key.
+            <div class="menu-grid">
+                <div class="game-card" onclick="openGame('aviator')"><img src="img/menu_aviator.png" class="game-img"><div class="game-title">AVIATOR</div></div>
+                <div class="game-card" onclick="openGame('penalty')"><img src="img/menu_penalty.png" class="game-img"><div class="game-title">PENALTY</div></div>
+                <div class="game-card" onclick="openGame('mines')"><img src="img/menu_mines.png" class="game-img"><div class="game-title">MINES</div></div>
+                <div class="game-card" onclick="openGame('chicken')"><img src="img/menu_chicken.png" class="game-img"><div class="game-title">CHICKEN</div></div>
+                <div class="game-card soon"><div class="soon-text">SOON</div></div>
+                <div class="game-card soon"><div class="soon-text">SOON</div></div>
             </div>
         </div>
-    </div>
 
-<script>
-    // --- V29 CONFIG ---
-    const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH'];
-    let signalsLeft = 5;
-    let currentGame = null;
+        <div id="id-modal" class="modal-overlay">
+            <div class="id-box">
+                <h3 style="color:#00f2ea;font-family:'Orbitron';margin-bottom:5px;">SYSTEM AUTH</h3>
+                <input type="number" id="user-id-input" class="id-input" placeholder="ACCOUNT ID" value="1559203">
+                <input type="text" id="access-key" class="id-input" placeholder="ACCESS KEY" style="text-transform: uppercase;">
+                <button id="btn-connect" class="id-btn" onclick="validateAndConnect()">CONNECT</button>
+                <div id="id-error" style="color:#ff334b;font-size:10px;margin-top:10px;"></div>
+                <div id="sync-log" class="sync-log"></div>
+            </div>
+        </div>
 
-    // --- V28 AVIATOR ENGINE VARIABLES ---
-    let avCtx, avCanvas, avW, avH, avAnimId;
-    let avPoints = [];
-    // Bezier Control Points
-    let avP0, avP1, avP2, avP3; 
-
-    // --- TERMINAL LOADER ---
-    const logs = [
-        "boot_sequence_init...",
-        "loading_neural_modules_v28...", // Legacy Core
-        "patching_security_protocols...",
-        "connecting_to_1xbet_socket...",
-        "bypassing_firewall_l7...",
-        "injecting_sql_payload...",
-        "v29_core_ready."
-    ];
-    let logIdx = 0;
-
-    function runTerminal() {
-        const div = document.createElement('div');
-        div.style.marginBottom = "5px";
-        div.innerText = "> " + logs[logIdx];
-        document.getElementById('preloader').appendChild(div);
-        logIdx++;
-        if(logIdx < logs.length) {
-            setTimeout(runTerminal, 300);
-        } else {
-            setTimeout(() => {
-                document.getElementById('preloader').classList.add('hidden');
-                document.getElementById('id-modal').classList.remove('hidden');
-            }, 500);
-        }
-    }
-    window.onload = runTerminal;
-
-    // --- LOGIN SYSTEM ---
-    function attemptLogin() {
-        const key = document.getElementById('access-key').value.trim().toUpperCase();
-        const err = document.getElementById('login-error');
-        
-        if(VALID_KEYS.includes(key)) {
-            document.getElementById('id-modal').classList.add('hidden');
-            document.getElementById('screen-menu').classList.remove('hidden');
-            updateCounts();
-        } else {
-            err.innerText = "ACCESS DENIED: INVALID KEY";
-        }
-    }
-
-    function updateCounts() {
-        document.getElementById('sig-count-menu').innerText = signalsLeft;
-        document.getElementById('sig-count-game').innerText = signalsLeft;
-    }
-
-    // --- NAVIGATION ---
-    function openGame(game) {
-        currentGame = game;
-        document.getElementById('screen-menu').classList.add('hidden');
-        document.getElementById('screen-game').classList.remove('hidden');
-        document.getElementById('game-name').innerText = game.toUpperCase();
-        
-        const area = document.getElementById('game-content-area');
-        area.innerHTML = ''; // Clear
-
-        if(game === 'aviator') {
-            area.innerHTML = `
-                <div class="aviator-wrapper">
-                    <canvas id="aviator-canvas"></canvas>
-                    <div id="coef-text" class="coef-display">1.00x</div>
-                </div>
-            `;
-            initAviator();
-        } else if (game === 'mines' || game === 'chicken') {
-            let grid = '<div class="grid-game">';
-            for(let i=0; i<25; i++) grid += `<div class="cell" id="c-${i}"></div>`;
-            grid += '</div>';
-            area.innerHTML = grid;
-        } else if (game === 'penalty') {
-            area.innerHTML = `
-                <div style="border:4px solid white; border-bottom:none; width:300px; height:160px; position:relative; display:flex; justify-content:center; align-items:flex-end;">
-                    <div id="ball" style="width:25px; height:25px; background:red; border-radius:50%; box-shadow:0 0 10px red; display:none; position:absolute;"></div>
-                    <div style="width:100%; border-bottom:1px solid rgba(255,255,255,0.2); position:absolute; bottom:0;"></div>
-                </div>
-            `;
-        }
-    }
-
-    function backToMenu() {
-        if(avAnimId) cancelAnimationFrame(avAnimId); // Stop Aviator
-        document.getElementById('screen-game').classList.add('hidden');
-        document.getElementById('screen-menu').classList.remove('hidden');
-    }
-
-    // --- MAIN SIGNAL LOGIC ---
-    function getSignal() {
-        if(signalsLeft <= 0) return;
-
-        const btn = document.getElementById('signal-btn');
-        btn.disabled = true;
-        btn.innerText = "ANALYZING...";
-
-        setTimeout(() => {
-            if(currentGame === 'aviator') playAviatorAnim();
-            else if(currentGame === 'mines') showMines();
-            else if(currentGame === 'chicken') showChicken();
-            else if(currentGame === 'penalty') showPenalty();
-
-            signalsLeft--;
-            updateCounts();
-
-            // Re-enable
-            setTimeout(() => {
-                btn.innerText = "GET SIGNAL";
-                btn.disabled = false;
-                if(signalsLeft === 0) {
-                    setTimeout(() => { document.getElementById('lock-modal').classList.remove('hidden'); }, 1500);
-                }
-            }, 3000); // 3s cooldown
-        }, 1000); // 1s fake delay
-    }
-
-    // --- V28 AVIATOR ENGINE (BEZIER CURVES) ---
-    function initAviator() {
-        avCanvas = document.getElementById('aviator-canvas');
-        avCtx = avCanvas.getContext('2d');
-        avW = avCanvas.offsetWidth;
-        avH = avCanvas.offsetHeight;
-        avCanvas.width = avW;
-        avCanvas.height = avH;
-
-        // Points from v28 Logic
-        avP0 = {x:0, y:avH};
-        avP1 = {x:avW*0.4, y:avH}; 
-        avP2 = {x:avW*0.7, y:avH}; 
-        avP3 = {x:avW*1.2, y:-avH*0.5};
-
-        drawAviatorStatic();
-    }
-
-    function drawAviatorStatic() {
-        avCtx.clearRect(0,0,avW,avH);
-        avCtx.fillStyle = '#1a253a'; // Bg placeholder
-        avCtx.fillRect(0,0,avW,avH);
-        // Grid lines
-        avCtx.strokeStyle = 'rgba(255,255,255,0.05)';
-        avCtx.beginPath(); avCtx.moveTo(0, avH/2); avCtx.lineTo(avW, avH/2); avCtx.stroke();
-    }
-
-    function playAviatorAnim() {
-        // WEIGHTED RANDOM from v28
-        let outcome; const r = Math.random();
-        if(r < 0.45) outcome = (Math.random()*(2.00-1.10)+1.10);
-        else if(r < 0.85) outcome = (Math.random()*(10.00-2.00)+2.00);
-        else if(r < 0.97) outcome = (Math.random()*(50.00-10.00)+10.00);
-        else outcome = (Math.random()*(255.00-50.00)+50.00);
-        
-        const finalCoef = parseFloat(outcome.toFixed(2));
-        const txt = document.getElementById('coef-text');
-        txt.classList.add('visible');
-
-        let start = null;
-        const duration = 2500; 
-        avPoints = [];
-
-        function step(timestamp) {
-            if(!start) start = timestamp;
-            const progress = (timestamp - start) / duration;
+        <div id="screen-game" class="screen">
+            <div id="aviator-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
+                <div class="game-header"><a href="#" class="telegram-link">@Omarsupportbot</a><img src="img/aviator_logo.png" class="game-logo-hero"></div>
+                <div class="aviator-wrapper"><canvas id="aviator-canvas"></canvas><img src="img/plane.png" id="aviator-plane" class="aviator-plane-img"><div class="coef-text" id="coef-text">0.00x</div></div>
+            </div>
             
-            if(progress <= 1) {
-                // Draw Bezier
-                avCtx.clearRect(0,0,avW,avH);
+            <div id="penalty-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
+                <div class="game-header"><a href="#" class="telegram-link">@Omarsupportbot</a><img src="img/menu_penalty.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
+                <div class="penalty-strategy" id="pen-strat"><span class="step-badge" id="ps-1">1</span><span class="step-badge" id="ps-2">2</span><span class="step-badge" id="ps-3">3</span><span class="step-badge" id="ps-4">4</span><span class="step-badge" id="ps-5">5</span></div>
+                <div class="cashout-msg" id="pen-msg">CASHOUT!</div>
+                <div class="penalty-container"><div class="target-zone z1" id="pz1"><div class="target-effect"></div></div><div class="target-zone z2" id="pz2"><div class="target-effect"></div></div><div class="target-zone z3" id="pz3"><div class="target-effect"></div></div><div class="target-zone z4" id="pz4"><div class="target-effect"></div></div><div class="target-zone z5" id="pz5"><div class="target-effect"></div></div></div>
+            </div>
+
+            <div id="mines-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
+                <div class="game-header"><a href="#" class="telegram-link">@Omarsupportbot</a><img src="img/menu_mines.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
+                <div class="mines-wrapper">
+                    <div class="mines-grid-select"><div class="mines-btn-grid active" onclick="setMinesGrid(3)">3x3</div><div class="mines-btn-grid" onclick="setMinesGrid(5)">5x5</div></div>
+                    <div id="mines-board" class="mines-board"></div>
+                </div>
+            </div>
+
+            <div id="chicken-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
+                <div class="game-header"><a href="#" class="telegram-link">@Omarsupportbot</a><img src="img/menu_chicken.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
+                <div class="chicken-wrapper"><div class="chicken-road-horizontal" id="chicken-road-container"></div></div>
+            </div>
+
+            <button id="signal-btn" class="btn-signal" onclick="getSignal()">GET SIGNAL</button>
+            <button class="btn-back" onclick="backMenu()">EXIT</button>
+        </div>
+
+        <div id="lock-modal" class="modal-overlay">
+            <div class="id-box" style="border-color:#ff334b; box-shadow:none;">
+                <div class="lock-icon">🛑</div>
+                <h3 style="color:#ff334b;font-family:'Orbitron';margin-bottom:5px;">SESSION EXPIRED</h3>
+                <p style="font-size:12px;color:#888;">Security Limit Reached (5/5).<br>Connection Terminated.</p>
+                <button class="id-btn" style="background:#333; color:#fff;" onclick="window.location.href='https://t.me/Omarsupportbot'">CONTACT OMAR</button>
+            </div>
+        </div>
+
+    </div>
+    
+    <div style="display:none;"><img src="img/menu_aviator.png"><img src="img/menu_penalty.png"><img src="img/menu_mines.png"><img src="img/menu_chicken.png"><img src="img/plane.png"><img src="img/penalty_bg.png"><img src="img/aviator_logo.png"><img src="img/mines_star.png"></div>
+
+    <script>
+        // --- v29 LOGIC CONFIG ---
+        const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH'];
+        let attemptsLeft = 5;
+        let activeGame = null;
+
+        // --- AVIATOR ENGINE VARS ---
+        let avCtx, avCanvas, avW, avH, avAnimId, avPoints=[]; 
+        let avP0, avP1, avP2, avP3;
+        
+        // --- CHICKEN DATA ---
+        const CHICKEN_COEFS = ["1.12x","1.28x","1.47x","1.70x","1.98x","2.33x","2.76x","3.32x","4.03x","4.96x","6.20x","6.91x","8.90x","11.76x"];
+
+        window.onload = function(){
+            // Fake Online Counter
+            setInterval(()=>{ let c=parseInt(document.getElementById('online-users').innerText); c+=Math.floor(Math.random()*5)-2; document.getElementById('online-users').innerText=c; },3000);
+            
+            // Terminal Loader
+            const term=document.getElementById('term-text');
+            const termLines=["INITIALIZING...","LOADING CORE v29...","CONNECTING TO 1XBET...","READY."];
+            let lineIdx=0;
+            function typeLine(){
+                if(lineIdx<termLines.length){
+                    term.innerText=termLines[lineIdx++]; setTimeout(typeLine,400);
+                } else {
+                    setTimeout(()=>{
+                        document.getElementById('preloader').style.display='none';
+                        document.getElementById('id-modal').style.display='flex';
+                    },500);
+                }
+            }
+            typeLine();
+
+            // Init Game Engines
+            initAviatorCanvas();
+        };
+
+        // --- AUTH SYSTEM ---
+        function validateAndConnect(){
+            const key = document.getElementById('access-key').value.trim().toUpperCase();
+            const btn = document.getElementById('btn-connect');
+            const err = document.getElementById('id-error');
+            
+            if(VALID_KEYS.includes(key)) {
+                btn.disabled=true; btn.innerText="CONNECTING...";
+                document.getElementById('sync-log').style.display="block";
+                document.getElementById('sync-log').innerText="> KEY VERIFIED. BYPASSING...";
                 
-                // Math from v28 (Cubic Bezier)
-                const t = progress;
-                const u = 1 - t; const tt = t*t; const uu = u*u; const uuu = uu*u; const ttt = tt*t;
-                
-                let x = uuu * avP0.x + 3 * uu * t * avP1.x + 3 * u * tt * avP2.x + ttt * avP3.x;
-                let y = uuu * avP0.y + 3 * uu * t * avP1.y + 3 * u * tt * avP2.y + ttt * avP3.y;
-                
-                avPoints.push({x, y});
-
-                // Fill
-                avCtx.beginPath();
-                avCtx.moveTo(0, avH);
-                for(let p of avPoints) avCtx.lineTo(p.x, p.y);
-                avCtx.lineTo(x, avH);
-                avCtx.fillStyle = 'rgba(255, 51, 75, 0.3)';
-                avCtx.fill();
-
-                // Stroke
-                avCtx.beginPath();
-                avCtx.moveTo(0, avH);
-                for(let p of avPoints) avCtx.lineTo(p.x, p.y);
-                avCtx.strokeStyle = '#ff334b';
-                avCtx.lineWidth = 4;
-                avCtx.stroke();
-
-                // Number Logic
-                let currentVal = 1.00 + (finalCoef - 1.00) * (progress * progress); // Ease in
-                if(currentVal > finalCoef) currentVal = finalCoef;
-                txt.innerText = currentVal.toFixed(2) + "x";
-
-                avAnimId = requestAnimationFrame(step);
+                setTimeout(()=>{
+                    document.getElementById('id-modal').style.display='none';
+                    document.getElementById('screen-menu').classList.add('active');
+                    updateLimitDisplay();
+                }, 2000);
             } else {
-                txt.innerText = finalCoef.toFixed(2) + "x";
+                err.innerText = "ACCESS DENIED: INVALID KEY";
             }
         }
-        avAnimId = requestAnimationFrame(step);
-    }
 
-    // --- OTHER GAMES LOGIC ---
-    function showMines() {
-        document.querySelectorAll('.cell').forEach(c => {c.innerHTML=''; c.className='cell'});
-        for(let k=0; k<3; k++) {
-            let r = Math.floor(Math.random()*25);
-            let el = document.getElementById(`c-${r}`);
-            el.classList.add('active');
-            el.innerHTML = '⭐';
+        function updateLimitDisplay() {
+            document.getElementById('limit-display').innerText = "ATTEMPTS: " + attemptsLeft;
         }
-    }
-    
-    function showChicken() {
-        document.querySelectorAll('.cell').forEach(c => {c.innerHTML=''; c.className='cell'});
-        for(let k=0; k<5; k++) {
-            let r = Math.floor(Math.random()*25);
-            let el = document.getElementById(`c-${r}`);
-            el.classList.add('chicken');
-            el.innerHTML = '🍗';
+
+        // --- NAVIGATION ---
+        function openGame(g){
+            activeGame=g;
+            document.getElementById('screen-menu').classList.remove('active');
+            document.getElementById('screen-game').classList.add('active');
+            
+            // Hide all views
+            ['aviator','penalty','mines','chicken'].forEach(id=>document.getElementById(id+'-view').style.display='none');
+            // Show current view
+            document.getElementById(g+'-view').style.display='flex';
+            
+            // Reset Button State
+            const btn = document.getElementById('signal-btn');
+            btn.disabled=false;
+            btn.innerText="GET SIGNAL";
+
+            // Init Specific Games
+            if(g==='aviator') { 
+                resizeAviator(); 
+                document.getElementById('coef-text').classList.remove('visible'); 
+                document.getElementById('aviator-plane').classList.remove('active');
+                if(avAnimId)cancelAnimationFrame(avAnimId); avCtx.clearRect(0,0,avW,avH); 
+            }
+            if(g==='mines') setMinesGrid(3);
+            if(g==='chicken') renderChickenRoad();
         }
-    }
 
-    function showPenalty() {
-        const ball = document.getElementById('ball');
-        ball.style.display = 'block';
-        ball.style.left = Math.floor(Math.random()*260) + "px";
-        ball.style.bottom = Math.floor(Math.random()*120) + "px";
-    }
+        function backMenu(){
+            document.getElementById('screen-game').classList.remove('active');
+            document.getElementById('screen-menu').classList.add('active');
+            if(avAnimId) cancelAnimationFrame(avAnimId);
+        }
 
-</script>
+        // --- SIGNAL LOGIC (GLOBAL LIMIT) ---
+        function getSignal(){
+            if(attemptsLeft <= 0) return;
+
+            const btn = document.getElementById('signal-btn');
+            btn.disabled=true;
+            btn.innerText="ANALYZING...";
+
+            setTimeout(()=>{
+                // Decrement Logic
+                attemptsLeft--;
+                updateLimitDisplay();
+
+                // Trigger Game Animations
+                if(activeGame==='aviator') runAviatorAnim();
+                if(activeGame==='penalty') runPenaltyAnim();
+                if(activeGame==='mines') runMinesAnim();
+                if(activeGame==='chicken') runChickenAnim();
+
+                // Cooldown & Lock Check
+                setTimeout(()=>{
+                    btn.innerText="GET SIGNAL";
+                    btn.disabled=false;
+                    
+                    if(attemptsLeft === 0) {
+                        setTimeout(()=>{
+                            document.getElementById('lock-modal').style.display='flex';
+                        }, 2000);
+                    }
+                }, 3000);
+
+            }, 1000);
+        }
+
+        // --- AVIATOR ENGINE ---
+        function initAviatorCanvas() { avCanvas=document.getElementById('aviator-canvas'); avCtx=avCanvas.getContext('2d'); }
+        function resizeAviator() {
+            if(!avCanvas) return;
+            avW=avCanvas.parentElement.offsetWidth; avH=avCanvas.parentElement.offsetHeight; avCanvas.width=avW; avCanvas.height=avH;
+            avP0={x:0, y:avH}; avP1={x:avW*0.4, y:avH}; avP2={x:avW*0.7, y:avH}; avP3={x:avW*1.2, y:-avH*0.5};
+        }
+        function drawAviatorFrame(t) {
+            avCtx.clearRect(0,0,avW,avH);
+            const u = 1 - t; const tt = t * t; const uu = u * u; const uuu = uu * u; const ttt = tt * t;
+            let x = uuu * avP0.x + 3 * uu * t * avP1.x + 3 * u * tt * avP2.x + ttt * avP3.x;
+            let y = uuu * avP0.y + 3 * uu * t * avP1.y + 3 * u * tt * avP2.y + ttt * avP3.y;
+            avPoints.push({x:x, y:y});
+            
+            avCtx.beginPath(); avCtx.moveTo(0, avH); for(let p of avPoints) avCtx.lineTo(p.x, p.y); avCtx.lineTo(x, avH);
+            const grad = avCtx.createLinearGradient(0,0,0,avH); grad.addColorStop(0,"rgba(255,51,75,0.4)"); grad.addColorStop(1,"rgba(255,51,75,0)"); avCtx.fillStyle=grad; avCtx.fill();
+            
+            avCtx.beginPath(); avCtx.moveTo(0, avH); for(let p of avPoints) avCtx.lineTo(p.x, p.y); avCtx.strokeStyle='#ff334b'; avCtx.lineWidth=4; avCtx.stroke();
+            
+            let angle = 0; if(avPoints.length > 5) { const prev = avPoints[avPoints.length-5]; const dx = x - prev.x; const dy = y - prev.y; angle = Math.atan2(dy, dx) * (180 / Math.PI); }
+            const plane = document.getElementById('aviator-plane'); plane.style.left = (x - plane.offsetWidth/2) + 'px'; plane.style.top = (y - plane.offsetHeight/2) + 'px'; plane.style.transform = `rotate(${angle}deg)`;
+        }
+        function runAviatorAnim() {
+            // WEIGHTED RANDOM from v28
+            let outcome; const r=Math.random();
+            if(r<0.45) outcome=(Math.random()*(2.00-1.10)+1.10); 
+            else if(r<0.85) outcome=(Math.random()*(10.00-2.00)+2.00); 
+            else outcome=(Math.random()*(50.00-10.00)+10.00);
+            
+            const final = parseFloat(outcome.toFixed(2));
+            const txt=document.getElementById('coef-text'); txt.classList.add('visible'); 
+            document.getElementById('aviator-plane').classList.add('active');
+            
+            let start=performance.now(); const duration=2500; avPoints = [];
+            function animate(time) {
+                let progress = (time - start) / duration; if(progress>1) progress=1;
+                drawAviatorFrame(progress);
+                let val = 1.00 + (final - 1.00) * (progress * progress); if(val > final) val = final;
+                txt.innerText=val.toFixed(2)+"x";
+                if(progress<1) avAnimId=requestAnimationFrame(animate);
+            } avAnimId=requestAnimationFrame(animate);
+        }
+
+        // --- PENALTY ENGINE ---
+        function runPenaltyAnim() {
+            document.querySelectorAll('.target-zone').forEach(e=>e.classList.remove('active','winner','scanning'));
+            document.getElementById('pen-msg').classList.remove('visible');
+            // Random step simulation
+            let step=0; const t=setInterval(()=>{
+                document.querySelectorAll('.target-zone').forEach(e=>e.classList.remove('scanning'));
+                document.getElementById('pz'+(Math.floor(Math.random()*5)+1)).classList.add('scanning');
+                step++;
+                if(step>8){
+                    clearInterval(t);
+                    document.querySelectorAll('.target-zone').forEach(e=>e.classList.remove('scanning'));
+                    const winZone=document.getElementById('pz'+(Math.floor(Math.random()*5)+1));
+                    winZone.classList.add('active','winner');
+                }
+            }, 100);
+        }
+
+        // --- MINES ENGINE ---
+        function setMinesGrid(s){
+            const b=document.getElementById('mines-board'); b.style.gridTemplateColumns=`repeat(${s}, 1fr)`; b.innerHTML="";
+            document.querySelectorAll('.mines-btn-grid').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            for(let i=0;i<s*s;i++){
+                const d=document.createElement('div'); d.className='mine-tile'; d.id='mt-'+i; d.innerHTML='<img src="img/mines_star.png">'; b.appendChild(d);
+            }
+        }
+        function runMinesAnim() {
+            document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
+            const tot=document.querySelectorAll('.mine-tile').length;
+            const openCount = Math.floor(Math.random()*3)+3; // Open 3-5 stars
+            let idxs=new Set(); while(idxs.size<openCount) idxs.add(Math.floor(Math.random()*tot));
+            let arr=Array.from(idxs); let k=0;
+            const t=setInterval(()=>{
+                if(k>=arr.length) clearInterval(t);
+                else { document.getElementById('mt-'+arr[k]).classList.add('reveal'); k++; }
+            }, 200);
+        }
+
+        // --- CHICKEN ENGINE ---
+        function renderChickenRoad(){
+            const c=document.getElementById('chicken-road-container'); c.innerHTML="";
+            CHICKEN_COEFS.forEach((coef,i)=>{
+                const div = document.createElement('div'); div.className='road-step'; div.id='rs-'+i;
+                div.innerHTML = `<span style="font-size:11px;font-weight:bold;color:#fff">${coef}</span>`;
+                c.appendChild(div);
+            });
+        }
+        function runChickenAnim(){
+            const c=document.getElementById('chicken-road-container');
+            document.querySelectorAll('.road-step').forEach(el=>el.classList.remove('safe'));
+            let safeLen = Math.floor(Math.random()*4)+4; // 4-8 steps
+            let k=0;
+            const t=setInterval(()=>{
+                if(k>=safeLen) clearInterval(t);
+                else {
+                    const el=document.getElementById('rs-'+k); el.classList.add('safe');
+                    c.scrollTo({left:el.offsetLeft-c.clientWidth/2+30,behavior:'smooth'}); k++;
+                }
+            }, 400);
+        }
+
+    </script>
 </body>
 </html>
