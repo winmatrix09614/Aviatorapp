@@ -3,100 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OMAR CONTROL PANEL v2.1</title>
+    <title>OMAR CONTROL PANEL v2.2</title>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #00f2ea; --green: #00ff41; --red: #ff334b; --bg: #050508; --panel: rgba(20, 20, 30, 0.8); }
-        body { 
-            margin: 0; padding: 20px; min-height: 100vh; font-family: 'Poppins', sans-serif; color: #fff;
-            background: linear-gradient(45deg, #020005, #130f40); display: flex; justify-content: center; align-items: flex-start;
-        }
-        
-        /* MAIN CONTAINER */
-        .admin-panel {
-            width: 100%; max-width: 450px; background: var(--panel); backdrop-filter: blur(15px);
-            border-radius: 20px; border: 1px solid rgba(0, 242, 234, 0.3); padding: 20px;
-            box-shadow: 0 0 40px rgba(0,0,0,0.5);
-        }
-
-        /* HEADER & STATUS */
+        body { margin: 0; padding: 20px; min-height: 100vh; font-family: 'Poppins', sans-serif; color: #fff; background: linear-gradient(45deg, #020005, #130f40); display: flex; justify-content: center; align-items: flex-start; }
+        .admin-panel { width: 100%; max-width: 450px; background: var(--panel); backdrop-filter: blur(15px); border-radius: 20px; border: 1px solid rgba(0, 242, 234, 0.3); padding: 20px; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .title { font-family: 'Orbitron'; font-weight: 900; font-size: 18px; color: var(--accent); letter-spacing: 1px; }
         .status-indicator { display: flex; align-items: center; font-family: 'Orbitron'; font-size: 10px; color: #666; background: #111; padding: 5px 10px; border-radius: 20px; border: 1px solid #333; }
-        .status-dot { width: 8px; height: 8px; background: #444; border-radius: 50%; margin-right: 6px; transition: 0.3s; }
-        .status-indicator.on .status-dot { background: var(--green); box-shadow: 0 0 10px var(--green); }
-        .status-indicator.on { color: var(--green); border-color: var(--green); }
-
-        /* INPUTS & BUTTONS */
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-family: 'Orbitron'; font-size: 10px; color: #888; margin-bottom: 5px; }
-        input, select { 
-            width: 100%; padding: 12px; background: #0a0a0a; border: 1px solid #333; border-radius: 8px;
-            color: var(--accent); font-family: 'Orbitron'; font-size: 14px; outline: none; transition: 0.3s;
-            box-sizing: border-box;
-        }
-        input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 242, 234, 0.2); }
-        
-        .btn-main { 
-            width: 100%; padding: 14px; background: linear-gradient(90deg, var(--accent), #0080ff); 
-            border: none; border-radius: 10px; color: #000; font-family: 'Orbitron'; font-weight: 900; 
-            font-size: 14px; cursor: pointer; transition: 0.2s; text-transform: uppercase;
-        }
-        .btn-main:active { transform: scale(0.98); opacity: 0.9; }
-        .btn-connect { background: #222; color: #fff; border: 1px solid #444; }
-
-        /* TABS */
+        .status-indicator.on { color: var(--green); border-color: var(--green); } .status-dot { width: 8px; height: 8px; background: #444; border-radius: 50%; margin-right: 6px; } .status-indicator.on .status-dot { background: var(--green); box-shadow: 0 0 10px var(--green); }
+        .input-group { margin-bottom: 15px; } label { display: block; font-family: 'Orbitron'; font-size: 10px; color: #888; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 12px; background: #0a0a0a; border: 1px solid #333; border-radius: 8px; color: var(--accent); font-family: 'Orbitron'; font-size: 14px; outline: none; box-sizing: border-box; }
+        .btn-main { width: 100%; padding: 14px; background: linear-gradient(90deg, var(--accent), #0080ff); border: none; border-radius: 10px; color: #000; font-family: 'Orbitron'; font-weight: 900; font-size: 14px; cursor: pointer; text-transform: uppercase; }
+        .btn-main:active { transform: scale(0.98); } .btn-connect { background: #222; color: #fff; border: 1px solid #444; }
         .tabs-nav { display: flex; gap: 8px; margin-bottom: 20px; background: #111; padding: 5px; border-radius: 12px; }
-        .tab-btn { 
-            flex: 1; padding: 10px; text-align: center; cursor: pointer; border-radius: 8px;
-            font-family: 'Orbitron'; font-size: 11px; color: #666; transition: 0.3s;
-        }
-        .tab-btn.active { background: var(--accent); color: #000; font-weight: bold; box-shadow: 0 0 15px rgba(0, 242, 234, 0.3); }
-        .tab-content { display: none; animation: fadeIn 0.3s; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* GAME SPECIFIC CONTROLS */
+        .tab-btn { flex: 1; padding: 10px; text-align: center; cursor: pointer; border-radius: 8px; font-family: 'Orbitron'; font-size: 11px; color: #666; }
+        .tab-btn.active { background: var(--accent); color: #000; font-weight: bold; }
+        .tab-content { display: none; } .tab-content.active { display: block; }
         .control-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 15px; }
-        
-        /* AVIATOR PRESETS */
         .aviator-presets { display: flex; gap: 5px; margin-bottom: 10px; }
         .preset-btn { flex: 1; padding: 8px; background: #222; border: 1px solid #444; color: #fff; border-radius: 6px; cursor: pointer; font-family:'Orbitron'; font-size:10px; }
-        .preset-btn:hover { border-color: var(--accent); }
-
-        /* PENALTY VISUALIZER */
-        .pen-steps-viz { display: flex; flex-direction: column; gap: 10px; }
-        .pen-step-row { display: flex; align-items: center; gap: 10px; }
-        .pen-step-label { font-family:'Orbitron'; font-size:10px; color:#666; width: 40px; }
-        .mini-goal-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 2px; flex: 1; height: 50px; background: #222; border: 2px solid #444; border-radius: 4px; padding: 2px; }
-        .goal-zone { background: #1a1a1a; cursor: pointer; transition: 0.2s; border-radius: 2px; }
-        .goal-zone:hover { background: #333; }
-        .goal-zone.selected { background: var(--accent); box-shadow: 0 0 5px var(--accent); }
-
-        /* MINES GRID */
+        .pen-steps-viz { display: flex; flex-direction: column; gap: 10px; } .pen-step-row { display: flex; align-items: center; gap: 10px; }
+        .mini-goal-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 2px; flex: 1; height: 50px; background: #222; padding: 2px; }
+        .goal-zone { background: #1a1a1a; cursor: pointer; } .goal-zone.selected { background: var(--accent); }
         .mines-grid-viz { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        .mine-cell { aspect-ratio: 1; background: #222; border: 2px solid #444; border-radius: 8px; cursor: pointer; display: flex; justify-content: center; align-items: center; font-family:'Orbitron'; font-size:12px; color:#444; transition:0.2s; }
-        .mine-cell.selected { border-color: var(--green); background: rgba(0, 255, 65, 0.2); color: var(--green); box-shadow: 0 0 10px rgba(0, 255, 65, 0.3); }
-
+        .mine-cell { aspect-ratio: 1; background: #222; border: 2px solid #444; border-radius: 8px; cursor: pointer; display: flex; justify-content: center; align-items: center; font-family:'Orbitron'; font-size:12px; }
+        .mine-cell.selected { border-color: var(--green); background: rgba(0, 255, 65, 0.2); color: var(--green); }
     </style>
 </head>
 <body>
-
 <div class="admin-panel">
+    <div class="header"><div class="title">CONTROL // PANEL v2.2</div><div class="status-indicator" id="status-box"><div class="status-dot"></div><span id="status-text">OFFLINE</span></div></div>
     
-    <div class="header">
-        <div class="title">CONTROL // PANEL</div>
-        <div class="status-indicator" id="status-box">
-            <div class="status-dot"></div><span id="status-text">OFFLINE</span>
-        </div>
-    </div>
-
     <div class="control-box">
-        <input type="text" id="server-url" value="https://ai-signal-server-production.up.railway.app" style="display:none;"> <div class="input-group">
-            <label>TARGET SESSION ID (FROM GAME)</label>
+        <input type="text" id="server-url" value="https://ai-signal-server-production.up.railway.app" style="display:none;">
+        <div class="input-group">
+            <label>TARGET SESSION ID</label>
             <div style="display: flex; gap: 10px;">
-                <input type="text" id="target-id" placeholder="e.g. SID-X9Y2Z" style="letter-spacing: 1px; font-weight: bold;">
+                <input type="text" id="target-id" placeholder="SID-..." style="letter-spacing: 1px; font-weight: bold;">
                 <button class="btn-main btn-connect" onclick="connectServer()" style="width: auto; padding: 0 20px;">LINK</button>
             </div>
         </div>
@@ -111,117 +57,77 @@
 
     <div id="tab-aviator" class="tab-content active">
         <div class="control-box">
-            <label>NEXT COEFFICIENT</label>
-            <div class="aviator-presets">
-                <button class="preset-btn" onclick="setAv(2.00)">2.00x</button>
-                <button class="preset-btn" onclick="setAv(5.55)">5.55x</button>
-                <button class="preset-btn" onclick="setAv(12.34)">12.34x</button>
-                <button class="preset-btn" onclick="setAv(99.99)">MAX</button>
-            </div>
-            <input type="number" id="av-coef" placeholder="Enter value (e.g. 62.55)" step="0.01" style="font-size: 18px; text-align: center;">
+            <label>COEFFICIENT</label>
+            <div class="aviator-presets"><button class="preset-btn" onclick="setAv(2.00)">2.00x</button><button class="preset-btn" onclick="setAv(10.00)">10.00x</button><button class="preset-btn" onclick="setAv(50.00)">50.00x</button></div>
+            <input type="number" id="av-coef" placeholder="e.g. 62.55" step="0.01" style="text-align: center; font-size: 18px;">
         </div>
-        <div class="control-box">
-            <label>SCHEDULE BROADCAST (HH:MM)</label>
-            <input type="time" id="av-time" style="text-align: center;">
-        </div>
-        <button class="btn-main" onclick="send('aviator')">TRANSMIT SIGNAL</button>
+        <div class="control-box"><label>SCHEDULE (HH:MM)</label><input type="time" id="av-time" style="text-align: center;"></div>
+        <button class="btn-main" onclick="send('aviator')">TRANSMIT</button>
     </div>
 
     <div id="tab-penalty" class="tab-content">
         <div class="control-box">
-            <label style="margin-bottom: 10px;">SCENARIO SEQUENCE (CLICK ZONES)</label>
-            <div class="pen-steps-viz" id="pen-viz-container">
-                </div>
+            <label>SCENARIO</label>
+            <div class="pen-steps-viz" id="pen-viz-container"></div>
         </div>
-        <div class="control-box">
-            <label>SCHEDULE BROADCAST (HH:MM)</label>
-            <input type="time" id="pen-time" style="text-align: center;">
-        </div>
-        <button class="btn-main" onclick="send('penalty')">TRANSMIT SCENARIO</button>
+        <div class="control-box"><label>SCHEDULE (HH:MM)</label><input type="time" id="pen-time" style="text-align: center;"></div>
+        <button class="btn-main" onclick="send('penalty')">TRANSMIT</button>
     </div>
 
     <div id="tab-mines" class="tab-content">
         <div class="control-box">
-            <label style="margin-bottom: 10px;">WINNING SPOTS MAP</label>
-            <div class="mines-grid-viz" id="mines-grid-viz">
-                </div>
+            <label>GAME SETTINGS</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <select id="mines-mode"><option value="safe">SAFE MODE</option><option value="risk">HIGH RISK</option></select>
+                <select id="mines-grid-size"><option value="3">3x3 GRID</option><option value="5">5x5 GRID</option></select>
+            </div>
+            <label>WINNING SPOTS</label>
+            <div class="mines-grid-viz" id="mines-grid-viz"></div>
         </div>
-        <div class="control-box">
-            <label>SCHEDULE BROADCAST (HH:MM)</label>
-            <input type="time" id="mines-time" style="text-align: center;">
-        </div>
+        <div class="control-box"><label>SCHEDULE (HH:MM)</label><input type="time" id="mines-time" style="text-align: center;"></div>
         <button class="btn-main" onclick="send('mines')">TRANSMIT MAP</button>
     </div>
 
     <div id="tab-chicken" class="tab-content">
         <div class="control-box">
-            <label>DIFFICULTY PRESET</label>
-            <select id="ch-diff">
-                <option value="easy">EASY ROAD</option>
-                <option value="medium" selected>MEDIUM ROAD</option>
-                <option value="hard">HARD ROAD</option>
-                <option value="hardcore">HARDCORE ROAD</option>
-            </select>
+            <label>DIFFICULTY</label>
+            <select id="ch-diff"><option value="easy">EASY</option><option value="medium">MEDIUM</option><option value="hard">HARD</option><option value="hardcore">HARDCORE</option></select>
         </div>
-        <div class="control-box">
-            <label>WINNING STEPS COUNT</label>
-            <input type="number" id="ch-steps" placeholder="e.g. 8 steps" style="font-size: 18px; text-align: center;">
-        </div>
-        <div class="control-box">
-            <label>SCHEDULE BROADCAST (HH:MM)</label>
-            <input type="time" id="ch-time" style="text-align: center;">
-        </div>
-        <button class="btn-main" onclick="send('chicken')">TRANSMIT SETUP</button>
+        <div class="control-box"><label>STEPS</label><input type="number" id="ch-steps" placeholder="e.g. 8" style="text-align: center; font-size: 18px;"></div>
+        <div class="control-box"><label>SCHEDULE (HH:MM)</label><input type="time" id="ch-time" style="text-align: center;"></div>
+        <button class="btn-main" onclick="send('chicken')">TRANSMIT</button>
     </div>
-
 </div>
 
 <script>
     let socket;
-    
-    // --- INIT PENALTY UI ---
+    // Penalty Init
     const penContainer = document.getElementById('pen-viz-container');
-    let penaltyMoves = [2, 2, 2, 2, 2]; // Default center for all 5 steps
-    
-    // Zones mapping: 0:TL, 1:TC, 2:TR, 3:BL, 4:BC, 5:BR -> We need 5 zones logic from game.
-    // Game uses: 0:TL, 1:TR, 2:CenterTop, 3:BL, 4:BR.
-    // Visual grid indices: 0 1 2 (top row), 3 4 5 (bottom row)
-    const vizToGameMap = {0:0, 2:1, 1:2, 3:3, 5:4}; // Maps visual grid index to game logic index
-    const gameToVizMap = {0:0, 1:2, 2:1, 3:3, 4:5}; // Reverse
-
+    let penaltyMoves = [2, 2, 2, 2, 2];
+    const vizToGameMap = {0:0, 2:1, 1:2, 3:3, 5:4};
     function renderPenaltyUI() {
         penContainer.innerHTML = '';
         for(let i=0; i<5; i++) {
             let row = document.createElement('div'); row.className = 'pen-step-row';
-            row.innerHTML = `<div class="pen-step-label">#${i+1}</div>`;
+            row.innerHTML = `<div style="font-size:10px;width:20px;">#${i+1}</div>`;
             let grid = document.createElement('div'); grid.className = 'mini-goal-grid';
             for(let z=0; z<6; z++) {
                 let zone = document.createElement('div'); zone.className = 'goal-zone';
-                // Check if this zone is selected for this step
-                if(vizToGameMap[z] !== undefined && penaltyMoves[i] === vizToGameMap[z]) {
-                    zone.classList.add('selected');
-                }
-                // Click handler
-                if(vizToGameMap[z] !== undefined) {
-                    zone.onclick = () => {
-                        penaltyMoves[i] = vizToGameMap[z];
-                        renderPenaltyUI(); // Re-render to update selection
-                    };
-                } else { zone.style.opacity = 0.3; zone.style.pointerEvents = 'none'; } // Disable center-bottom as game uses 5 zones
+                if(vizToGameMap[z] !== undefined && penaltyMoves[i] === vizToGameMap[z]) zone.classList.add('selected');
+                if(vizToGameMap[z] !== undefined) zone.onclick = () => { penaltyMoves[i] = vizToGameMap[z]; renderPenaltyUI(); };
+                else zone.style.opacity = 0;
                 grid.appendChild(zone);
             }
-            row.appendChild(grid);
-            penContainer.appendChild(row);
+            row.appendChild(grid); penContainer.appendChild(row);
         }
     }
     renderPenaltyUI();
 
-    // --- INIT MINES UI ---
+    // Mines Init
     const minesContainer = document.getElementById('mines-grid-viz');
     let minesSpots = [];
     for(let i=0; i<25; i++) {
-        let cell = document.createElement('div');
-        cell.className = 'mine-cell'; cell.innerText = i+1;
+        let cell = document.createElement('div'); cell.className = 'mine-cell'; cell.innerText = i+1;
         cell.onclick = function() {
             this.classList.toggle('selected');
             if(minesSpots.includes(i)) minesSpots = minesSpots.filter(x=>x!==i); else minesSpots.push(i);
@@ -229,21 +135,17 @@
         minesContainer.appendChild(cell);
     }
 
-    // --- LOGIC ---
     function switchTab(game, btn) {
         document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
         document.getElementById('tab-'+game).classList.add('active');
         document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active'));
         btn.classList.add('active');
     }
-
     function setAv(val) { document.getElementById('av-coef').value = val.toFixed(2); }
-
     function connectServer(){
         const url = document.getElementById('server-url').value;
-        if(!url) return alert("Server URL Missing");
-        const btn = document.querySelector('.btn-connect');
-        btn.innerText = '...';
+        if(!url) return alert("URL Missing");
+        const btn = document.querySelector('.btn-connect'); btn.innerText = '...';
         socket = io(url);
         socket.on('connect', ()=>{
             document.getElementById('status-box').classList.add('on');
@@ -251,43 +153,25 @@
             btn.innerText = 'LINKED'; btn.style.background = 'var(--green)'; btn.style.color='#000';
         });
     }
-
     function send(game){
-        if(!socket || !socket.connected) return alert("⚠️ CONNECT TO SERVER FIRST");
+        if(!socket || !socket.connected) return alert("NOT CONNECTED");
         const sid = document.getElementById('target-id').value;
-        if(!sid) return alert("⚠️ ENTER TARGET SESSION ID");
-
         const timeId = game==='aviator'?'av-time':game==='penalty'?'pen-time':game==='mines'?'mines-time':'ch-time';
         const timeVal = document.getElementById(timeId).value;
-        
         let payload = {};
-        if(game === 'aviator') {
-            const coef = document.getElementById('av-coef').value;
-            if(!coef) return alert("Enter Coefficient");
-            payload = { coef: coef };
-        }
-        if(game === 'penalty') {
-            payload = { moves: penaltyMoves };
-        }
+        if(game === 'aviator') payload = { coef: document.getElementById('av-coef').value };
+        if(game === 'penalty') payload = { moves: penaltyMoves };
         if(game === 'mines') {
-            if(minesSpots.length === 0) return alert("Select at least 1 spot");
-            payload = { spots: minesSpots };
+            payload = { 
+                spots: minesSpots,
+                mode: document.getElementById('mines-mode').value,
+                grid: parseInt(document.getElementById('mines-grid-size').value)
+            };
         }
-        if(game === 'chicken') {
-            payload = { diff: document.getElementById('ch-diff').value, steps: document.getElementById('ch-steps').value };
-        }
-
-        socket.emit('send_command', { sessionId: sid, game: game, payload: payload, time: timeVal || null });
+        if(game === 'chicken') payload = { diff: document.getElementById('ch-diff').value, steps: document.getElementById('ch-steps').value };
         
-        // Feedback
-        const mainBtn = document.querySelector(`#tab-${game} .btn-main`);
-        const originalText = mainBtn.innerText;
-        mainBtn.innerText = timeVal ? `SCHEDULED @ ${timeVal} ✅` : "SIGNAL SENT ⚡";
-        mainBtn.style.background = "var(--green)";
-        setTimeout(() => {
-            mainBtn.innerText = originalText;
-            mainBtn.style.background = "";
-        }, 2000);
+        socket.emit('send_command', { sessionId: sid, game: game, payload: payload, time: timeVal || null });
+        alert("SENT!");
     }
 </script>
 </body>

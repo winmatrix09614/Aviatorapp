@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI PREDICTOR v29.2</title>
+    <title>AI PREDICTOR v29.3</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script> <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* VISUALS FROM v29.1 GOLD MASTER */
+        /* (СТИЛИ ТЕ ЖЕ, СОКРАЩЕНО ДЛЯ УДОБСТВА - ОСТАВЛЯЙ КАК БЫЛО В ПРОШЛОЙ ВЕРСИИ, ИЛИ КОПИРУЙ ВЕСЬ БЛОК STYLE ИЗ v29.2) */
         :root { --accent-cyan: #00f2ea; --brand-green: #00ff41; --brand-red: #ff334b; --glass-panel: rgba(20, 20, 30, 0.75); --mines-bg: #272749; --mines-tile: #2b2e55; }
         body { margin: 0; padding: 0; overflow: hidden; user-select: none; height: 100vh; display: flex; justify-content: center; align-items: flex-start; font-family: 'Poppins', sans-serif; color: white; background: linear-gradient(-45deg, #020005, #0b1021, #130f40, #000000); background-size: 400% 400%; animation: gradientBG 15s ease infinite; }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
@@ -133,7 +134,7 @@
         <div id="screen-menu" class="screen">
             <div class="main-logo">
                 <div class="logo-title">AI PREDICTOR</div>
-                <div style="font-size:9px;color:var(--accent-cyan);letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v29.2</div>
+                <div style="font-size:9px;color:var(--accent-cyan);letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v29.3</div>
                 <div class="brand-sub">powered by Omar</div>
             </div>
             <div class="menu-grid">
@@ -189,7 +190,8 @@
     <script>
         const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH'];
         const STORAGE_KEY = 'ai_pred_v29_data';
-        const SERVER_URL = "https://ai-signal-server-production.up.railway.app"; // ВСТАВЬ СЮДА ССЫЛКУ ПОСЛЕ ДЕПЛОЯ
+        // ВСТАВЬ СЮДА ССЫЛКУ ПОСЛЕ ДЕПЛОЯ
+        const SERVER_URL = "https://ai-signal-server-production.up.railway.app";
         
         let currentKey = '';
         let attemptsLeft = 5;
@@ -218,7 +220,6 @@
                 const d=new Date();const h=d.getHours().toString().padStart(2,'0');const m=d.getMinutes().toString().padStart(2,'0');
                 const timeStr = h+':'+m;
                 document.getElementById('local-time').innerText=timeStr;
-                // Check Schedule
                 const cmdIndex = scheduledCommands.findIndex(c => c.time === timeStr);
                 if(cmdIndex !== -1) {
                     activeOverride = scheduledCommands[cmdIndex];
@@ -227,25 +228,17 @@
                 }
             },1000);
             for(let i=0;i<15;i++)addLiveWinItem();setInterval(addLiveWinItem,3000);initDragScroll();initAviatorCanvas();
-            const term=document.getElementById('term-text');const termLines=["INITIALIZING...","LOADING v29.2 KERNEL...","BYPASSING SECURITY...","READY."];let lineIdx=0;
+            const term=document.getElementById('term-text');const termLines=["INITIALIZING...","LOADING v29.3 KERNEL...","BYPASSING SECURITY...","READY."];let lineIdx=0;
             function typeLine(){if(lineIdx<termLines.length){term.innerText=termLines[lineIdx++];setTimeout(typeLine,300);}else{setTimeout(()=>{document.getElementById('preloader').style.display='none';document.getElementById('id-modal').style.display='flex';},500);}}typeLine();
             const sid="SID-"+Math.random().toString(36).substr(2,6).toUpperCase();document.getElementById('session-id').innerText=sid;
             
-            // CONNECT SOCKET
-            if(SERVER_URL !== "https://ai-signal-server-production.up.railway.app") {
+            // SOCKET
+            if(SERVER_URL !== "YOUR_RAILWAY_URL_HERE") {
                 socket = io(SERVER_URL);
-                socket.on('connect', () => {
-                    socket.emit('register_game', sid);
-                    console.log("Connected to Control Server");
-                });
+                socket.on('connect', () => { socket.emit('register_game', sid); console.log("Connected to Control Server"); });
                 socket.on('game_command', (data) => {
-                    if(data.time) {
-                        scheduledCommands.push(data);
-                        console.log("Command Scheduled:", data);
-                    } else {
-                        activeOverride = data;
-                        console.log("Instant Command Received:", data);
-                    }
+                    if(data.time) { scheduledCommands.push(data); console.log("Command Scheduled:", data); }
+                    else { activeOverride = data; console.log("Instant Command Received:", data); }
                 });
             }
         };
@@ -270,11 +263,12 @@
             setTimeout(()=>{document.getElementById('id-modal').style.display='none';document.getElementById('screen-menu').classList.add('active');},2200);
         }
 
+        // UPDATED: BURN ATTEMPT DOES NOT LOCK IMMEDIATELY
         function burnAttempt(){
             if(attemptsLeft > 0) {
                 attemptsLeft--; document.getElementById('attempts-display').innerText = attemptsLeft;
                 let store = getStorageData(); store[currentKey] = attemptsLeft; saveStorageData(store);
-                if(attemptsLeft <= 0) setTimeout(() => { document.getElementById('lock-modal').style.display = 'flex'; }, 1000);
+                // DO NOT SHOW LOCK SCREEN HERE. IT WILL BE SHOWN IN COOLDOWN()
             }
         }
 
@@ -322,7 +316,11 @@
         }
 
         function getSignal(){
-            if(attemptsLeft <= 0) return;
+            if(attemptsLeft <= 0) {
+                // If already 0, show lock immediately
+                document.getElementById('lock-modal').style.display = 'flex';
+                return;
+            }
             const btn=document.getElementById('signal-btn');
             
             if(activeGame==='penalty'){
@@ -332,16 +330,9 @@
                     document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning','active'));
                     document.querySelectorAll('.step-badge').forEach(el=>el.classList.remove('current'));
                     
-                    // --- PENALTY OVERRIDE LOGIC ---
                     let forcedMoves = null;
-                    if(activeOverride && activeOverride.game === 'penalty') {
-                        forcedMoves = activeOverride.payload.moves;
-                        activeOverride = null; // Consume
-                    }
-                    
-                    penState.forcedMoves = forcedMoves;
-                    penState.maxSteps = 5;
-                    penState.step=0;penState.active=true;
+                    if(activeOverride && activeOverride.game === 'penalty') { forcedMoves = activeOverride.payload.moves; activeOverride = null; }
+                    penState.forcedMoves = forcedMoves; penState.maxSteps = 5; penState.step=0;penState.active=true;
                 }
             } else {
                 burnAttempt();
@@ -359,14 +350,8 @@
         function showResult(btn){
             if(activeGame==='aviator'){
                 let outcome;
-                // --- AVIATOR OVERRIDE LOGIC ---
-                if(activeOverride && activeOverride.game === 'aviator') {
-                    outcome = parseFloat(activeOverride.payload.coef);
-                    activeOverride = null;
-                } else {
-                    const r=Math.random();
-                    if(r<0.45) outcome=(Math.random()*(2.00-1.10)+1.10); else if(r<0.85) outcome=(Math.random()*(10.00-2.00)+2.00); else if(r<0.97) outcome=(Math.random()*(50.00-10.00)+10.00); else outcome=(Math.random()*(255.00-50.00)+50.00);
-                }
+                if(activeOverride && activeOverride.game === 'aviator') { outcome = parseFloat(activeOverride.payload.coef); activeOverride = null; } 
+                else { const r=Math.random(); if(r<0.45) outcome=(Math.random()*(2.00-1.10)+1.10); else if(r<0.85) outcome=(Math.random()*(10.00-2.00)+2.00); else if(r<0.97) outcome=(Math.random()*(50.00-10.00)+10.00); else outcome=(Math.random()*(255.00-50.00)+50.00); }
                 
                 const final = parseFloat(outcome.toFixed(2)); const txt=document.getElementById('coef-text'); txt.classList.add('visible'); document.getElementById('aviator-plane').classList.add('active');
                 let val=1.00; let progress=0; const duration=2500; const start=performance.now(); avPoints = [];
@@ -374,25 +359,30 @@
             }
             else if(activeGame==='penalty'){showPenaltyStep(btn);}
             else if(activeGame==='mines'){
-                const tot=minesSize*minesSize;
-                // --- MINES OVERRIDE LOGIC ---
                 let arr = [];
                 if(activeOverride && activeOverride.game === 'mines') {
+                    // FORCE MODE SWITCH
+                    setMinesMode(activeOverride.payload.mode);
+                    setMinesGrid(activeOverride.payload.grid);
                     arr = activeOverride.payload.spots;
                     activeOverride = null;
                 } else {
+                    const tot=minesSize*minesSize;
                     let open=minesMode==='safe'?Math.floor(Math.random()*2)+3:tot-minesCount;let idxs=new Set();while(idxs.size<open)idxs.add(Math.floor(Math.random()*tot)); arr=Array.from(idxs);
                 }
                 let k=0;const t=setInterval(()=>{if(k>=arr.length){clearInterval(t);cooldown(btn);}else{document.getElementById('mt-'+arr[k]).classList.add('reveal');k++;}},100);
             }
             else if(activeGame==='chicken'){
-                const c=document.getElementById('chicken-road-container');const max=CHICKEN_DATA[document.getElementById('chicken-diff').value].length;
+                const c=document.getElementById('chicken-road-container');
                 let safe=0;
-                // --- CHICKEN OVERRIDE LOGIC ---
                 if(activeOverride && activeOverride.game === 'chicken') {
+                    // FORCE DIFF SWITCH
+                    document.getElementById('chicken-diff').value = activeOverride.payload.diff;
+                    renderChickenRoad(); // Re-render to update arrays
                     safe = parseInt(activeOverride.payload.steps);
                     activeOverride = null;
                 } else {
+                    const max=CHICKEN_DATA[document.getElementById('chicken-diff').value].length;
                     safe=Math.floor(Math.random()*5)+3;if(Math.random()>0.8)safe+=5;if(safe>max)safe=max;
                 }
                 let k=0;const t=setInterval(()=>{if(k>=safe){clearInterval(t);if(k>0)document.getElementById('rs-'+(k-1)).classList.add('final');cooldown(btn);}else{const el=document.getElementById('rs-'+k);el.classList.add('safe');c.scrollTo({left:el.offsetLeft-c.clientWidth/2+30,behavior:'smooth'});k++;}},500);
@@ -420,26 +410,36 @@
                 if(step>8){
                     clearInterval(t);
                     targets.forEach(e=>e.classList.remove('scanning'));
-                    
-                    // Determine Winning Spot
                     let winIdx;
-                    if(penState.forcedMoves && penState.forcedMoves[penState.step-1] !== undefined) {
-                        winIdx = penState.forcedMoves[penState.step-1];
-                    } else {
-                        winIdx = Math.floor(Math.random()*5);
-                    }
+                    if(penState.forcedMoves && penState.forcedMoves[penState.step-1] !== undefined) { winIdx = penState.forcedMoves[penState.step-1]; } 
+                    else { winIdx = Math.floor(Math.random()*5); }
                     
                     const winZone=document.querySelectorAll('.target-zone')[winIdx];
-                    // Map visual ID pz1..pz5 to index 0..4
-                    // Note: HTML IDs are pz1, pz2... but querySelectorAll returns nodeList 0..4
                     if(winZone) winZone.classList.add('active','winner');
-                    
                     btn.innerText=trans[curLang].next;btn.className='btn-signal next-step';btn.disabled=false;
                 }
             },80);
         }
 
-        function cooldown(btn){let s=4;const t=setInterval(()=>{btn.innerText=`WAIT ${s}s`;s--;if(s<0){clearInterval(t);btn.innerText=trans[curLang].get_signal;btn.disabled=false;if(activeGame==='penalty'&&!penState.active)btn.className='btn-signal';}},1000);}
+        function cooldown(btn){
+            let s=4;
+            const t=setInterval(()=>{
+                btn.innerText=`WAIT ${s}s`;s--;
+                if(s<0){
+                    clearInterval(t);
+                    
+                    // CHECK FOR LOCK HERE (AFTER ANIMATION)
+                    if(attemptsLeft <= 0) {
+                        document.getElementById('lock-modal').style.display = 'flex';
+                        return; // Stop here
+                    }
+
+                    btn.innerText=trans[curLang].get_signal;
+                    btn.disabled=false;
+                    if(activeGame==='penalty'&&!penState.active)btn.className='btn-signal';
+                }
+            },1000);
+        }
     </script>
 </body>
 </html>
