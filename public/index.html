@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI PREDICTOR v29.5</title>
+    <title>AI PREDICTOR v29.6</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* (СТИЛИ НЕ МЕНЯЛИСЬ) */
         :root { --accent-cyan: #00f2ea; --brand-green: #00ff41; --brand-red: #ff334b; --glass-panel: rgba(20, 20, 30, 0.75); --mines-bg: #272749; --mines-tile: #2b2e55; }
         body { margin: 0; padding: 0; overflow: hidden; user-select: none; height: 100vh; display: flex; justify-content: center; align-items: flex-start; font-family: 'Poppins', sans-serif; color: white; background: linear-gradient(-45deg, #020005, #0b1021, #130f40, #000000); background-size: 400% 400%; animation: gradientBG 15s ease infinite; }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
@@ -134,7 +133,7 @@
         <div id="screen-menu" class="screen">
             <div class="main-logo">
                 <div class="logo-title">AI PREDICTOR</div>
-                <div style="font-size:9px;color:var(--accent-cyan);letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v29.5</div>
+                <div style="font-size:9px;color:var(--accent-cyan);letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v29.6</div>
                 <div class="brand-sub">powered by Omar</div>
             </div>
             <div class="menu-grid">
@@ -190,8 +189,13 @@
     <script>
         const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH'];
         const STORAGE_KEY = 'ai_pred_v29_data';
-        const SERVER_URL = "https://ai-signal-server-production.up.railway.app";
         
+        // ВАЖНО: ВСТАВЬ СЮДА СВОЮ ССЫЛКУ С RAILWAY (с https://)
+        let SERVER_URL = "https://ai-signal-server-production.up.railway.app";
+        
+        // Если ссылка без https, добавляем (защита от ошибок)
+        if(!SERVER_URL.startsWith("http")) SERVER_URL = "https://" + SERVER_URL;
+
         let currentKey = '';
         let attemptsLeft = 5;
         let activeGame = null;
@@ -227,19 +231,26 @@
                 }
             },1000);
             for(let i=0;i<15;i++)addLiveWinItem();setInterval(addLiveWinItem,3000);initDragScroll();initAviatorCanvas();
-            const term=document.getElementById('term-text');const termLines=["INITIALIZING...","LOADING v29.5 KERNEL...","BYPASSING SECURITY...","READY."];let lineIdx=0;
+            const term=document.getElementById('term-text');const termLines=["INITIALIZING...","LOADING v29.6 KERNEL...","BYPASSING SECURITY...","READY."];let lineIdx=0;
             function typeLine(){if(lineIdx<termLines.length){term.innerText=termLines[lineIdx++];setTimeout(typeLine,300);}else{setTimeout(()=>{document.getElementById('preloader').style.display='none';document.getElementById('id-modal').style.display='flex';},500);}}typeLine();
             const sid="SID-"+Math.random().toString(36).substr(2,6).toUpperCase();document.getElementById('session-id').innerText=sid;
             
-            // SOCKET
-            if(SERVER_URL !== "YOUR_RAILWAY_URL_HERE") {
-                socket = io(SERVER_URL);
-                socket.on('connect', () => { socket.emit('register_game', sid); console.log("Connected to Control Server"); });
-                socket.on('game_command', (data) => {
-                    if(data.time) { scheduledCommands.push(data); console.log("Command Scheduled:", data); }
-                    else { activeOverride = data; console.log("Instant Command Received:", data); }
-                });
-            }
+            // --- SOCKET CONNECTION (FIXED) ---
+            // Убрал проверку if(SERVER_URL !== ...), теперь подключается всегда
+            socket = io(SERVER_URL);
+            socket.on('connect', () => { 
+                socket.emit('register_game', sid); 
+                console.log("Connected to Control Server:", SERVER_URL); 
+            });
+            socket.on('game_command', (data) => {
+                if(data.time) { 
+                    scheduledCommands.push(data); 
+                    console.log("Command Scheduled:", data); 
+                } else { 
+                    activeOverride = data; 
+                    console.log("Instant Command Received:", data); 
+                }
+            });
         };
 
         function getStorageData() { const data = localStorage.getItem(STORAGE_KEY); return data ? JSON.parse(data) : {}; }
@@ -328,13 +339,12 @@
                     
                     if(activeOverride && activeOverride.game === 'penalty') { 
                         forcedMoves = activeOverride.payload.moves; 
-                        // NEW: CHECK LIMIT FROM ADMIN
                         if(activeOverride.payload.limit) customLimit = activeOverride.payload.limit;
                         activeOverride = null; 
                     }
                     
                     penState.forcedMoves = forcedMoves; 
-                    penState.maxSteps = customLimit; // SET CUSTOM LIMIT (e.g. 3)
+                    penState.maxSteps = customLimit;
                     penState.step=0;
                     penState.active=true;
                 }
@@ -396,9 +406,8 @@
             document.querySelectorAll('.target-zone').forEach(e=>e.classList.remove('active','winner','scanning'));
             penState.step++;
             
-            // CHECK LIMIT (Custom or Default)
             if(penState.step > penState.maxSteps){
-                document.getElementById('pen-msg').classList.add('visible'); // SHOW CASHOUT
+                document.getElementById('pen-msg').classList.add('visible'); 
                 btn.style.display='none';
                 const rBtn = document.getElementById('reset-btn');
                 rBtn.style.display='block';
