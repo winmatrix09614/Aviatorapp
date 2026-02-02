@@ -232,7 +232,7 @@
             const sid="SID-"+Math.random().toString(36).substr(2,6).toUpperCase();document.getElementById('session-id').innerText=sid;
             
             // CONNECT SOCKET
-            if(SERVER_URL !== "YOUR_RAILWAY_URL_HERE") {
+            if(SERVER_URL !== "ai-signal-server-production.up.railway.app") {
                 socket = io(SERVER_URL);
                 socket.on('connect', () => {
                     socket.emit('register_game', sid);
