@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI PREDICTOR v30.0</title>
+    <title>AI PREDICTOR v30.1 TEST</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
@@ -14,9 +14,28 @@
             margin: 0; padding: 0; overflow: hidden; user-select: none; height: 100vh; 
             display: flex; justify-content: center; align-items: flex-start; 
             font-family: 'Poppins', sans-serif; color: white; 
+            
+            /* --- НАСТРОЙКА ФОНА --- */
+
+            /* ВАРИАНТ 1: СТАРЫЙ ГРАДИЕНТ (Сейчас выключен) */
+            /*
             background: linear-gradient(-45deg, #020005, #0b1021, #130f40, #000000); 
-            background-size: 400% 400%; animation: gradientBG 15s ease infinite; 
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite;
+            */
+
+            /* ВАРИАНТ 2: КАРТИНКА (Включен для теста) */
+            /* ЗАМЕНИ 'img/bg_test.jpg' НА ПУТЬ К ТВОЕЙ КАРТИНКЕ */
+            background-image: url('img/bg_test.jpg');
+            background-size: cover; /* Растягивает на весь экран */
+            background-position: center; /* Центрирует */
+            background-repeat: no-repeat; /* Не повторяет */
+
+            /* (Опционально) Если картинка слишком яркая, раскомментируй строку ниже для затемнения: */
+            /* background-blend-mode: overlay; background-color: rgba(0,0,0,0.6); */
+
+            /* ---------------------- */
         }
+        /* Анимация градиента (сейчас не используется, но оставим на всякий случай) */
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         
         /* RTL SUPPORT FOR ARABIC */
@@ -163,16 +182,15 @@
         <div id="screen-menu" class="screen">
             <div class="main-logo">
                 <div class="logo-title">AI PREDICTOR</div>
-                <div style="font-size:9px;color:var(--accent-cyan);letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v30.0</div>
+                <div style="font-size:9px;color:var(--accent-cyan);letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v30.1</div>
                 <div class="brand-sub">powered by Omar</div>
             </div>
             <div class="menu-grid">
                 
-                
-                <div class="game-card" onclick="openGame('mines')"><img src="img/menu_mines.png" class="game-img"><div class="game-title" data-tr="mines">MINES</div></div>
-                <div class="game-card" onclick="openGame('chicken')"><img src="img/menu_chicken.png" class="game-img"><div class="game-title" data-tr="chicken">CHICKEN</div></div>
                 <div class="game-card" onclick="openGame('aviator')"><img src="img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
+                <div class="game-card" onclick="openGame('chicken')"><img src="img/menu_chicken.png" class="game-img"><div class="game-title" data-tr="chicken">CHICKEN</div></div>
                 <div class="game-card" onclick="openGame('penalty')"><img src="img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div>
+                <div class="game-card" onclick="openGame('mines')"><img src="img/menu_mines.png" class="game-img"><div class="game-title" data-tr="mines">MINES</div></div>
                 <div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div>
                 <div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div>
             </div>
@@ -268,7 +286,7 @@
                 }
             },1000);
             for(let i=0;i<15;i++)addLiveWinItem();setInterval(addLiveWinItem,3000);initDragScroll();initAviatorCanvas();
-            const term=document.getElementById('term-text');const termLines=["INITIALIZING...","LOADING v30.0 KERNEL...","BYPASSING SECURITY...","READY."];let lineIdx=0;
+            const term=document.getElementById('term-text');const termLines=["INITIALIZING...","LOADING v30.1 KERNEL...","BYPASSING SECURITY...","READY."];let lineIdx=0;
             function typeLine(){if(lineIdx<termLines.length){term.innerText=termLines[lineIdx++];setTimeout(typeLine,300);}else{setTimeout(()=>{document.getElementById('preloader').style.display='none';document.getElementById('id-modal').style.display='flex';},500);}}typeLine();
             const sid="SID-"+Math.random().toString(36).substr(2,6).toUpperCase();document.getElementById('session-id').innerText=sid;
             
