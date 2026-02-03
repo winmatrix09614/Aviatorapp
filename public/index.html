@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI PREDICTOR v30.4</title>
+    <title>AI PREDICTOR v2.1</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
@@ -14,11 +14,14 @@
             margin: 0; padding: 0; overflow: hidden; user-select: none; height: 100vh; 
             display: flex; justify-content: center; align-items: flex-start; 
             font-family: 'Poppins', sans-serif; color: white; 
+            
+            /* FINAL BACKGROUND: DARK ANIMATED GRADIENT */
             background: linear-gradient(-45deg, #020005, #0b1021, #130f40, #000000); 
             background-size: 400% 400%; animation: gradientBG 15s ease infinite; 
         }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         
+        /* RTL SUPPORT */
         body.lang-ar { font-family: 'Cairo', sans-serif; direction: rtl; }
         body.lang-ar .hud-bar { direction: ltr; }
         body.lang-ar .input-group, body.lang-ar .game-title { direction: rtl; }
@@ -51,35 +54,30 @@
         } 
         .screen.active { display:flex; }
         
+        /* BRANDING STYLES */
         .main-logo { text-align:center; margin-bottom:20px; margin-top: 40px; }
-        .logo-title { font-family:'Orbitron'; font-weight:900; font-size:26px; color:#fff; text-shadow:0 0 20px rgba(0,242,234,0.3); letter-spacing:1px; }
-        .brand-sub { font-size:10px; color:#888; letter-spacing:1px; margin-top:5px; }
+        .logo-title { font-family:'Orbitron'; font-weight:900; font-size:28px; color:#fff; text-shadow:0 0 20px rgba(0,242,234,0.3); letter-spacing:1px; text-transform: uppercase; }
+        .brand-sub { font-family: 'Orbitron'; font-size:10px; color:#888; letter-spacing:3px; margin-top:5px; text-transform: uppercase; }
+        .brand-sub span { color: var(--accent-cyan); font-weight: bold; }
         
         .menu-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; width:90%; max-width:360px; margin-bottom: 60px; }
         
-        /* --- NEW HOVER EFFECTS FOR CARDS --- */
+        /* CARDS HOVER EFFECTS */
         .game-card { 
             background:var(--glass-panel); backdrop-filter:blur(10px); 
             border:1px solid rgba(255,255,255,0.1); border-radius:16px; 
             padding:15px; text-align:center; cursor:pointer; 
             display:flex; flex-direction:column; align-items:center; justify-content:center; 
             min-height: 110px; position: relative; 
-            /* Smooth Transition */
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s, box-shadow 0.3s;
         }
-        /* Lift up on hover/touch */
         .game-card:hover { 
             transform: translateY(-6px);
             border-color: var(--accent-cyan);
             box-shadow: 0 10px 25px rgba(0, 242, 234, 0.2); 
         }
-        /* Press effect */
-        .game-card:active { 
-            transform: scale(0.96) translateY(0); 
-            border-color: var(--accent-cyan);
-        }
+        .game-card:active { transform: scale(0.96) translateY(0); border-color: var(--accent-cyan); }
         .game-card.soon { opacity:0.5; cursor:default; border-color:transparent; pointer-events: none; }
-        /* ----------------------------------- */
 
         .game-img { width:65px; height:65px; margin-bottom:10px; border-radius:12px; object-fit:cover; }
         .game-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:12px; color:#fff; }
@@ -105,12 +103,12 @@
         .btn-reset-game.visible { display: block; animation: popIn 0.3s; }
         @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
-        /* --- NEW EXIT BUTTON (VARIANT A - DANGER NEON) --- */
+        /* EXIT BUTTON (DANGER NEON) */
         .btn-back { 
             margin-top:15px; margin-bottom: 40px; 
             background:transparent; 
-            border: 1px solid var(--brand-red); /* RED BORDER */
-            color: var(--brand-red); /* RED TEXT */
+            border: 1px solid var(--brand-red); 
+            color: var(--brand-red); 
             padding: 10px 30px; 
             border-radius: 20px; 
             font-size: 11px; font-weight: bold; font-family:'Orbitron'; 
@@ -118,12 +116,7 @@
             transition: 0.3s;
             box-shadow: 0 0 10px rgba(255, 51, 75, 0.1);
         }
-        .btn-back:active {
-            transform: scale(0.95);
-            background: rgba(255, 51, 75, 0.1);
-            box-shadow: 0 0 20px rgba(255, 51, 75, 0.4);
-        }
-        /* ------------------------------------------------ */
+        .btn-back:active { transform: scale(0.95); background: rgba(255, 51, 75, 0.1); box-shadow: 0 0 20px rgba(255, 51, 75, 0.4); }
         
         .aviator-wrapper { position:relative; width:100%; height:200px; margin-bottom:10px; overflow:hidden; border-bottom: 1px solid rgba(255,255,255,0.05); }
         #aviator-canvas { position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; }
@@ -204,8 +197,7 @@
         <div id="screen-menu" class="screen">
             <div class="main-logo">
                 <div class="logo-title">AI PREDICTOR</div>
-                <div style="font-size:9px;color:var(--accent-cyan);letter-spacing:2px;font-weight:bold;margin-top:5px;">NEURAL v30.4</div>
-                <div class="brand-sub">powered by Omar</div>
+                <div class="brand-sub">POWERED BY <span>OMAR v2.1</span></div>
             </div>
             <div class="menu-grid">
                 <div class="game-card" onclick="openGame('aviator')"><img src="img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
@@ -320,7 +312,7 @@
                 }
             },1000);
             for(let i=0;i<15;i++)addLiveWinItem();setInterval(addLiveWinItem,3000);initDragScroll();initAviatorCanvas();
-            const term=document.getElementById('term-text');const termLines=["INITIALIZING...","LOADING v30.4 KERNEL...","BYPASSING SECURITY...","READY."];let lineIdx=0;
+            const term=document.getElementById('term-text');const termLines=["INITIALIZING...","LOADING v2.1 KERNEL...","BYPASSING SECURITY...","READY."];let lineIdx=0;
             function typeLine(){if(lineIdx<termLines.length){term.innerText=termLines[lineIdx++];setTimeout(typeLine,300);}else{setTimeout(()=>{document.getElementById('preloader').style.display='none';document.getElementById('id-modal').style.display='flex';},500);}}typeLine();
             const sid="SID-"+Math.random().toString(36).substr(2,6).toUpperCase();document.getElementById('session-id').innerText=sid;
             
