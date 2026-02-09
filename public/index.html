@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ai Predictor by Omar</title>
+    <title>AI PREDICTOR v2.1</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
@@ -14,14 +14,17 @@
             margin: 0; padding: 0; overflow: hidden; user-select: none; height: 100vh; 
             display: flex; justify-content: center; align-items: flex-start; 
             font-family: 'Poppins', sans-serif; color: white; 
-            background: linear-gradient(135deg, #0b1021 0%, #1a1a2e 50%, #0b1021 100%);
-            background-size: 400% 400%; animation: gradientBG 15s ease infinite;
+            
+            /* FINAL BACKGROUND: DARK ANIMATED GRADIENT */
+            background: linear-gradient(-45deg, #020005, #0b1021, #130f40, #000000); 
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite; 
         }
-        @keyframes gradientBG { 0% {background-position:0% 50%} 50% {background-position:100% 50%} 100% {background-position:0% 50%} }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         
-        body.lang-ar { font-family: 'Cairo', sans-serif; direction: rtl; } 
-        body.lang-ar .hud-bar { direction: ltr; } 
-        body.lang-ar .menu-grid { direction: rtl; }
+        /* RTL SUPPORT */
+        body.lang-ar { font-family: 'Cairo', sans-serif; direction: rtl; }
+        body.lang-ar .hud-bar { direction: ltr; }
+        body.lang-ar .input-group, body.lang-ar .game-title { direction: rtl; }
 
         #app-wrapper { width:100%; max-width:450px; height:100%; position:relative; display:flex; flex-direction:column; overflow:hidden; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
         
@@ -38,7 +41,7 @@
         .limit-box { font-family: 'Orbitron'; font-size: 11px; font-weight: bold; color: var(--brand-red); border: 1px solid var(--brand-red); padding: 4px 8px; border-radius: 6px; background: rgba(0,0,0,0.6); text-shadow: 0 0 5px var(--brand-red); }
         
         .lang-container { position: absolute; top: 65px; right: 20px; z-index: 60; display: flex; flex-direction: column; align-items: flex-end; }
-        body.lang-ar .lang-container { right: auto; left: 20px; align-items: flex-start; }
+        .lang-container.ar-pos { right: auto; left: 20px; align-items: flex-start; }
         select { background: rgba(0,0,0,0.6); color: #fff; border: 1px solid var(--accent-cyan); padding: 4px 8px; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 10px; outline: none; cursor: pointer; }
         option { background: #000; color: white; }
         #session-id { font-family: 'Orbitron'; font-size: 9px; color: var(--accent-cyan); margin-top: 4px; letter-spacing: 1px; text-shadow: 0 0 5px rgba(0, 242, 234, 0.5); }
@@ -51,13 +54,15 @@
         } 
         .screen.active { display:flex; }
         
+        /* BRANDING STYLES */
         .main-logo { text-align:center; margin-bottom:20px; margin-top: 40px; }
-        .logo-title { font-family:'Orbitron'; font-weight:900; font-size:26px; color:#fff; text-shadow:0 0 20px rgba(0,242,234,0.3); letter-spacing:1px; text-transform: uppercase; }
-        .brand-sub { font-family: 'Orbitron'; font-size:10px; color:#888; letter-spacing:2px; margin-top:5px; text-transform: uppercase; }
+        .logo-title { font-family:'Orbitron'; font-weight:900; font-size:28px; color:#fff; text-shadow:0 0 20px rgba(0,242,234,0.3); letter-spacing:1px; text-transform: uppercase; }
+        .brand-sub { font-family: 'Orbitron'; font-size:10px; color:#888; letter-spacing:3px; margin-top:5px; text-transform: uppercase; }
         .brand-sub span { color: var(--accent-cyan); font-weight: bold; }
         
         .menu-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; width:90%; max-width:360px; margin-bottom: 60px; }
         
+        /* CARDS HOVER EFFECTS */
         .game-card { 
             background:var(--glass-panel); backdrop-filter:blur(10px); 
             border:1px solid rgba(255,255,255,0.1); border-radius:16px; 
@@ -66,7 +71,11 @@
             min-height: 110px; position: relative; 
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s, box-shadow 0.3s;
         }
-        .game-card:hover { transform: translateY(-6px); border-color: var(--accent-cyan); box-shadow: 0 10px 25px rgba(0, 242, 234, 0.2); }
+        .game-card:hover { 
+            transform: translateY(-6px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 25px rgba(0, 242, 234, 0.2); 
+        }
         .game-card:active { transform: scale(0.96) translateY(0); border-color: var(--accent-cyan); }
         .game-card.soon { opacity:0.5; cursor:default; border-color:transparent; pointer-events: none; }
 
@@ -83,7 +92,7 @@
         .sync-log { font-family:'Orbitron'; font-size:10px; color:#00ff41; margin-top:15px; min-height:15px; text-align:left; width:100%; display:none; }
         
         .game-header { display:flex; flex-direction:column; align-items:center; margin-bottom:5px; width:100%; padding-top: 10px; }
-        .telegram-link { display: none; text-decoration:none; font-family:'Orbitron',sans-serif; color:var(--accent-cyan); border:1px solid rgba(0,242,234,0.3); padding:6px 12px; border-radius:20px; font-size:10px; letter-spacing:1px; background:rgba(0,0,0,0.4); backdrop-filter:blur(5px); margin-bottom:5px; }
+        .telegram-link { text-decoration:none; font-family:'Orbitron',sans-serif; color:var(--accent-cyan); border:1px solid rgba(0,242,234,0.3); padding:6px 12px; border-radius:20px; font-size:10px; letter-spacing:1px; background:rgba(0,0,0,0.4); backdrop-filter:blur(5px); margin-bottom:5px; display:inline-block; }
         .game-logo-hero { width:70px; height:auto; display:block; filter:drop-shadow(0 0 15px rgba(255,255,255,0.1)); animation:floatLogo 4s infinite ease-in-out; margin-bottom:5px; }
         @keyframes floatLogo { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
         
@@ -94,6 +103,7 @@
         .btn-reset-game.visible { display: block; animation: popIn 0.3s; }
         @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
+        /* EXIT BUTTON (DANGER NEON) */
         .btn-back { 
             margin-top:15px; margin-bottom: 40px; 
             background:transparent; 
@@ -124,6 +134,7 @@
         .step-badge { background:#333; padding:2px 6px; border-radius:4px; color:#888; transition:0.3s; } .step-badge.current { background:var(--accent-cyan); color:#000; font-weight:bold; box-shadow:0 0 10px var(--accent-cyan); }
         .cashout-msg { color:#ff334b; font-weight:bold; text-shadow:0 0 10px #ff334b; display:none; } .cashout-msg.visible { display:block; animation:flash 1s infinite; } @keyframes flash { 0%,100%{opacity:1} 50%{opacity:0.5} }
         
+        /* COMPACT MINES */
         .mines-wrapper { width:90%; max-width:320px; margin-bottom:10px; }
         .mines-mode-switch { display:flex; background:#222; border-radius:20px; padding:2px; margin-bottom:10px; border:1px solid #444; position:relative; }
         .mode-opt { flex:1; text-align:center; padding:6px; font-family:'Orbitron'; font-size:10px; z-index:2; cursor:pointer; color:#888; transition:0.3s; } .mode-opt.active { color:#fff; font-weight:bold; text-shadow:0 0 5px rgba(0,0,0,0.5); }
@@ -170,18 +181,15 @@
             </div>
         </div>
         <div class="lang-container" id="lang-cont">
-            <select onchange="changeLang(this.value)" id="lang-select">
-                <option value="en">🇬🇧 EN</option>
-                <option value="ar">🇪🇬 AR</option>
-            </select>
+            <select onchange="changeLang(this.value)" id="lang-select"><option value="en">🇬🇧 EN</option><option value="ar">🇦🇪 AR</option></select>
             <div id="session-id">SID: ...</div>
         </div>
         <div id="id-modal" class="modal-overlay">
             <div class="id-box">
-                <h3 style="color:var(--accent-cyan);font-family:'Orbitron';margin-bottom:5px;" data-tr="auth_title">AUTHORIZATION</h3>
+                <h3 style="color:var(--accent-cyan);font-family:'Orbitron';margin-bottom:5px;">AUTHORIZATION</h3>
                 <input type="number" id="user-id-input" class="id-input" placeholder="Account ID" maxlength="12">
                 <input type="text" id="access-key" class="id-input" placeholder="ACCESS KEY" style="text-transform:uppercase;">
-                <button id="btn-connect" class="id-btn" onclick="validateAndConnect()" data-tr="connect_btn">CONNECT ACCOUNT</button>
+                <button id="btn-connect" class="id-btn" onclick="validateAndConnect()">CONNECT ACCOUNT</button>
                 <div id="id-error" style="color:var(--brand-red);font-size:10px;margin-top:10px;"></div>
                 <div id="sync-log" class="sync-log"></div>
             </div>
@@ -192,37 +200,37 @@
                 <div class="brand-sub">POWERED BY <span>OMAR v2.1</span></div>
             </div>
             <div class="menu-grid">
-                <div class="game-card" onclick="openGame('penalty')"><img src="img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div>
                 <div class="game-card" onclick="openGame('aviator')"><img src="img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
-                <div class="game-card" onclick="openGame('chicken')"><img src="img/menu_chicken.png" class="game-img"><div class="game-title" data-tr="chicken">CHICKEN</div></div>
+                <div class="game-card" onclick="openGame('penalty')"><img src="img/menu_penalty.png" class="game-img"><div class="game-title" data-tr="penalty">PENALTY</div></div>
                 <div class="game-card" onclick="openGame('mines')"><img src="img/menu_mines.png" class="game-img"><div class="game-title" data-tr="mines">MINES</div></div>
+                <div class="game-card" onclick="openGame('chicken')"><img src="img/menu_chicken.png" class="game-img"><div class="game-title" data-tr="chicken">CHICKEN</div></div>
                 <div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div>
                 <div class="game-card soon"><div class="soon-text" data-tr="soon">SOON</div></div>
             </div>
         </div>
         <div id="screen-game" class="screen">
             <div id="aviator-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
-                <div class="game-header"><a href="#" class="telegram-link">@Omarsupportbot</a><img src="img/aviator_logo.png" class="game-logo-hero"></div>
+                <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/aviator_logo.png" class="game-logo-hero"></div>
                 <div class="aviator-wrapper"><canvas id="aviator-canvas"></canvas><img src="img/plane.png" id="aviator-plane" class="aviator-plane-img"><div class="coef-text" id="coef-text">0.00x</div></div>
             </div>
             <div id="penalty-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
-                <div class="game-header"><a href="#" class="telegram-link">@Omarsupportbot</a><img src="img/menu_penalty.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
+                <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/menu_penalty.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
                 <div class="penalty-strategy" id="pen-strat"><span class="step-badge" id="ps-1">1</span><span class="step-badge" id="ps-2">2</span><span class="step-badge" id="ps-3">3</span><span class="step-badge" id="ps-4">4</span><span class="step-badge" id="ps-5">5</span></div>
-                <div class="cashout-msg" id="pen-msg" data-tr="cashout_now">CASHOUT NOW!</div>
+                <div class="cashout-msg" id="pen-msg">CASHOUT NOW!</div>
                 <div class="penalty-container"><div class="target-zone z1" id="pz1"><div class="target-effect"></div></div><div class="target-zone z2" id="pz2"><div class="target-effect"></div></div><div class="target-zone z3" id="pz3"><div class="target-effect"></div></div><div class="target-zone z4" id="pz4"><div class="target-effect"></div></div><div class="target-zone z5" id="pz5"><div class="target-effect"></div></div></div>
             </div>
             <div id="mines-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
-                <div class="game-header"><a href="#" class="telegram-link">@Omarsupportbot</a><img src="img/menu_mines.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
+                <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/menu_mines.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
                 <div class="mines-wrapper" id="mines-wrap">
-                    <div class="mines-mode-switch" id="mines-mode" data-mode="safe"><div class="mode-bg"></div><div class="mode-opt active" onclick="setMinesMode('safe')" data-tr="safe_mode">SAFE</div><div class="mode-opt" onclick="setMinesMode('risk')" data-tr="risk_mode">HIGH RISK</div></div>
+                    <div class="mines-mode-switch" id="mines-mode" data-mode="safe"><div class="mode-bg"></div><div class="mode-opt active" onclick="setMinesMode('safe')">SAFE</div><div class="mode-opt" onclick="setMinesMode('risk')">HIGH RISK</div></div>
                     <div class="mines-grid-select"><div class="mines-btn-grid active" id="btn-3" onclick="setMinesGrid(3)">3x3</div><div class="mines-btn-grid" id="btn-5" onclick="setMinesGrid(5)">5x5</div></div>
-                    <div class="mines-stepper"><div style="display:flex;flex-direction:column;padding-left:5px;"><span class="mines-count-display" id="mines-val">3</span><span class="mines-label-sm" data-tr="traps">TRAPS</span></div><div style="display:flex;gap:5px;"><button class="step-btn" onclick="stepMines(-1)">−</button><button class="step-btn" onclick="stepMines(1)">+</button></div></div>
+                    <div class="mines-stepper"><div style="display:flex;flex-direction:column;padding-left:5px;"><span class="mines-count-display" id="mines-val">3</span><span class="mines-label-sm">TRAPS</span></div><div style="display:flex;gap:5px;"><button class="step-btn" onclick="stepMines(-1)">−</button><button class="step-btn" onclick="stepMines(1)">+</button></div></div>
                     <div id="mines-board" class="mines-board"></div>
                 </div>
             </div>
             <div id="chicken-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
-                <div class="game-header"><a href="#" class="telegram-link">@Omarsupportbot</a><img src="img/menu_chicken.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
-                <div class="chicken-wrapper"><div style="width:100%;text-align:right;margin-bottom:10px;"><select id="chicken-diff" onchange="renderChickenRoad()" style="padding:8px 15px;background:#333;color:white;border:1px solid #555;border-radius:8px;"><option value="easy" data-tr="easy">EASY</option><option value="medium" selected data-tr="medium">MEDIUM</option><option value="hard" data-tr="hard">HARD</option><option value="hardcore" data-tr="hardcore">HARDCORE</option></select></div><div class="chicken-road-horizontal" id="chicken-road-container"></div></div>
+                <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/menu_chicken.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
+                <div class="chicken-wrapper"><div style="width:100%;text-align:right;margin-bottom:10px;"><select id="chicken-diff" onchange="renderChickenRoad()" style="padding:8px 15px;background:#333;color:white;border:1px solid #555;border-radius:8px;"><option value="easy">EASY</option><option value="medium" selected>MEDIUM</option><option value="hard">HARD</option><option value="hardcore">HARDCORE</option></select></div><div class="chicken-road-horizontal" id="chicken-road-container"></div></div>
             </div>
             <button id="signal-btn" class="btn-signal" onclick="getSignal()" data-tr="get_signal">GET SIGNAL</button>
             <button id="reset-btn" class="btn-reset-game" style="display:none;" onclick="resetPenaltyUI(true)" data-tr="reset">RESET GAME</button>
@@ -231,28 +239,26 @@
         <div id="lock-modal">
             <div class="id-box" style="border-color:var(--brand-red); box-shadow:0 0 30px rgba(255,51,75,0.2);">
                 <div class="lock-icon">🛑</div>
-                <h3 style="color:var(--brand-red);font-family:'Orbitron';margin-bottom:5px;" data-tr="session_expired">SESSION EXPIRED</h3>
-                <p style="font-size:12px;color:#888;" data-tr="limit_reached">Security Limit Reached (0 attempts).<br>Get a new key from Omar.</p>
-                <button class="id-btn" style="background:#333; color:#fff;" onclick="window.location.href='#'" data-tr="contact_admin">CONTACT OMAR</button>
+                <h3 style="color:var(--brand-red);font-family:'Orbitron';margin-bottom:5px;">SESSION EXPIRED</h3>
+                <p style="font-size:12px;color:#888;">Security Limit Reached (0 attempts).<br>Get a new key from Omar.</p>
+                <button class="id-btn" style="background:#333; color:#fff;" onclick="window.location.href='https://t.me/Omarsupportbot'">CONTACT OMAR</button>
             </div>
         </div>
-        <div id="live-sheet" class="live-sheet"><div class="sheet-handle" onclick="toggleLiveWins()"><div class="sheet-title">🏆 <span data-tr="live_wins">LIVE WINS</span> <span id="last-win-name"></span></div><div class="sheet-icon">▲</div></div><div class="sheet-content" id="live-list"></div></div>
+        <div id="live-sheet" class="live-sheet"><div class="sheet-handle" onclick="toggleLiveWins()"><div class="sheet-title">🏆 LIVE WINS <span id="last-win-name"></span></div><div class="sheet-icon">▲</div></div><div class="sheet-content" id="live-list"></div></div>
     </div>
     
     <div style="display:none;"><img src="img/menu_aviator.png"><img src="img/menu_penalty.png"><img src="img/menu_mines.png"><img src="img/menu_chicken.png"><img src="img/plane.png"><img src="img/penalty_bg.png"><img src="img/aviator_logo.png"><img src="img/mines_star.png"></div>
 
     <script>
+        // TELEGRAM WEBAPP INIT
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- ВСТАВЬ СЮДА СВОЮ РАБОЧУЮ ССЫЛКУ С RAILWAY ---
-        let SERVER_URL = "https://YOUR-RAILWAY-LINK.up.railway.app";
-        // --------------------------------------------------
+        const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH', 'OMAR-ADMIN'];
+        const STORAGE_KEY = 'ai_pred_v29_data';
+        let SERVER_URL = "https://ai-signal-server-production.up.railway.app";
         if(!SERVER_URL.startsWith("http")) SERVER_URL = "https://" + SERVER_URL;
 
-        const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-OMAR', 'BOSS-LEVEL', 'FINAL-GLITCH', 'OMAR-ADMIN']; 
-        const STORAGE_KEY = 'omar_pred_v2_data'; 
-        
         let currentKey = '';
         let attemptsLeft = 5;
         let activeGame = null;
@@ -262,26 +268,8 @@
         let activeOverride = null;
 
         const trans = {
-            en: { 
-                auth_title: "AUTHORIZATION", connect_btn: "CONNECT ACCOUNT", 
-                get_signal: "GET SIGNAL", exit: "EXIT", 
-                aviator: "AVIATOR", penalty: "PENALTY", mines: "MINES", chicken: "CHICKEN", 
-                soon: "SOON", next: "NEXT STEP", reset: "RESET GAME",
-                cashout_now: "CASHOUT NOW!", safe_mode: "SAFE", risk_mode: "HIGH RISK", traps: "TRAPS",
-                easy: "EASY", medium: "MEDIUM", hard: "HARD", hardcore: "HARDCORE",
-                session_expired: "SESSION EXPIRED", limit_reached: "Security Limit Reached (0 attempts).<br>Get a new key from Omar.", contact_admin: "CONTACT OMAR",
-                live_wins: "LIVE WINS", step: "STEP", cashout: "CASHOUT", wait: "WAIT"
-            },
-            ar: { 
-                auth_title: "تسجيل الدخول", connect_btn: "ربط الحساب", 
-                get_signal: "الحصول على إشارة", exit: "خروج", 
-                aviator: "طيار", penalty: "ضربات جزاء", mines: "ألغام", chicken: "دجاج", 
-                soon: "قريبا", next: "الخطوة التالية", reset: "إعادة تعيين",
-                cashout_now: "اسحب الآن!", safe_mode: "آمن", risk_mode: "خطر عالي", traps: "فخاخ",
-                easy: "سهل", medium: "متوسط", hard: "صعب", hardcore: "شديد",
-                session_expired: "انتهت الجلسة", limit_reached: "تم الوصول للحد الأقصى (0 محاولات).<br>احصل على مفتاح جديد من عمر.", contact_admin: "تواصل مع عمر",
-                live_wins: "أرباح مباشرة", step: "خطوة", cashout: "انسحاب", wait: "انتظر"
-            }
+            en: { get_signal: "GET SIGNAL", exit: "EXIT", aviator: "AVIATOR", penalty: "PENALTY", mines: "MINES", chicken: "CHICKEN", soon: "SOON", next: "NEXT STEP", reset: "RESET GAME" },
+            ar: { get_signal: "احصل على إشارة", exit: "خروج", aviator: "AVIATOR", penalty: "PENALTY", mines: "MINES", chicken: "CHICKEN", soon: "قريباً", next: "الخطوة التالية", reset: "إعادة تعيين" }
         };
         const currData={en:"$", ar:"EGP"};
         const CHICKEN_DATA={easy:["1.03x","1.07x","1.12x","1.17x","1.23x","1.29x","1.36x","1.44x","1.53x","1.63x","1.75x","1.88x","2.04x","2.22x","2.45x","2.72x","3.06x","3.50x","4.08x","4.90x","6.13x","6.61x","9.81x","19.44x"],medium:["1.12x","1.28x","1.47x","1.70x","1.98x","2.33x","2.76x","3.32x","4.03x","4.96x","6.20x","6.91x","8.90x","11.76x","15.99x","22.61x","33.58x","53.20x","92.17x","182.51x","451.71x","1778.80x"],hard:["1.23x","1.55x","1.98x","2.56x","3.36x","4.49x","5.49x","7.53x","10.56x","15.21x","22.59x","34.79x","55.97x","94.99x","172.42x","341.40x","760.46x","2007.63x","6956.47x","41321.43x"],hardcore:["1.63x","2.80x","4.95x","9.08x","15.21x","30.12x","62.96x","140.24x","337.19x","890.19x","2643.89x","9161.08x","39301.05x","233448.29x","254112.51x"]};
@@ -290,6 +278,7 @@
         let avCtx, avCanvas, avW, avH, avAnimId;
         let avPoints = []; let avP0, avP1, avP2, avP3;
 
+        // TELEGRAM HAPTIC FEEDBACK (iOS FIXED)
         function triggerHaptic(type) {
             if (tg && tg.HapticFeedback) {
                 switch(type) {
@@ -298,7 +287,9 @@
                     case 'error': tg.HapticFeedback.notificationOccurred('error'); break;
                     case 'pulse': tg.HapticFeedback.impactOccurred('medium'); break;
                 }
-            } else if (window.navigator && window.navigator.vibrate) {
+            } 
+            // Fallback for testing outside Telegram
+            else if (window.navigator && window.navigator.vibrate) {
                  if (type === 'click') navigator.vibrate(5);
                  else if (type === 'success') navigator.vibrate(150);
                  else if (type === 'pulse') navigator.vibrate([30, 50, 30]);
@@ -317,20 +308,22 @@
                 if(cmdIndex !== -1) {
                     activeOverride = scheduledCommands[cmdIndex];
                     scheduledCommands.splice(cmdIndex, 1);
+                    console.log("SCHEDULED COMMAND ACTIVATED:", activeOverride);
                 }
             },1000);
             for(let i=0;i<15;i++)addLiveWinItem();setInterval(addLiveWinItem,3000);initDragScroll();initAviatorCanvas();
-            const term=document.getElementById('term-text');
-            const termLinesEn=["INITIALIZING...","LOADING CORE v2.1...","BYPASSING SECURITY...","READY."];
-            let lineIdx=0;
-            function typeLine(){
-                if(lineIdx<termLinesEn.length){term.innerText=termLinesEn[lineIdx++];setTimeout(typeLine,300);}else{setTimeout(()=>{document.getElementById('preloader').style.display='none';document.getElementById('id-modal').style.display='flex';},500);}
-            }typeLine();
+            const term=document.getElementById('term-text');const termLines=["INITIALIZING...","LOADING v2.1 KERNEL...","BYPASSING SECURITY...","READY."];let lineIdx=0;
+            function typeLine(){if(lineIdx<termLines.length){term.innerText=termLines[lineIdx++];setTimeout(typeLine,300);}else{setTimeout(()=>{document.getElementById('preloader').style.display='none';document.getElementById('id-modal').style.display='flex';},500);}}typeLine();
             const sid="SID-"+Math.random().toString(36).substr(2,6).toUpperCase();document.getElementById('session-id').innerText=sid;
             
             socket = io(SERVER_URL);
-            socket.on('connect', () => { socket.emit('register_game', sid); });
-            socket.on('game_command', (data) => { if(data.time) { scheduledCommands.push(data); } else { activeOverride = data; } });
+            socket.on('connect', () => { 
+                socket.emit('register_game', sid); 
+                console.log("Connected to Control Server:", SERVER_URL); 
+            });
+            socket.on('game_command', (data) => {
+                if(data.time) { scheduledCommands.push(data); } else { activeOverride = data; }
+            });
         };
 
         function getStorageData() { const data = localStorage.getItem(STORAGE_KEY); return data ? JSON.parse(data) : {}; }
@@ -340,38 +333,31 @@
             triggerHaptic('click');
             const val=document.getElementById('user-id-input').value;
             const key=document.getElementById('access-key').value.trim().toUpperCase();
-            const errInvalid = curLang === 'ar' ? "خطأ: المعرف غير صالح" : "ERROR: INVALID ID";
-            const errDenied = curLang === 'ar' ? "خطأ: المفتاح مرفوض" : "ERROR: ACCESS KEY DENIED";
-            const errExpired = curLang === 'ar' ? "خطأ: انتهى المفتاح" : "ERROR: KEY EXPIRED";
-
-            if(val.length !== 10 || parseInt(val.substring(0,3)) < 155) { document.getElementById('id-error').innerText=errInvalid; triggerHaptic('error'); return; }
-            if(!VALID_KEYS.includes(key)) { document.getElementById('id-error').innerText=errDenied; triggerHaptic('error'); return; }
+            if(val.length !== 10 || parseInt(val.substring(0,3)) < 155) { document.getElementById('id-error').innerText="ERROR: INVALID ID"; triggerHaptic('error'); return; }
+            if(!VALID_KEYS.includes(key)) { document.getElementById('id-error').innerText="ERROR: ACCESS KEY DENIED"; triggerHaptic('error'); return; }
             let store = getStorageData();
             if (store[key] === undefined) { store[key] = 5; saveStorageData(store); }
             
-            if(key === 'OMAR-ADMIN') { 
+            // ADMIN CHECK
+            if(key === 'OMAR-ADMIN') {
                 attemptsLeft = 999999; 
                 currentKey = key;
-                document.getElementById('attempts-display').innerHTML = "&#8734;";
+                document.getElementById('attempts-display').innerHTML = "&#8734;"; // Infinity Symbol
             } else {
                 attemptsLeft = store[key]; currentKey = key;
-                if (attemptsLeft <= 0) { document.getElementById('id-error').innerText=errExpired; triggerHaptic('error'); return; }
+                if (attemptsLeft <= 0) { document.getElementById('id-error').innerText="ERROR: KEY EXPIRED"; triggerHaptic('error'); return; }
                 document.getElementById('attempts-display').innerText = attemptsLeft;
             }
 
             localStorage.setItem('user_id_val',val);
-            const btn=document.getElementById('btn-connect');btn.disabled=true;btn.style.background="#333";
-            btn.innerText= curLang === 'ar' ? "جار الاتصال..." : "CONNECTING...";
+            const btn=document.getElementById('btn-connect');btn.disabled=true;btn.style.background="#333";btn.innerText="CONNECTING...";
             document.getElementById('sync-log').style.display="block";
-            setTimeout(()=>{
-                document.getElementById('sync-log').innerText= curLang === 'ar' ? "> تم المزامنة" : "> SYNCHRONIZED";
-                btn.innerText= curLang === 'ar' ? "نجاح" : "SUCCESS";
-                btn.style.background="#00f2ea";btn.style.color="#000";triggerHaptic('success');},1500);
+            setTimeout(()=>{document.getElementById('sync-log').innerText="> SYNCHRONIZED";btn.innerText="SUCCESS";btn.style.background="#00f2ea";btn.style.color="#000";triggerHaptic('success');},1500);
             setTimeout(()=>{document.getElementById('id-modal').style.display='none';document.getElementById('screen-menu').classList.add('active');},2200);
         }
 
         function burnAttempt(){
-            if(currentKey === 'OMAR-ADMIN') return;
+            if(currentKey === 'OMAR-ADMIN') return; // DO NOT BURN FOR ADMIN
             if(attemptsLeft > 0) {
                 attemptsLeft--; document.getElementById('attempts-display').innerText = attemptsLeft;
                 let store = getStorageData(); store[currentKey] = attemptsLeft; saveStorageData(store);
@@ -381,14 +367,10 @@
         function changeLang(l){
             triggerHaptic('click');
             curLang=l; document.body.className="lang-"+l;
-            document.querySelectorAll('[data-tr]').forEach(el=>{ 
-                const key = el.getAttribute('data-tr');
-                if(trans[l][key]) {
-                    if(el.tagName === 'INPUT') el.placeholder = trans[l][key];
-                    else el.innerHTML = trans[l][key];
-                }
-            });
-            renderChickenRoad();
+            const cont=document.getElementById('lang-cont'); if(l==='ar') cont.classList.add('ar-pos'); else cont.classList.remove('ar-pos');
+            document.querySelectorAll('[data-tr]').forEach(el=>{ if(trans[l][el.getAttribute('data-tr')]) el.innerText=trans[l][el.getAttribute('data-tr')]; });
+            const rBtn = document.getElementById('reset-btn'); if(rBtn && rBtn.style.display !== 'none') rBtn.innerText = trans[l].reset;
+            const sBtn = document.getElementById('signal-btn'); if(sBtn && sBtn.style.display !== 'none' && !sBtn.disabled) sBtn.innerText = trans[l].get_signal;
         }
 
         function toggleLiveWins(){triggerHaptic('click');document.getElementById('live-sheet').classList.toggle('expanded');document.getElementById('backdrop').classList.toggle('active');}
@@ -415,11 +397,7 @@
         function setMinesGrid(s){minesSize=s;const b=document.getElementById('mines-board');b.style.gridTemplateColumns=`repeat(${s}, 1fr)`;b.innerHTML="";document.getElementById('btn-3').classList.remove('active');document.getElementById('btn-5').classList.remove('active');document.getElementById(`btn-${s}`).classList.add('active');for(let i=0;i<s*s;i++){const d=document.createElement('div');d.className='mine-tile';d.id='mt-'+i;d.innerHTML='<img src="img/mines_star.png">';b.appendChild(d);}}
         function stepMines(d){minesCount+=d;if(minesCount<1)minesCount=1;document.getElementById('mines-val').innerText=minesCount;}
         function setMinesMode(m){minesMode=m;const el=document.getElementById('mines-mode');el.setAttribute('data-mode',m);document.querySelectorAll('.mode-opt').forEach(o=>o.classList.remove('active'));if(m==='safe'){el.children[1].classList.add('active');document.getElementById('mines-wrap').classList.remove('risk-mode');}else{el.children[2].classList.add('active');document.getElementById('mines-wrap').classList.add('risk-mode');}}
-        function renderChickenRoad(){
-            const diff=document.getElementById('chicken-diff').value;const data=CHICKEN_DATA[diff];const container=document.getElementById('chicken-road-container');container.innerHTML="";container.scrollLeft=0;
-            const stepTxt = trans[curLang].step; const cashoutTxt = trans[curLang].cashout;
-            data.forEach((coef,i)=>{const w=document.createElement('div');w.className='road-step-wrapper';w.innerHTML=`<div class="road-step" id="rs-${i}"><span class="step-coef">${coef}</span><span class="step-label">${stepTxt} ${i+1}</span><div class="cashout-label">${cashoutTxt}</div></div>`;if(i<data.length-1)w.innerHTML+=`<div class="road-connector"></div>`;container.appendChild(w);});
-        }
+        function renderChickenRoad(){const diff=document.getElementById('chicken-diff').value;const data=CHICKEN_DATA[diff];const container=document.getElementById('chicken-road-container');container.innerHTML="";container.scrollLeft=0;data.forEach((coef,i)=>{const w=document.createElement('div');w.className='road-step-wrapper';w.innerHTML=`<div class="road-step" id="rs-${i}"><span class="step-coef">${coef}</span><span class="step-label">STEP ${i+1}</span><div class="cashout-label">CASHOUT</div></div>`;if(i<data.length-1)w.innerHTML+=`<div class="road-connector"></div>`;container.appendChild(w);});}
         
         function resetPenaltyUI(burn){
             if(burn) burnAttempt();
@@ -466,16 +444,14 @@
             if(activeGame==='mines')document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
             if(activeGame==='chicken'){document.querySelectorAll('.road-step').forEach(el=>el.classList.remove('safe','final'));document.getElementById('chicken-road-container').scrollLeft=0;}
             
-            let stepsEn=["CONNECTING...","ANALYZING...","PREDICTING..."];
-            let stepsAr=["جار الاتصال...","تحليل البيانات...","جاري التوقع..."];
-            let i=0;btn.innerText= curLang === 'ar' ? stepsAr[0] : stepsEn[0];
+            let steps=["CONNECTING...","ANALYZING...","PREDICTING..."];if(curLang==='ar')steps=["جار الاتصال","تحليل","تنبؤ"];let i=0;btn.innerText=steps[0];
             
-            const delay = Math.floor(Math.random() * 2000) + 2000; 
+            // SMART RANDOM DELAY
+            const delay = Math.floor(Math.random() * 2000) + 2000; // 2.0s - 4.0s
             
             const t=setInterval(()=>{
                 triggerHaptic('pulse');
                 i++;
-                const steps = curLang === 'ar' ? stepsAr : stepsEn;
                 if(i < steps.length) btn.innerText=steps[i];
             }, 600);
 
@@ -497,7 +473,8 @@
                 function animate(time) { 
                     progress = (time - start) / duration; if(progress>1) progress=1; 
                     drawAviatorFrame(progress); 
-                    val = 1.00 + (final - 1.00) * (progress); 
+                    // COUNTER UP EFFECT
+                    val = 1.00 + (final - 1.00) * (progress); // Linear progression for text
                     if(val > final) val = final; 
                     txt.innerText=val.toFixed(2)+"x"; 
                     if(progress<1) avAnimId=requestAnimationFrame(animate); else { cooldown(btn); } 
@@ -539,9 +516,12 @@
                     } else {
                         const el=document.getElementById('rs-'+k);
                         el.classList.add('safe');
+                        
+                        // AUTO SCROLL ANIMATION (FIXED for iOS/Android)
                         const wrapper = el.parentElement;
                         const centerPos = wrapper.offsetLeft - (c.clientWidth / 2) + (wrapper.offsetWidth / 2);
                         c.scrollTo({ left: centerPos, behavior: 'smooth' });
+                        
                         triggerHaptic('click');
                         k++;
                     }
@@ -588,7 +568,7 @@
         function cooldown(btn){
             let s=4;
             const t=setInterval(()=>{
-                btn.innerText=`${trans[curLang].wait} ${s}s`;s--;
+                btn.innerText=`WAIT ${s}s`;s--;
                 if(s<0){
                     clearInterval(t);
                     if(attemptsLeft <= 0) { document.getElementById('lock-modal').style.display = 'flex'; triggerHaptic('error'); return; }
