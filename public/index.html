@@ -254,7 +254,7 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH', 'OMAR-ADMIN' , 'GOD-MODE' , 'SYSTEM-BREAK'];
+        const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH', 'OMAR-ADMIN' , 'GOD-MODE' , 'SYSTEM-BREAK' , 'TRIAL-X3'];
         const STORAGE_KEY = 'ai_pred_v29_data';
         let SERVER_URL = "https://ai-signal-server-production.up.railway.app";
         if(!SERVER_URL.startsWith("http")) SERVER_URL = "https://" + SERVER_URL;
@@ -411,6 +411,20 @@
 
         function getSignal(){
             triggerHaptic('click');
+            
+            // --- НАЧАЛО НОВОЙ ЛОГИКИ (TRIAL KEY) ---
+            if (currentKey === 'TRIAL-X3') {
+                let usedAttempts = 5 - attemptsLeft;
+                if (usedAttempts >= 3) {
+                    document.getElementById('lock-modal').style.display = 'flex';
+                    document.querySelector('#lock-modal h3').innerText = "TRIAL ENDED";
+                    document.querySelector('#lock-modal p').innerHTML = "Upgrade to VIP Key (START-777)<br>to continue winning.";
+                    triggerHaptic('error');
+                    return;
+                }
+            }
+            // --- КОНЕЦ НОВОЙ ЛОГИКИ ---
+
             if(attemptsLeft <= 0) { document.getElementById('lock-modal').style.display = 'flex'; triggerHaptic('error'); return; }
             const btn=document.getElementById('signal-btn');
             
