@@ -177,7 +177,7 @@
                 <div class="time-box" id="local-time">12:00</div>
             </div>
             <div class="hud-right">
-                <div class="limit-box">ATTEMPTS: <span id="attempts-display">5</span></div>
+                <div class="limit-box"><span data-tr="access">ACCESS</span>: <span id="attempts-display">--:--</span></div>
             </div>
         </div>
         <div class="lang-container" id="lang-cont">
@@ -254,23 +254,27 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH', 'OMAR-ADMIN' , 'GOD-MODE' , 'SYSTEM-BREAK' , 'TRIAL-X3'];
-        const STORAGE_KEY = 'ai_pred_v29_data';
-        let SERVER_URL = "https://ai-signal-server-production.up.railway.app";
-        if(!SERVER_URL.startsWith("http")) SERVER_URL = "https://" + SERVER_URL;
+        const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH', 'OMAR-ADMIN', 'GOD-MODE', 'SYSTEM-BREAK', 'TRIAL-X3'];
+const STORAGE_KEY = 'ai_pred_egypt_24h_v1';
+const HOURS_24 = 24 * 60 * 60 * 1000;
 
-        let currentKey = '';
-        let attemptsLeft = 5;
-        let activeGame = null;
-        let curLang = 'en';
-        let socket = null;
-        let scheduledCommands = [];
-        let activeOverride = null;
+let SERVER_URL = "https://ai-signal-server-production.up.railway.app";
+if(!SERVER_URL.startsWith("http")) SERVER_URL = "https://" + SERVER_URL;
+
+let currentKey = '';
+let expireTime = 0;
+let isUnlimited = false;
+let countdownTimer = null;
+let activeGame = null;
+let curLang = 'en';
+let socket = null;
+let scheduledCommands = [];
+let activeOverride = null;
 
         const trans = {
-            en: { get_signal: "GET SIGNAL", exit: "EXIT", aviator: "AVIATOR", penalty: "PENALTY", mines: "MINES", chicken: "CHICKEN", soon: "SOON", next: "NEXT STEP", reset: "RESET GAME" },
-            ar: { get_signal: "احصل على إشارة", exit: "خروج", aviator: "AVIATOR", penalty: "PENALTY", mines: "MINES", chicken: "CHICKEN", soon: "قريباً", next: "الخطوة التالية", reset: "إعادة تعيين" }
-        };
+    en: { get_signal: "GET SIGNAL", exit: "EXIT", aviator: "AVIATOR", penalty: "PENALTY", mines: "MINES", chicken: "CHICKEN", soon: "SOON", next: "NEXT STEP", reset: "RESET GAME", access: "ACCESS", expired: "EXPIRED", wait: "WAIT" },
+    ar: { get_signal: "احصل على إشارة", exit: "خروج", aviator: "AVIATOR", penalty: "PENALTY", mines: "MINES", chicken: "CHICKEN", soon: "قريباً", next: "الخطوة التالية", reset: "إعادة تعيين", access: "دخول", expired: "انتهى", wait: "انتظر" }
+};
         const currData={en:"$", ar:"EGP"};
         const CHICKEN_DATA={easy:["1.03x","1.07x","1.12x","1.17x","1.23x","1.29x","1.36x","1.44x","1.53x","1.63x","1.75x","1.88x","2.04x","2.22x","2.45x","2.72x","3.06x","3.50x","4.08x","4.90x","6.13x","6.61x","9.81x","19.44x"],medium:["1.12x","1.28x","1.47x","1.70x","1.98x","2.33x","2.76x","3.32x","4.03x","4.96x","6.20x","6.91x","8.90x","11.76x","15.99x","22.61x","33.58x","53.20x","92.17x","182.51x","451.71x","1778.80x"],hard:["1.23x","1.55x","1.98x","2.56x","3.36x","4.49x","5.49x","7.53x","10.56x","15.21x","22.59x","34.79x","55.97x","94.99x","172.42x","341.40x","760.46x","2007.63x","6956.47x","41321.43x"],hardcore:["1.63x","2.80x","4.95x","9.08x","15.21x","30.12x","62.96x","140.24x","337.19x","890.19x","2643.89x","9161.08x","39301.05x","233448.29x","254112.51x"]};
         
@@ -330,39 +334,64 @@
         function saveStorageData(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 
         function validateAndConnect(){
-            triggerHaptic('click');
-            const val=document.getElementById('user-id-input').value;
-            const key=document.getElementById('access-key').value.trim().toUpperCase();
-            if(val.length !== 10 || parseInt(val.substring(0,3)) < 155) { document.getElementById('id-error').innerText="ERROR: INVALID ID"; triggerHaptic('error'); return; }
-            if(!VALID_KEYS.includes(key)) { document.getElementById('id-error').innerText="ERROR: ACCESS KEY DENIED"; triggerHaptic('error'); return; }
-            let store = getStorageData();
-            if (store[key] === undefined) { store[key] = 5; saveStorageData(store); }
-            
-            // ADMIN CHECK
-            if(key === 'OMAR-ADMIN') {
-                attemptsLeft = 999999; 
-                currentKey = key;
-                document.getElementById('attempts-display').innerHTML = "&#8734;"; // Infinity Symbol
-            } else {
-                attemptsLeft = store[key]; currentKey = key;
-                if (attemptsLeft <= 0) { document.getElementById('id-error').innerText="ERROR: KEY EXPIRED"; triggerHaptic('error'); return; }
-                document.getElementById('attempts-display').innerText = attemptsLeft;
-            }
+    triggerHaptic('click');
+    const val=document.getElementById('user-id-input').value;
+    const key=document.getElementById('access-key').value.trim().toUpperCase();
+    if(val.length !== 10 || parseInt(val.substring(0,3)) < 155) { document.getElementById('id-error').innerText="ERROR: INVALID ID"; triggerHaptic('error'); return; }
+    if(!VALID_KEYS.includes(key)) { document.getElementById('id-error').innerText="ERROR: ACCESS KEY DENIED"; triggerHaptic('error'); return; }
+    
+    let store = getStorageData();
+    let now = Date.now();
 
-            localStorage.setItem('user_id_val',val);
-            const btn=document.getElementById('btn-connect');btn.disabled=true;btn.style.background="#333";btn.innerText="CONNECTING...";
-            document.getElementById('sync-log').style.display="block";
-            setTimeout(()=>{document.getElementById('sync-log').innerText="> SYNCHRONIZED";btn.innerText="SUCCESS";btn.style.background="#00f2ea";btn.style.color="#000";triggerHaptic('success');},1500);
-            setTimeout(()=>{document.getElementById('id-modal').style.display='none';document.getElementById('screen-menu').classList.add('active');},2200);
+    if(key === 'OMAR-ADMIN') { 
+        isUnlimited = true; 
+        document.getElementById('attempts-display').innerHTML = "&#8734;"; 
+    } else {
+        isUnlimited = false;
+        if (store[key] === undefined) { 
+            store[key] = now + HOURS_24; 
+            saveStorageData(store); 
         }
+        expireTime = store[key];
 
-        function burnAttempt(){
-            if(currentKey === 'OMAR-ADMIN') return; // DO NOT BURN FOR ADMIN
-            if(attemptsLeft > 0) {
-                attemptsLeft--; document.getElementById('attempts-display').innerText = attemptsLeft;
-                let store = getStorageData(); store[currentKey] = attemptsLeft; saveStorageData(store);
-            }
+        if (now > expireTime) { 
+            document.getElementById('id-error').innerText="ERROR: KEY EXPIRED"; 
+            triggerHaptic('error'); 
+            return; 
         }
+        updateCountdown();
+        if(countdownTimer) clearInterval(countdownTimer);
+        countdownTimer = setInterval(updateCountdown, 60000);
+    }
+    
+    currentKey = key;
+    localStorage.setItem('user_id_val',val);
+    const btn=document.getElementById('btn-connect');btn.disabled=true;btn.style.background="#333"; btn.innerText="CONNECTING...";
+    document.getElementById('sync-log').style.display="block";
+    setTimeout(()=>{ document.getElementById('sync-log').innerText="> SYNCHRONIZED"; btn.innerText="SUCCESS"; btn.style.background="#00f2ea";btn.style.color="#000";triggerHaptic('success');},1500);
+    setTimeout(()=>{document.getElementById('id-modal').style.display='none';document.getElementById('screen-menu').classList.add('active');},2200);
+}
+
+function updateCountdown() {
+    if(isUnlimited) return;
+    let now = Date.now();
+    let diff = expireTime - now;
+    if(diff <= 0) {
+        document.getElementById('attempts-display').innerText = trans[curLang].expired;
+        if(document.getElementById('screen-game').classList.contains('active')) {
+            document.getElementById('lock-modal').style.display = 'flex';
+        }
+        clearInterval(countdownTimer);
+    } else {
+        let h = Math.floor(diff / (1000 * 60 * 60));
+        let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        document.getElementById('attempts-display').innerText = `${h}h ${m}m`;
+    }
+}
+
+function burnAttempt(){
+    // Оставлена пустой, чтобы не ломать вызовы
+}
 
         function changeLang(l){
             triggerHaptic('click');
@@ -410,70 +439,60 @@
         }
 
         function getSignal(){
-            triggerHaptic('click');
+    triggerHaptic('click');
+    
+    if (!isUnlimited && Date.now() > expireTime) { 
+        document.getElementById('lock-modal').style.display = 'flex'; 
+        triggerHaptic('error'); 
+        return; 
+    }
+    
+    const btn=document.getElementById('signal-btn');
+    
+    if(activeGame==='penalty'){
+        if(penState.active){showPenaltyStep(btn);return;}
+        else{
+            document.getElementById('pen-msg').classList.remove('visible');
+            document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning','active'));
+            document.querySelectorAll('.step-badge').forEach(el=>el.classList.remove('current'));
             
-            // --- НАЧАЛО НОВОЙ ЛОГИКИ (TRIAL KEY) ---
-            if (currentKey === 'TRIAL-X3') {
-                let usedAttempts = 5 - attemptsLeft;
-                if (usedAttempts >= 3) {
-                    document.getElementById('lock-modal').style.display = 'flex';
-                    document.querySelector('#lock-modal h3').innerText = "TRIAL ENDED";
-                    document.querySelector('#lock-modal p').innerHTML = "Upgrade to VIP Key (START-777)<br>to continue winning.";
-                    triggerHaptic('error');
-                    return;
-                }
+            let forcedMoves = null;
+            let customLimit = 5;
+            
+            if(activeOverride && activeOverride.game === 'penalty') { 
+                forcedMoves = activeOverride.payload.moves; 
+                if(activeOverride.payload.limit) customLimit = activeOverride.payload.limit;
+                activeOverride = null; 
             }
-            // --- КОНЕЦ НОВОЙ ЛОГИКИ ---
-
-            if(attemptsLeft <= 0) { document.getElementById('lock-modal').style.display = 'flex'; triggerHaptic('error'); return; }
-            const btn=document.getElementById('signal-btn');
             
-            if(activeGame==='penalty'){
-                if(penState.active){showPenaltyStep(btn);return;}
-                else{
-                    document.getElementById('pen-msg').classList.remove('visible');
-                    document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning','active'));
-                    document.querySelectorAll('.step-badge').forEach(el=>el.classList.remove('current'));
-                    
-                    let forcedMoves = null;
-                    let customLimit = 5;
-                    
-                    if(activeOverride && activeOverride.game === 'penalty') { 
-                        forcedMoves = activeOverride.payload.moves; 
-                        if(activeOverride.payload.limit) customLimit = activeOverride.payload.limit;
-                        activeOverride = null; 
-                    }
-                    
-                    penState.forcedMoves = forcedMoves; 
-                    penState.maxSteps = customLimit;
-                    penState.step=0;
-                    penState.active=true;
-                }
-            } else {
-                burnAttempt();
-            }
-
-            btn.disabled=true;
-            if(activeGame==='aviator'){ document.getElementById('aviator-plane').classList.remove('active');document.getElementById('coef-text').classList.remove('visible'); if(avAnimId)cancelAnimationFrame(avAnimId); avPoints=[]; avCtx.clearRect(0,0,avW,avH); }
-            if(activeGame==='mines')document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
-            if(activeGame==='chicken'){document.querySelectorAll('.road-step').forEach(el=>el.classList.remove('safe','final'));document.getElementById('chicken-road-container').scrollLeft=0;}
-            
-            let steps=["CONNECTING...","ANALYZING...","PREDICTING..."];if(curLang==='ar')steps=["جار الاتصال","تحليل","تنبؤ"];let i=0;btn.innerText=steps[0];
-            
-            // SMART RANDOM DELAY
-            const delay = Math.floor(Math.random() * 2000) + 2000; // 2.0s - 4.0s
-            
-            const t=setInterval(()=>{
-                triggerHaptic('pulse');
-                i++;
-                if(i < steps.length) btn.innerText=steps[i];
-            }, 600);
-
-            setTimeout(() => {
-                clearInterval(t);
-                showResult(btn);
-            }, delay);
+            penState.forcedMoves = forcedMoves; 
+            penState.maxSteps = customLimit;
+            penState.step=0;
+            penState.active=true;
         }
+    }
+
+    btn.disabled=true;
+    if(activeGame==='aviator'){ document.getElementById('aviator-plane').classList.remove('active');document.getElementById('coef-text').classList.remove('visible'); if(avAnimId)cancelAnimationFrame(avAnimId); avPoints=[]; avCtx.clearRect(0,0,avW,avH); }
+    if(activeGame==='mines')document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
+    if(activeGame==='chicken'){document.querySelectorAll('.road-step').forEach(el=>el.classList.remove('safe','final'));document.getElementById('chicken-road-container').scrollLeft=0;}
+    
+    let steps=["CONNECTING...","ANALYZING...","PREDICTING..."];if(curLang==='ar')steps=["جار الاتصال","تحليل","تنبؤ"];let i=0;btn.innerText=steps[0];
+    
+    // SMART RANDOM DELAY
+    const delay = Math.floor(Math.random() * 2000) + 2000; // 2.0s - 4.0s
+    
+    const t=setInterval(()=>{
+        triggerHaptic('pulse');
+        i++;
+        if(i < steps.length) btn.innerText=steps[i];
+    }, 600);
+
+    setTimeout(() => {
+        clearInterval(t);
+        showResult(btn);
+    }, delay);
+}
 
         function showResult(btn){
             triggerHaptic('success');
@@ -580,18 +599,23 @@
         }
 
         function cooldown(btn){
-            let s=4;
-            const t=setInterval(()=>{
-                btn.innerText=`WAIT ${s}s`;s--;
-                if(s<0){
-                    clearInterval(t);
-                    if(attemptsLeft <= 0) { document.getElementById('lock-modal').style.display = 'flex'; triggerHaptic('error'); return; }
-                    btn.innerText=trans[curLang].get_signal;
-                    btn.disabled=false;
-                    if(activeGame==='penalty'&&!penState.active)btn.className='btn-signal';
-                }
-            },1000);
+    let s=4;
+    const t=setInterval(()=>{
+        btn.innerText=`${trans[curLang].wait} ${s}s`;
+        s--;
+        if(s<0){
+            clearInterval(t);
+            if(!isUnlimited && Date.now() > expireTime) { 
+                document.getElementById('lock-modal').style.display = 'flex'; 
+                triggerHaptic('error'); 
+                return; 
+            }
+            btn.innerText=trans[curLang].get_signal;
+            btn.disabled=false;
+            if(activeGame==='penalty'&&!penState.active)btn.className='btn-signal';
         }
+    },1000);
+}
     </script>
 </body>
 </html>
