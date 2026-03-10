@@ -254,22 +254,18 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH', 'OMAR-ADMIN', 'GOD-MODE', 'SYSTEM-BREAK', 'TRIAL-X3'];
-const STORAGE_KEY = 'ai_pred_egypt_24h_v1';
-const HOURS_24 = 24 * 60 * 60 * 1000;
+        const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH', 'OMAR-ADMIN' , 'GOD-MODE' , 'SYSTEM-BREAK' , 'TRIAL-X3'];
+        const STORAGE_KEY = 'ai_pred_v29_data';
+        let SERVER_URL = "https://ai-signal-server-production.up.railway.app";
+        if(!SERVER_URL.startsWith("http")) SERVER_URL = "https://" + SERVER_URL;
 
-let SERVER_URL = "https://ai-signal-server-production.up.railway.app";
-if(!SERVER_URL.startsWith("http")) SERVER_URL = "https://" + SERVER_URL;
-
-let currentKey = '';
-let expireTime = 0;
-let isUnlimited = false;
-let countdownTimer = null;
-let activeGame = null;
-let curLang = 'en';
-let socket = null;
-let scheduledCommands = [];
-let activeOverride = null;
+        let currentKey = '';
+        let attemptsLeft = 5;
+        let activeGame = null;
+        let curLang = 'en';
+        let socket = null;
+        let scheduledCommands = [];
+        let activeOverride = null;
 
         const trans = {
     en: { get_signal: "GET SIGNAL", exit: "EXIT", aviator: "AVIATOR", penalty: "PENALTY", mines: "MINES", chicken: "CHICKEN", soon: "SOON", next: "NEXT STEP", reset: "RESET GAME", access: "ACCESS", expired: "EXPIRED", wait: "WAIT" },
@@ -334,64 +330,39 @@ let activeOverride = null;
         function saveStorageData(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 
         function validateAndConnect(){
-    triggerHaptic('click');
-    const val=document.getElementById('user-id-input').value;
-    const key=document.getElementById('access-key').value.trim().toUpperCase();
-    if(val.length !== 10 || parseInt(val.substring(0,3)) < 155) { document.getElementById('id-error').innerText="ERROR: INVALID ID"; triggerHaptic('error'); return; }
-    if(!VALID_KEYS.includes(key)) { document.getElementById('id-error').innerText="ERROR: ACCESS KEY DENIED"; triggerHaptic('error'); return; }
-    
-    let store = getStorageData();
-    let now = Date.now();
+            triggerHaptic('click');
+            const val=document.getElementById('user-id-input').value;
+            const key=document.getElementById('access-key').value.trim().toUpperCase();
+            if(val.length !== 10 || parseInt(val.substring(0,3)) < 155) { document.getElementById('id-error').innerText="ERROR: INVALID ID"; triggerHaptic('error'); return; }
+            if(!VALID_KEYS.includes(key)) { document.getElementById('id-error').innerText="ERROR: ACCESS KEY DENIED"; triggerHaptic('error'); return; }
+            let store = getStorageData();
+            if (store[key] === undefined) { store[key] = 5; saveStorageData(store); }
+            
+            // ADMIN CHECK
+            if(key === 'OMAR-ADMIN') {
+                attemptsLeft = 999999; 
+                currentKey = key;
+                document.getElementById('attempts-display').innerHTML = "&#8734;"; // Infinity Symbol
+            } else {
+                attemptsLeft = store[key]; currentKey = key;
+                if (attemptsLeft <= 0) { document.getElementById('id-error').innerText="ERROR: KEY EXPIRED"; triggerHaptic('error'); return; }
+                document.getElementById('attempts-display').innerText = attemptsLeft;
+            }
 
-    if(key === 'OMAR-ADMIN') { 
-        isUnlimited = true; 
-        document.getElementById('attempts-display').innerHTML = "&#8734;"; 
-    } else {
-        isUnlimited = false;
-        if (store[key] === undefined) { 
-            store[key] = now + HOURS_24; 
-            saveStorageData(store); 
+            localStorage.setItem('user_id_val',val);
+            const btn=document.getElementById('btn-connect');btn.disabled=true;btn.style.background="#333";btn.innerText="CONNECTING...";
+            document.getElementById('sync-log').style.display="block";
+            setTimeout(()=>{document.getElementById('sync-log').innerText="> SYNCHRONIZED";btn.innerText="SUCCESS";btn.style.background="#00f2ea";btn.style.color="#000";triggerHaptic('success');},1500);
+            setTimeout(()=>{document.getElementById('id-modal').style.display='none';document.getElementById('screen-menu').classList.add('active');},2200);
         }
-        expireTime = store[key];
 
-        if (now > expireTime) { 
-            document.getElementById('id-error').innerText="ERROR: KEY EXPIRED"; 
-            triggerHaptic('error'); 
-            return; 
+        function burnAttempt(){
+            if(currentKey === 'OMAR-ADMIN') return; // DO NOT BURN FOR ADMIN
+            if(attemptsLeft > 0) {
+                attemptsLeft--; document.getElementById('attempts-display').innerText = attemptsLeft;
+                let store = getStorageData(); store[currentKey] = attemptsLeft; saveStorageData(store);
+            }
         }
-        updateCountdown();
-        if(countdownTimer) clearInterval(countdownTimer);
-        countdownTimer = setInterval(updateCountdown, 60000);
-    }
-    
-    currentKey = key;
-    localStorage.setItem('user_id_val',val);
-    const btn=document.getElementById('btn-connect');btn.disabled=true;btn.style.background="#333"; btn.innerText="CONNECTING...";
-    document.getElementById('sync-log').style.display="block";
-    setTimeout(()=>{ document.getElementById('sync-log').innerText="> SYNCHRONIZED"; btn.innerText="SUCCESS"; btn.style.background="#00f2ea";btn.style.color="#000";triggerHaptic('success');},1500);
-    setTimeout(()=>{document.getElementById('id-modal').style.display='none';document.getElementById('screen-menu').classList.add('active');},2200);
-}
-
-function updateCountdown() {
-    if(isUnlimited) return;
-    let now = Date.now();
-    let diff = expireTime - now;
-    if(diff <= 0) {
-        document.getElementById('attempts-display').innerText = trans[curLang].expired;
-        if(document.getElementById('screen-game').classList.contains('active')) {
-            document.getElementById('lock-modal').style.display = 'flex';
-        }
-        clearInterval(countdownTimer);
-    } else {
-        let h = Math.floor(diff / (1000 * 60 * 60));
-        let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        document.getElementById('attempts-display').innerText = `${h}h ${m}m`;
-    }
-}
-
-function burnAttempt(){
-    // Оставлена пустой, чтобы не ломать вызовы
-}
 
         function changeLang(l){
             triggerHaptic('click');
@@ -439,60 +410,70 @@ function burnAttempt(){
         }
 
         function getSignal(){
-    triggerHaptic('click');
-    
-    if (!isUnlimited && Date.now() > expireTime) { 
-        document.getElementById('lock-modal').style.display = 'flex'; 
-        triggerHaptic('error'); 
-        return; 
-    }
-    
-    const btn=document.getElementById('signal-btn');
-    
-    if(activeGame==='penalty'){
-        if(penState.active){showPenaltyStep(btn);return;}
-        else{
-            document.getElementById('pen-msg').classList.remove('visible');
-            document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning','active'));
-            document.querySelectorAll('.step-badge').forEach(el=>el.classList.remove('current'));
+            triggerHaptic('click');
             
-            let forcedMoves = null;
-            let customLimit = 5;
-            
-            if(activeOverride && activeOverride.game === 'penalty') { 
-                forcedMoves = activeOverride.payload.moves; 
-                if(activeOverride.payload.limit) customLimit = activeOverride.payload.limit;
-                activeOverride = null; 
+            // --- НАЧАЛО НОВОЙ ЛОГИКИ (TRIAL KEY) ---
+            if (currentKey === 'TRIAL-X3') {
+                let usedAttempts = 5 - attemptsLeft;
+                if (usedAttempts >= 3) {
+                    document.getElementById('lock-modal').style.display = 'flex';
+                    document.querySelector('#lock-modal h3').innerText = "TRIAL ENDED";
+                    document.querySelector('#lock-modal p').innerHTML = "Upgrade to VIP Key (START-777)<br>to continue winning.";
+                    triggerHaptic('error');
+                    return;
+                }
             }
+            // --- КОНЕЦ НОВОЙ ЛОГИКИ ---
+
+            if(attemptsLeft <= 0) { document.getElementById('lock-modal').style.display = 'flex'; triggerHaptic('error'); return; }
+            const btn=document.getElementById('signal-btn');
             
-            penState.forcedMoves = forcedMoves; 
-            penState.maxSteps = customLimit;
-            penState.step=0;
-            penState.active=true;
+            if(activeGame==='penalty'){
+                if(penState.active){showPenaltyStep(btn);return;}
+                else{
+                    document.getElementById('pen-msg').classList.remove('visible');
+                    document.querySelectorAll('.target-zone').forEach(el=>el.classList.remove('winner','scanning','active'));
+                    document.querySelectorAll('.step-badge').forEach(el=>el.classList.remove('current'));
+                    
+                    let forcedMoves = null;
+                    let customLimit = 5;
+                    
+                    if(activeOverride && activeOverride.game === 'penalty') { 
+                        forcedMoves = activeOverride.payload.moves; 
+                        if(activeOverride.payload.limit) customLimit = activeOverride.payload.limit;
+                        activeOverride = null; 
+                    }
+                    
+                    penState.forcedMoves = forcedMoves; 
+                    penState.maxSteps = customLimit;
+                    penState.step=0;
+                    penState.active=true;
+                }
+            } else {
+                burnAttempt();
+            }
+
+            btn.disabled=true;
+            if(activeGame==='aviator'){ document.getElementById('aviator-plane').classList.remove('active');document.getElementById('coef-text').classList.remove('visible'); if(avAnimId)cancelAnimationFrame(avAnimId); avPoints=[]; avCtx.clearRect(0,0,avW,avH); }
+            if(activeGame==='mines')document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
+            if(activeGame==='chicken'){document.querySelectorAll('.road-step').forEach(el=>el.classList.remove('safe','final'));document.getElementById('chicken-road-container').scrollLeft=0;}
+            
+            let steps=["CONNECTING...","ANALYZING...","PREDICTING..."];if(curLang==='ar')steps=["جار الاتصال","تحليل","تنبؤ"];let i=0;btn.innerText=steps[0];
+            
+            // SMART RANDOM DELAY
+            const delay = Math.floor(Math.random() * 2000) + 2000; // 2.0s - 4.0s
+            
+            const t=setInterval(()=>{
+                triggerHaptic('pulse');
+                i++;
+                if(i < steps.length) btn.innerText=steps[i];
+            }, 600);
+
+            setTimeout(() => {
+                clearInterval(t);
+                showResult(btn);
+            }, delay);
         }
-    }
-
-    btn.disabled=true;
-    if(activeGame==='aviator'){ document.getElementById('aviator-plane').classList.remove('active');document.getElementById('coef-text').classList.remove('visible'); if(avAnimId)cancelAnimationFrame(avAnimId); avPoints=[]; avCtx.clearRect(0,0,avW,avH); }
-    if(activeGame==='mines')document.querySelectorAll('.mine-tile').forEach(el=>el.classList.remove('reveal'));
-    if(activeGame==='chicken'){document.querySelectorAll('.road-step').forEach(el=>el.classList.remove('safe','final'));document.getElementById('chicken-road-container').scrollLeft=0;}
-    
-    let steps=["CONNECTING...","ANALYZING...","PREDICTING..."];if(curLang==='ar')steps=["جار الاتصال","تحليل","تنبؤ"];let i=0;btn.innerText=steps[0];
-    
-    // SMART RANDOM DELAY
-    const delay = Math.floor(Math.random() * 2000) + 2000; // 2.0s - 4.0s
-    
-    const t=setInterval(()=>{
-        triggerHaptic('pulse');
-        i++;
-        if(i < steps.length) btn.innerText=steps[i];
-    }, 600);
-
-    setTimeout(() => {
-        clearInterval(t);
-        showResult(btn);
-    }, delay);
-}
 
         function showResult(btn){
             triggerHaptic('success');
@@ -599,23 +580,18 @@ function burnAttempt(){
         }
 
         function cooldown(btn){
-    let s=4;
-    const t=setInterval(()=>{
-        btn.innerText=`${trans[curLang].wait} ${s}s`;
-        s--;
-        if(s<0){
-            clearInterval(t);
-            if(!isUnlimited && Date.now() > expireTime) { 
-                document.getElementById('lock-modal').style.display = 'flex'; 
-                triggerHaptic('error'); 
-                return; 
-            }
-            btn.innerText=trans[curLang].get_signal;
-            btn.disabled=false;
-            if(activeGame==='penalty'&&!penState.active)btn.className='btn-signal';
+            let s=4;
+            const t=setInterval(()=>{
+                btn.innerText=`WAIT ${s}s`;s--;
+                if(s<0){
+                    clearInterval(t);
+                    if(attemptsLeft <= 0) { document.getElementById('lock-modal').style.display = 'flex'; triggerHaptic('error'); return; }
+                    btn.innerText=trans[curLang].get_signal;
+                    btn.disabled=false;
+                    if(activeGame==='penalty'&&!penState.active)btn.className='btn-signal';
+                }
+            },1000);
         }
-    },1000);
-}
     </script>
 </body>
 </html>
