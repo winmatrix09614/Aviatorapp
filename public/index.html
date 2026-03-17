@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI PREDICTOR v2.1</title>
+    <title>AI PREDICTOR v2.2.1</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Poppins:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
@@ -181,7 +181,7 @@
             </div>
         </div>
         <div class="lang-container" id="lang-cont">
-            <select onchange="changeLang(this.value)" id="lang-select"><option value="en">🇬🇧 EN</option><option value="ar">🇦🇪 AR</option></select>
+            <select onchange="changeLang(this.value)" id="lang-select"><option value="en">🇬🇧 EN</option><option value="ar">🇩🇿 AR</option></select>
             <div id="session-id">SID: ...</div>
         </div>
         <div id="id-modal" class="modal-overlay">
@@ -197,7 +197,7 @@
         <div id="screen-menu" class="screen">
             <div class="main-logo">
                 <div class="logo-title">AI PREDICTOR</div>
-                <div class="brand-sub">POWERED BY <span>OMAR v2.1</span></div>
+                <div class="brand-sub">POWERED BY <span>OMAR v2.2.1</span></div>
             </div>
             <div class="menu-grid">
                 <div class="game-card" onclick="openGame('aviator')"><img src="img/menu_aviator.png" class="game-img"><div class="game-title" data-tr="aviator">AVIATOR</div></div>
@@ -210,17 +210,17 @@
         </div>
         <div id="screen-game" class="screen">
             <div id="aviator-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
-                <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/aviator_logo.png" class="game-logo-hero"></div>
+                <div class="game-header"><a href="https://t.me/OmarDZsupport_bot" class="telegram-link">@OmarDZsupport_bot</a><img src="img/aviator_logo.png" class="game-logo-hero"></div>
                 <div class="aviator-wrapper"><canvas id="aviator-canvas"></canvas><img src="img/plane.png" id="aviator-plane" class="aviator-plane-img"><div class="coef-text" id="coef-text">0.00x</div></div>
             </div>
             <div id="penalty-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
-                <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/menu_penalty.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
+                <div class="game-header"><a href="https://t.me/OmarDZsupport_bot" class="telegram-link">@OmarDZsupport_bot</a><img src="img/menu_penalty.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
                 <div class="penalty-strategy" id="pen-strat"><span class="step-badge" id="ps-1">1</span><span class="step-badge" id="ps-2">2</span><span class="step-badge" id="ps-3">3</span><span class="step-badge" id="ps-4">4</span><span class="step-badge" id="ps-5">5</span></div>
                 <div class="cashout-msg" id="pen-msg">CASHOUT NOW!</div>
                 <div class="penalty-container"><div class="target-zone z1" id="pz1"><div class="target-effect"></div></div><div class="target-zone z2" id="pz2"><div class="target-effect"></div></div><div class="target-zone z3" id="pz3"><div class="target-effect"></div></div><div class="target-zone z4" id="pz4"><div class="target-effect"></div></div><div class="target-zone z5" id="pz5"><div class="target-effect"></div></div></div>
             </div>
             <div id="mines-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
-                <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/menu_mines.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
+                <div class="game-header"><a href="https://t.me/OmarDZsupport_bot" class="telegram-link">@OmarDZsupport_bot</a><img src="img/menu_mines.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
                 <div class="mines-wrapper" id="mines-wrap">
                     <div class="mines-mode-switch" id="mines-mode" data-mode="safe"><div class="mode-bg"></div><div class="mode-opt active" onclick="setMinesMode('safe')">SAFE</div><div class="mode-opt" onclick="setMinesMode('risk')">HIGH RISK</div></div>
                     <div class="mines-grid-select"><div class="mines-btn-grid active" id="btn-3" onclick="setMinesGrid(3)">3x3</div><div class="mines-btn-grid" id="btn-5" onclick="setMinesGrid(5)">5x5</div></div>
@@ -229,7 +229,7 @@
                 </div>
             </div>
             <div id="chicken-view" style="display:none;width:100%;flex-direction:column;align-items:center;">
-                <div class="game-header"><a href="https://t.me/Omarsupportbot" class="telegram-link">@Omarsupportbot</a><img src="img/menu_chicken.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
+                <div class="game-header"><a href="https://t.me/OmarDZsupport_bot" class="telegram-link">@OmarDZsupport_bot</a><img src="img/menu_chicken.png" class="game-logo-hero" style="width:60px;height:60px;border-radius:12px;"></div>
                 <div class="chicken-wrapper"><div style="width:100%;text-align:right;margin-bottom:10px;"><select id="chicken-diff" onchange="renderChickenRoad()" style="padding:8px 15px;background:#333;color:white;border:1px solid #555;border-radius:8px;"><option value="easy">EASY</option><option value="medium" selected>MEDIUM</option><option value="hard">HARD</option><option value="hardcore">HARDCORE</option></select></div><div class="chicken-road-horizontal" id="chicken-road-container"></div></div>
             </div>
             <button id="signal-btn" class="btn-signal" onclick="getSignal()" data-tr="get_signal">GET SIGNAL</button>
@@ -241,7 +241,7 @@
                 <div class="lock-icon">🛑</div>
                 <h3 style="color:var(--brand-red);font-family:'Orbitron';margin-bottom:5px;">SESSION EXPIRED</h3>
                 <p style="font-size:12px;color:#888;">Security Limit Reached (0 attempts).<br>Get a new key from Omar.</p>
-                <button class="id-btn" style="background:#333; color:#fff;" onclick="window.location.href='https://t.me/Omarsupportbot'">CONTACT OMAR</button>
+                <button class="id-btn" style="background:#333; color:#fff;" onclick="window.location.href='https://t.me/OmarDZsupport_bot'">CONTACT OMAR</button>
             </div>
         </div>
         <div id="live-sheet" class="live-sheet"><div class="sheet-handle" onclick="toggleLiveWins()"><div class="sheet-title">🏆 LIVE WINS <span id="last-win-name"></span></div><div class="sheet-icon">▲</div></div><div class="sheet-content" id="live-list"></div></div>
@@ -254,7 +254,7 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-EGYPT', 'BOSS-LEVEL', 'FINAL-GLITCH', 'OMAR-ADMIN' , 'GOD-MODE' , 'SYSTEM-BREAK' , 'TRIAL-X3'];
+        const VALID_KEYS = ['START-777', 'WIN-2024', 'VIP-DZD', 'BOSS-LEVEL', 'FINAL-GLITCH', 'OMAR-ADMIN' , 'GOD-MODE' , 'SYSTEM-BREAK' , 'TRIAL-X3'];
         const STORAGE_KEY = 'ai_pred_v29_data';
         let SERVER_URL = "https://ai-signal-server-production.up.railway.app";
         if(!SERVER_URL.startsWith("http")) SERVER_URL = "https://" + SERVER_URL;
@@ -271,7 +271,7 @@
     en: { get_signal: "GET SIGNAL", exit: "EXIT", aviator: "AVIATOR", penalty: "PENALTY", mines: "MINES", chicken: "CHICKEN", soon: "SOON", next: "NEXT STEP", reset: "RESET GAME", access: "ACCESS", expired: "EXPIRED", wait: "WAIT" },
     ar: { get_signal: "احصل على إشارة", exit: "خروج", aviator: "AVIATOR", penalty: "PENALTY", mines: "MINES", chicken: "CHICKEN", soon: "قريباً", next: "الخطوة التالية", reset: "إعادة تعيين", access: "دخول", expired: "انتهى", wait: "انتظر" }
 };
-        const currData={en:"$", ar:"EGP"};
+        const currData={en:"$", ar:"DZD"};
         const CHICKEN_DATA={easy:["1.03x","1.07x","1.12x","1.17x","1.23x","1.29x","1.36x","1.44x","1.53x","1.63x","1.75x","1.88x","2.04x","2.22x","2.45x","2.72x","3.06x","3.50x","4.08x","4.90x","6.13x","6.61x","9.81x","19.44x"],medium:["1.12x","1.28x","1.47x","1.70x","1.98x","2.33x","2.76x","3.32x","4.03x","4.96x","6.20x","6.91x","8.90x","11.76x","15.99x","22.61x","33.58x","53.20x","92.17x","182.51x","451.71x","1778.80x"],hard:["1.23x","1.55x","1.98x","2.56x","3.36x","4.49x","5.49x","7.53x","10.56x","15.21x","22.59x","34.79x","55.97x","94.99x","172.42x","341.40x","760.46x","2007.63x","6956.47x","41321.43x"],hardcore:["1.63x","2.80x","4.95x","9.08x","15.21x","30.12x","62.96x","140.24x","337.19x","890.19x","2643.89x","9161.08x","39301.05x","233448.29x","254112.51x"]};
         
         let penState={step:0,maxSteps:0,active:false};
