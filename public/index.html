@@ -33,7 +33,6 @@
         .hud-right { display: flex; align-items: center; pointer-events: auto; gap: 8px; }
         .balance-box { font-family: 'Orbitron'; font-size: 12px; font-weight: bold; color: var(--brand-green); border: 1px solid var(--brand-green); padding: 4px 8px; border-radius: 6px; background: rgba(0,0,0,0.6); text-shadow: 0 0 5px var(--brand-green); }
         
-        /* Кнопка вывода в хедере */
         .header-withdraw-btn { background: linear-gradient(90deg, #00ff41, #00b32d); color: #000; font-family: 'Orbitron'; font-size: 10px; font-weight: bold; border: none; border-radius: 6px; padding: 5px 10px; cursor: pointer; box-shadow: 0 0 8px rgba(0, 255, 65, 0.4); text-transform: uppercase; transition: 0.2s; }
         .header-withdraw-btn:active { transform: scale(0.95); }
 
@@ -50,7 +49,6 @@
         } 
         .screen.active { display:flex; }
         
-        /* BRANDING STYLES */
         .main-logo { text-align:center; margin-bottom:30px; margin-top: 40px; }
         .logo-title { font-family:'Orbitron'; font-weight:900; font-size:32px; color:#fff; text-shadow:0 0 20px rgba(0,242,234,0.5); letter-spacing:2px; }
         
@@ -91,6 +89,9 @@
         
         .btn-reset-game { background: #333; color: #fff; font-family:'Orbitron'; font-weight:900; font-size:14px; width: 60%; padding: 12px; border:1px solid #555; border-radius: 10px; margin-top: 10px; cursor: pointer; display: none; text-transform: uppercase; }
         
+        .btn-withdraw { background: linear-gradient(90deg, #00ff41, #00b32d); color: #000; font-family:'Orbitron'; font-weight:900; font-size:16px; width: 85%; max-width:320px; padding: 16px; border:none; border-radius: 14px; margin-top: 10px; cursor: pointer; display: none; box-shadow: 0 0 20px rgba(0, 255, 65, 0.4); text-transform: uppercase; animation: popIn 0.3s; }
+        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
         .btn-back { margin-top:15px; margin-bottom: 40px; background:transparent; border: 1px solid var(--brand-red); color: var(--brand-red); padding: 10px 30px; border-radius: 20px; font-size: 11px; font-weight: bold; font-family:'Orbitron'; cursor:pointer; z-index:100; flex-shrink: 0; transition: 0.3s; box-shadow: 0 0 10px rgba(255, 51, 75, 0.1); }
         .btn-back:active { transform: scale(0.95); background: rgba(255, 51, 75, 0.1); box-shadow: 0 0 20px rgba(255, 51, 75, 0.4); }
         
@@ -275,13 +276,18 @@
         let avCtx, avCanvas, avW, avH, avAnimId;
         let avPoints = []; let avP0, avP1, avP2, avP3;
         
-        // VIRTUAL BALANCE SYSTEM
-        let vBalance = 0;
+        // VIRTUAL BALANCE SYSTEM (С сохранением в браузере)
+        let vBalance = parseInt(localStorage.getItem('guru_vBalance')) || 0;
 
         function addVirtualBalance() {
             // Рандом от 50 000 до 100 000
             let winAmt = Math.floor(Math.random() * (100000 - 50000 + 1)) + 50000;
             vBalance += winAmt;
+            
+            // Сохраняем в память
+            localStorage.setItem('guru_vBalance', vBalance);
+            
+            // Обновляем текст на экране
             document.getElementById('v-balance').innerText = vBalance.toLocaleString('ko-KR');
         }
 
@@ -302,6 +308,9 @@
         }
 
         window.onload=function(){
+            // ОТОБРАЖЕНИЕ СОХРАНЕННОГО БАЛАНСА ПРИ ЗАГРУЗКЕ
+            document.getElementById('v-balance').innerText = vBalance.toLocaleString('ko-KR');
+
             // Dynamic Online Count
             let currentOnline = Math.floor(Math.random() * (4219 - 2724 + 1)) + 2724;
             document.getElementById('online-users').innerText = currentOnline;
@@ -373,7 +382,6 @@
             const p=['155','156','157'][Math.floor(Math.random()*3)];
             const id=`${p}****${Math.floor(Math.random()*90)+10}`;
             
-            // Фейковые победы в вонах (например, от 50,000 до 300,000)
             const amt = Math.floor(Math.random() * (300000 - 50000 + 1)) + 50000; 
             const curr = '₩';
             const isBig = amt > 150000;
